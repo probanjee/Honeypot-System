@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HR Portal – Nowhere Esports (Admin)</title>
+  <meta name="description" content="Admin HR portal for team roster management, leave requests, and documents" />
+  <link rel="stylesheet" href="../../css/base.css" />
+  <link rel="stylesheet" href="../../css/layout.css" />
+  <link rel="stylesheet" href="../../css/animations.css" />
+  <style>
+    .admin-banner {
+      background: rgba(255,0,128,0.08);
+      border: 1px solid rgba(255,0,128,0.25);
+      border-radius: 12px;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 28px;
+      font-size: 13px;
+      color: var(--neon-pink);
+    }
+    .tab-bar {
+      display: flex; gap: 4px; margin-bottom: 24px;
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 4px;
+      width: fit-content;
+    }
+    .tab-btn {
+      padding: 8px 20px; border-radius: 9px; border: none;
+      font-size: 13px; font-weight: 600; cursor: pointer;
+      background: transparent; color: var(--text-secondary);
+      transition: var(--transition);
+    }
+    .tab-btn.active {
+      background: rgba(0,229,255,0.12);
+      color: var(--neon-cyan);
+      border: 1px solid rgba(0,229,255,0.2);
+    }
+    .user-table { width: 100%; border-collapse: collapse; }
+    .user-table th {
+      text-align: left; padding: 12px 16px;
+      font-size: 11px; color: var(--text-muted); text-transform: uppercase;
+      letter-spacing: 0.1em; border-bottom: 1px solid var(--border);
+    }
+    .user-table td {
+      padding: 14px 16px; font-size: 13px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+    }
+    .user-table tr:hover td { background: rgba(0,229,255,0.02); }
+    .leave-card {
+      padding: 16px 20px; border-radius: 12px;
+      background: var(--bg-card); border: 1px solid var(--border);
+      display: grid; grid-template-columns: 1fr auto auto auto;
+      gap: 16px; align-items: center;
+      transition: var(--transition);
+    }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <aside class="sidebar" id="sidebar"></aside>
+    <main class="main-content fade-in" id="hr-content">
+      <div class="page-header">
+        <div>
+          <h1 style="font-size: 28px; letter-spacing: 0.05em;">HR PORTAL</h1>
+          <p class="text-secondary" style="margin-top: 4px; font-size: 13px;">Team roster, leave management &amp; documents</p>
+        </div>
+      </div>
+
+      <div class="admin-banner">
+        🔒 <strong>Admin Access Required</strong> — This portal is restricted to Admin and Coach roles.
+      </div>
+
+      <!-- Tabs -->
+      <div class="tab-bar">
+        <button class="tab-btn active" onclick="switchTab('roster', this)">👥 Roster</button>
+        <button class="tab-btn" onclick="switchTab('leave', this)">📅 Leave Requests</button>
+        <button class="tab-btn" onclick="switchTab('docs', this)">📄 Documents</button>
+      </div>
+
+      <!-- ROSTER TAB -->
+      <div class="tab-panel active glass" id="tab-roster" style="overflow-x: auto;">
+        <div style="padding: 20px; display: flex; justify-content: space-between; align-items: center;">
+          <h3 style="font-size: 16px;">Team Roster (12 Members)</h3>
+          <button class="btn btn-primary" style="font-size: 12px; padding: 8px 18px;">+ Add Member</button>
+        </div>
+        <table class="user-table">
+          <thead>
+            <tr>
+              <th>Player / Name</th>
+              <th>Role</th>
+              <th>Team</th>
+              <th>Status</th>
+              <th>Joined</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="roster-table"></tbody>
+        </table>
+      </div>
+
+      <!-- LEAVE TAB -->
+      <div class="tab-panel" id="tab-leave">
+        <div style="display: flex; flex-direction: column; gap: 12px;" id="leave-list"></div>
+      </div>
+
+      <!-- DOCS TAB -->
+      <div class="tab-panel glass p-24" id="tab-docs">
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px;" id="docs-grid"></div>
+      </div>
+    </main>
+  </div>
+
+  <script src="../../js/utils.js"></script>
+  <script src="../../js/auth.js"></script>
+  <script>
+    function switchTab(id, btn) {
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById(`tab-${id}`).classList.add('active');
+      btn.classList.add('active');
+    }
+
+    const ROSTER = [
+      { ign: 'ShadowByte', name: 'Arjun Mehta',    role: 'Player', team: 'CS2 – A', status: 'Active', joined: 'Jan 2024' },
+      { ign: 'NullVoid',   name: 'Priya Kapoor',   role: 'IGL',    team: 'CS2 – A', status: 'Active', joined: 'Mar 2023' },
+      { ign: 'GlitchX',   name: 'Rahul Verma',    role: 'AWPer',  team: 'CS2 – A', status: 'Active', joined: 'Jun 2023' },
+      { ign: 'PacketLoss', name: 'Sneha Rao',      role: 'Support',team: 'CS2 – A', status: 'Active', joined: 'Aug 2023' },
+      { ign: 'RootKit',   name: 'Dev Sharma',     role: 'Lurker', team: 'CS2 – A', status: 'Active', joined: 'Nov 2023' },
+      { ign: 'Pixel',     name: 'Anjali Singh',   role: 'Coach',  team: 'CS2 – A', status: 'Active', joined: 'Feb 2023' },
+      { ign: 'VortexX',   name: 'Karan Gupta',    role: 'Player', team: 'Valorant', status: 'Active', joined: 'May 2024' },
+    ];
+
+    const LEAVES = [
+      { name: 'Arjun Mehta',  type: 'Medical Leave',   dates: 'May 14-16', status: 'pending',  reason: 'Doctor appointment' },
+      { name: 'Rahul Verma',  type: 'Personal Leave',  dates: 'May 20-21', status: 'approved', reason: 'Family event' },
+      { name: 'Sneha Rao',    type: 'Tournament Away', dates: 'May 18-19', status: 'pending',  reason: 'Regional qualifiers' },
+    ];
+
+    const DOCS = [
+      { name: 'Team Contract',     icon: '📋', type: 'PDF',  size: '2.4 MB' },
+      { name: 'NDA Agreement',     icon: '🔏', type: 'PDF',  size: '1.1 MB' },
+      { name: 'Sponsorship Deck',  icon: '📊', type: 'PPTX', size: '8.7 MB' },
+      { name: 'Player Handbook',   icon: '📖', type: 'PDF',  size: '3.2 MB' },
+      { name: 'Brand Kit',         icon: '🎨', type: 'ZIP',  size: '45 MB'  },
+      { name: 'Travel Policy',     icon: '✈️', type: 'PDF',  size: '0.8 MB' },
+    ];
+
+    document.getElementById('roster-table').innerHTML = ROSTER.map(r => `
+      <tr>
+        <td>
+          <div style="font-weight:700;font-family:'Rajdhani',sans-serif;color:var(--neon-cyan);">${r.ign}</div>
+          <div style="font-size:12px;color:var(--text-muted);">${r.name}</div>
+        </td>
+        <td><span class="badge badge-purple">${r.role}</span></td>
+        <td style="color:var(--text-secondary)">${r.team}</td>
+        <td><span class="badge badge-success">● ${r.status}</span></td>
+        <td style="color:var(--text-muted);font-size:12px;">${r.joined}</td>
+        <td style="display:flex;gap:8px;">
+          <button class="btn btn-outline" style="padding:4px 12px;font-size:11px;">Edit</button>
+          <button class="btn btn-danger" style="padding:4px 12px;font-size:11px;">Remove</button>
+        </td>
+      </tr>
+    `).join('');
+
+    document.getElementById('leave-list').innerHTML = LEAVES.map(l => `
+      <div class="leave-card">
+        <div>
+          <div style="font-weight:700;font-size:14px;">${l.name}</div>
+          <div style="font-size:12px;color:var(--text-muted);margin-top:2px;">${l.type} · ${l.dates}</div>
+          <div style="font-size:12px;color:var(--text-secondary);margin-top:4px;">"${l.reason}"</div>
+        </div>
+        <span class="badge ${l.status === 'approved' ? 'badge-success' : 'badge-warning'}">${l.status}</span>
+        ${l.status === 'pending' ? `
+          <button class="btn btn-primary" style="padding:6px 14px;font-size:12px;">Approve</button>
+          <button class="btn btn-danger" style="padding:6px 14px;font-size:12px;">Deny</button>
+        ` : '<span></span><span></span>'}
+      </div>
+    `).join('');
+
+    document.getElementById('docs-grid').innerHTML = DOCS.map(d => `
+      <div class="glass p-20 hover-float" style="cursor:pointer;text-align:center;">
+        <div style="font-size:36px;margin-bottom:12px;">${d.icon}</div>
+        <div style="font-weight:700;font-size:13px;margin-bottom:4px;">${d.name}</div>
+        <div style="font-size:11px;color:var(--text-muted);">${d.type} · ${d.size}</div>
+        <button class="btn btn-outline" style="margin-top:12px;padding:6px 16px;font-size:11px;width:100%;">⬇ Download</button>
+      </div>
+    `).join('');
+  </script>
+</body>
+</html>

@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: http-honeypot
+  namespace: honeypot
+  labels:
+    app: http-honeypot
+spec:
+  selector:
+    matchLabels:
+      app: http-honeypot
+  template:
+    metadata:
+      labels:
+        app: http-honeypot
+    spec:
+      hostNetwork: false
+      containers:
+        - name: http-honeypot
+          image: honeypot-http:latest
+          ports:
+            - containerPort: 8080
+              hostPort: 8080
+          env:
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: "kafka-service:9092"
+            - name: HTTP_PORT
+              value: "8080"
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "64Mi"
+            limits:
+              cpu: "200m"
+              memory: "128Mi"
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: ssh-honeypot
+  namespace: honeypot
+  labels:
+    app: ssh-honeypot
+spec:
+  selector:
+    matchLabels:
+      app: ssh-honeypot
+  template:
+    metadata:
+      labels:
+        app: ssh-honeypot
+    spec:
+      hostNetwork: false
+      containers:
+        - name: ssh-honeypot
+          image: honeypot-ssh:latest
+          ports:
+            - containerPort: 2222
+              hostPort: 2222
+          env:
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              value: "kafka-service:9092"
+            - name: SSH_PORT
+              value: "2222"
+          resources:
+            requests:
+              cpu: "50m"
+              memory: "64Mi"
+            limits:
+              cpu: "200m"
+              memory: "128Mi"

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nowhere Esports | Login</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #0d0d12; color: #fff; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .login-box { background: #1a1a24; padding: 40px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.5); width: 100%; max-width: 400px; position: relative; }
+        h2 { margin-top: 0; color: #00ff88; text-align: center; }
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; margin-bottom: 8px; font-size: 14px; color: #a0a0b0; }
+        .input-group input { width: 100%; padding: 10px; box-sizing: border-box; background: #0d0d12; border: 1px solid #333; color: #fff; border-radius: 4px; }
+        button { width: 100%; padding: 12px; background: #00ff88; color: #000; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        button:hover { background: #00cc6a; }
+        .badge { position: absolute; top: -10px; right: -10px; background: red; color: white; padding: 5px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; box-shadow: 0 0 10px red; }
+    </style>
+</head>
+<body>
+    <div class="login-box">
+        <div class="badge">⚠ Honeypot Active</div>
+        <h2>Sign In to Nowhere</h2>
+        <form id="loginForm">
+            <div class="input-group">
+                <label for="email">Email Address</label>
+                <input type="email" id="email" required placeholder="player@nowhere.gg">
+            </div>
+            <div class="input-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" required placeholder="••••••••">
+            </div>
+            <button type="submit">Sign In</button>
+        </form>
+    </div>
+    <script src="login.js"></script>
+</body>
+</html>

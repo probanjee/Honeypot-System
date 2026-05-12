@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Match Schedule – Nowhere Esports</title>
+  <meta name="description" content="View upcoming and past match schedule for Nowhere Esports team" />
+  <link rel="stylesheet" href="../../css/base.css" />
+  <link rel="stylesheet" href="../../css/layout.css" />
+  <link rel="stylesheet" href="../../css/animations.css" />
+  <style>
+    .schedule-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 28px;
+    }
+    .month-nav { display: flex; align-items: center; gap: 16px; }
+    .month-btn {
+      width: 36px; height: 36px;
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 8px; color: var(--text-primary);
+      cursor: pointer; font-size: 18px; display: flex;
+      align-items: center; justify-content: center;
+      transition: var(--transition);
+    }
+    .month-btn:hover { border-color: var(--neon-cyan); color: var(--neon-cyan); }
+
+    .match-list { display: flex; flex-direction: column; gap: 12px; }
+    .match-row {
+      display: grid;
+      grid-template-columns: 140px 1fr auto 1fr 120px 100px;
+      gap: 16px;
+      align-items: center;
+      padding: 20px 24px;
+      border-radius: 14px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      transition: var(--transition);
+    }
+    .match-row:hover {
+      border-color: rgba(0,229,255,0.2);
+      background: rgba(0,229,255,0.03);
+    }
+    .match-row.live {
+      border-color: rgba(57,255,20,0.3);
+      background: rgba(57,255,20,0.04);
+      animation: livePulse 2s ease-in-out infinite;
+    }
+    .team-name {
+      font-weight: 700;
+      font-size: 15px;
+      font-family: 'Rajdhani', sans-serif;
+      letter-spacing: 0.05em;
+    }
+    .score {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--neon-cyan);
+      text-align: center;
+      min-width: 80px;
+    }
+    .score-vs {
+      font-size: 12px;
+      color: var(--text-muted);
+      letter-spacing: 0.1em;
+    }
+    .match-game-tag {
+      font-size: 11px;
+      padding: 3px 10px;
+      border-radius: 6px;
+      background: rgba(168,85,247,0.12);
+      color: var(--neon-purple);
+      border: 1px solid rgba(168,85,247,0.25);
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
+    .filter-bar { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+    .filter-btn {
+      padding: 6px 16px; border-radius: 8px;
+      font-size: 12px; font-weight: 600; cursor: pointer;
+      background: var(--bg-card); border: 1px solid var(--border);
+      color: var(--text-secondary); transition: var(--transition);
+    }
+    .filter-btn.active, .filter-btn:hover {
+      border-color: var(--neon-cyan); color: var(--neon-cyan);
+      background: rgba(0,229,255,0.07);
+    }
+  </style>
+</head>
+<body>
+  <div class="app-layout">
+    <!-- Sidebar injected by JS -->
+    <aside class="sidebar" id="sidebar"></aside>
+
+    <main class="main-content fade-in">
+      <div class="page-header">
+        <div>
+          <h1 style="font-size: 28px; letter-spacing: 0.05em;">MATCH SCHEDULE</h1>
+          <p class="text-secondary" style="margin-top: 4px; font-size: 13px;">Upcoming matches, results, and streams</p>
+        </div>
+        <div class="filter-bar" style="margin-bottom: 0;">
+          <button class="filter-btn active" onclick="filterMatches('all', this)">All</button>
+          <button class="filter-btn" onclick="filterMatches('upcoming', this)">Upcoming</button>
+          <button class="filter-btn" onclick="filterMatches('live', this)">Live</button>
+          <button class="filter-btn" onclick="filterMatches('completed', this)">Completed</button>
+        </div>
+      </div>
+
+      <!-- Live ticker banner -->
+      <div id="live-ticker" style="overflow: hidden; background: rgba(57,255,20,0.05); border: 1px solid rgba(57,255,20,0.2); border-radius: 10px; padding: 10px 0; margin-bottom: 24px;">
+        <div class="ticker-track" id="ticker-content" style="display: inline-flex; gap: 40px; padding: 0 20px; font-size: 13px; font-family: 'JetBrains Mono', monospace; color: var(--neon-green);">
+          <span>🟢 LIVE: NW Esports vs Team Alpha — CS2 — 14:7</span>
+          <span>🔔 UPCOMING: NW vs Phoenix — Valorant — May 12 20:00 IST</span>
+          <span>✅ RESULT: NW beat Spectral 2-1 in BGMI Regional</span>
+        </div>
+      </div>
+
+      <!-- Filter bar -->
+      <div class="filter-bar">
+        <button class="filter-btn active" onclick="filterGame('all', this)">All Games</button>
+        <button class="filter-btn" onclick="filterGame('cs2', this)">CS2</button>
+        <button class="filter-btn" onclick="filterGame('valorant', this)">Valorant</button>
+        <button class="filter-btn" onclick="filterGame('bgmi', this)">BGMI</button>
+        <button class="filter-btn" onclick="filterGame('dota2', this)">Dota 2</button>
+      </div>
+
+      <!-- Match list -->
+      <div class="match-list" id="match-list"></div>
+    </main>
+  </div>
+
+  <script src="../../js/utils.js"></script>
+  <script src="../../js/auth.js"></script>
+  <script>
+    const MATCHES = [
+      { id: 1, status: 'live',      game: 'cs2',     team1: 'NW Esports', team2: 'Team Alpha',   score: '14 : 7',  date: 'LIVE NOW',          stream: '#' },
+      { id: 2, status: 'upcoming',  game: 'valorant', team1: 'NW Esports', team2: 'Phoenix Corp', score: 'vs',      date: 'May 12 · 20:00 IST', stream: '' },
+      { id: 3, status: 'upcoming',  game: 'bgmi',     team1: 'NW Esports', team2: 'Spectral',     score: 'vs',      date: 'May 13 · 18:30 IST', stream: '' },
+      { id: 4, status: 'completed', game: 'cs2',      team1: 'NW Esports', team2: 'Shadow5',      score: '16 : 9',  date: 'May 9 · 21:00 IST',  stream: '' },
+      { id: 5, status: 'completed', game: 'valorant', team1: 'NW Esports', team2: 'Infinity',     score: '13 : 6',  date: 'May 7 · 19:00 IST',  stream: '' },
+      { id: 6, status: 'completed', game: 'dota2',    team1: 'NW Esports', team2: 'Titan Blades',  score: '2 : 0',   date: 'May 5 · 17:00 IST',  stream: '' },
+      { id: 7, status: 'upcoming',  game: 'dota2',    team1: 'NW Esports', team2: 'Renegades',    score: 'vs',      date: 'May 15 · 16:00 IST', stream: '' },
+    ];
+
+    const GAME_LABELS = { cs2: 'CS2', valorant: 'VALORANT', bgmi: 'BGMI', dota2: 'DOTA 2' };
+
+    let currentStatusFilter = 'all';
+    let currentGameFilter = 'all';
+
+    function renderMatches() {
+      const list = document.getElementById('match-list');
+      const filtered = MATCHES.filter(m => {
+        const statusOk = currentStatusFilter === 'all' || m.status === currentStatusFilter;
+        const gameOk = currentGameFilter === 'all' || m.game === currentGameFilter;
+        return statusOk && gameOk;
+      });
+
+      if (filtered.length === 0) {
+        list.innerHTML = '<div style="text-align:center;padding:60px;color:var(--text-muted);font-size:14px;">No matches found for the selected filters</div>';
+        return;
+      }
+
+      list.innerHTML = filtered.map(m => {
+        const statusBadge = m.status === 'live'
+          ? '<span class="badge badge-success live-badge">🟢 LIVE</span>'
+          : m.status === 'upcoming'
+          ? '<span class="badge badge-info">Upcoming</span>'
+          : '<span class="badge badge-purple">Completed</span>';
+
+        const scoreEl = m.status === 'live'
+          ? `<div class="score neon-text-green">${m.score}</div>`
+          : m.status === 'completed'
+          ? `<div class="score">${m.score}</div>`
+          : `<div class="score" style="color:var(--text-muted);font-size:14px;">vs</div>`;
+
+        const streamBtn = m.status === 'live' || m.status === 'upcoming'
+          ? `<a href="${m.stream || '#'}" class="btn btn-outline" style="padding:6px 16px;font-size:12px;">
+              ${m.status === 'live' ? '📺 WATCH' : '🔔 REMIND'}
+            </a>`
+          : `<span class="text-muted" style="font-size:12px;">—</span>`;
+
+        return `
+          <div class="match-row ${m.status === 'live' ? 'live' : ''}">
+            <div style="display:flex;align-items:center;gap:8px;">
+              ${statusBadge}
+            </div>
+            <div>
+              <div class="team-name">${m.team1}</div>
+              <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">Nowhere Esports</div>
+            </div>
+            ${scoreEl}
+            <div>
+              <div class="team-name">${m.team2}</div>
+              <div style="font-size:11px;color:var(--text-muted);margin-top:2px;">Opponent</div>
+            </div>
+            <div>
+              <span class="match-game-tag">${GAME_LABELS[m.game]}</span>
+              <div style="font-size:11px;color:var(--text-muted);margin-top:6px;">${m.date}</div>
+            </div>
+            ${streamBtn}
+          </div>
+        `;
+      }).join('');
+    }
+
+    function filterMatches(status, btn) {
+      currentStatusFilter = status;
+      document.querySelectorAll('.schedule-header .filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderMatches();
+    }
+
+    function filterGame(game, btn) {
+      currentGameFilter = game;
+      document.querySelectorAll('.filter-bar:not(.schedule-header .filter-bar) .filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderMatches();
+    }
+
+    renderMatches();
+
+    // SSE for live updates
+    if (typeof EventSource !== 'undefined') {
+      const sse = new EventSource('/matches/live/sse');
+      sse.onmessage = (e) => {
+        const data = JSON.parse(e.data);
+        const idx = MATCHES.findIndex(m => m.id === data.id);
+        if (idx !== -1) { MATCHES[idx] = { ...MATCHES[idx], ...data }; renderMatches(); }
+      };
+    }
+  </script>
+</body>
+</html>

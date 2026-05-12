@@ -1,0 +1,12 @@
+log_level: DEBUG
+rate_limit: 1000/min
+feature_flags:
+  mock_external_apis: true
+  enable_geoip: true
+  enable_websockets: true
+database:
+  pool_size: 20
+  max_overflow: 10
+kafka:
+  consumer_group: honeypot-dev
+  auto_offset_reset: earliest

@@ -1,0 +1,281 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Theme Tokens ───────────────────────────────────── */
+:root {
+  --neon-green: #00ff88;
+  --neon-blue: #00d4ff;
+  --neon-red: #ff003c;
+  --neon-amber: #ffaa00;
+  --transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ── Dark Theme (default) ───────────────────────────── */
+html.dark {
+  --bg-base: #050508;
+  --bg-surface: #0c0c12;
+  --bg-card: rgba(255, 255, 255, 0.03);
+  --border: rgba(255, 255, 255, 0.08);
+  --text-1: #f0f0f5;
+  --text-2: #8b8b99;
+  --text-3: #52525f;
+  --sidebar-bg: rgba(8, 8, 14, 0.85);
+}
+
+/* ── Light Theme ────────────────────────────────────── */
+html.light {
+  --bg-base: #f0f2f8;
+  --bg-surface: #ffffff;
+  --bg-card: rgba(0, 0, 0, 0.03);
+  --border: rgba(0, 0, 0, 0.1);
+  --text-1: #111118;
+  --text-2: #555563;
+  --text-3: #aaaab8;
+  --sidebar-bg: rgba(255, 255, 255, 0.9);
+}
+
+/* ── Base ────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--bg-base);
+  color: var(--text-1);
+  transition: var(--transition);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+}
+
+html.dark body {
+  background-image:
+    radial-gradient(ellipse 80% 60% at 20% -5%, rgba(0, 212, 255, 0.06) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 40% at 80% 110%, rgba(0, 255, 136, 0.05) 0%, transparent 55%);
+}
+
+/* ── Glass card ──────────────────────────────────────── */
+.glass {
+  background: var(--bg-card);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  transition: var(--transition);
+}
+
+.glass:hover {
+  border-color: rgba(0, 212, 255, 0.2);
+  box-shadow: 0 0 0 1px rgba(0, 212, 255, 0.08), 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+/* ── Sidebar ─────────────────────────────────────────── */
+.sidebar {
+  background: var(--sidebar-bg);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-right: 1px solid var(--border);
+  transition: var(--transition);
+}
+
+/* ── Nav link ────────────────────────────────────────── */
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-2);
+  transition: var(--transition);
+  text-decoration: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.nav-link::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--neon-blue);
+  opacity: 0;
+  transition: var(--transition);
+}
+
+.nav-link:hover {
+  color: var(--text-1);
+  background: var(--bg-card);
+}
+
+.nav-link.active {
+  color: var(--neon-blue);
+  background: rgba(0, 212, 255, 0.08);
+  border: 1px solid rgba(0, 212, 255, 0.18);
+}
+
+.nav-link.active svg {
+  filter: drop-shadow(0 0 6px var(--neon-blue));
+}
+
+/* ── Stat card ───────────────────────────────────────── */
+.stat-card {
+  position: relative;
+  overflow: hidden;
+  transition: var(--transition);
+}
+
+.stat-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 16px;
+  opacity: 0;
+  transition: var(--transition);
+}
+
+.stat-card:hover {
+  transform: translateY(-3px);
+}
+
+.stat-card.red::after {
+  background: radial-gradient(circle at top left, rgba(255, 0, 60, 0.1), transparent 60%);
+  opacity: 1;
+}
+
+.stat-card.green::after {
+  background: radial-gradient(circle at top left, rgba(0, 255, 136, 0.1), transparent 60%);
+  opacity: 1;
+}
+
+.stat-card.blue::after {
+  background: radial-gradient(circle at top left, rgba(0, 212, 255, 0.1), transparent 60%);
+  opacity: 1;
+}
+
+/* ── Neon text ───────────────────────────────────────── */
+.neon-green {
+  color: var(--neon-green);
+  text-shadow: 0 0 12px rgba(0, 255, 136, 0.5);
+}
+
+.neon-blue {
+  color: var(--neon-blue);
+  text-shadow: 0 0 12px rgba(0, 212, 255, 0.5);
+}
+
+.neon-red {
+  color: var(--neon-red);
+  text-shadow: 0 0 12px rgba(255, 0, 60, 0.5);
+}
+
+/* ── Theme toggle ────────────────────────────────────── */
+.theme-toggle {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  border-radius: 999px;
+  cursor: pointer;
+  border: none;
+  padding: 0;
+  outline: none;
+  flex-shrink: 0;
+  transition: var(--transition);
+}
+
+html.dark .theme-toggle {
+  background: rgba(0, 212, 255, 0.15);
+  border: 1px solid rgba(0, 212, 255, 0.3);
+}
+
+html.light .theme-toggle {
+  background: rgba(255, 170, 0, 0.15);
+  border: 1px solid rgba(255, 170, 0, 0.4);
+}
+
+.theme-toggle-thumb {
+  position: absolute;
+  top: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  transition: var(--transition);
+}
+
+html.dark .theme-toggle-thumb {
+  left: 3px;
+  background: var(--neon-blue);
+  box-shadow: 0 0 8px var(--neon-blue);
+}
+
+html.light .theme-toggle-thumb {
+  left: 23px;
+  background: var(--neon-amber);
+  box-shadow: 0 0 8px var(--neon-amber);
+}
+
+/* ── Pulse dot ───────────────────────────────────────── */
+.pulse-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--neon-green);
+  box-shadow: 0 0 0 0 rgba(0, 255, 136, 0.5);
+  animation: pulse-ring 2s ease-out infinite;
+}
+
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 255, 136, 0.5);
+  }
+
+  70% {
+    box-shadow: 0 0 0 8px rgba(0, 255, 136, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 255, 136, 0);
+  }
+}
+
+/* ── Monospace text ──────────────────────────────────── */
+.mono {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* ── Fade-in for rows ────────────────────────────────── */
+@keyframes row-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.row-animate {
+  animation: row-in 0.4s ease forwards;
+}
+
+/* ── Scrollbar ───────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 999px;
+}

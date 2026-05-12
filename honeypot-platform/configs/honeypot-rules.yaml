@@ -1,0 +1,65 @@
+ssh_banner: "SSH-2.0-OpenSSH_8.9p1 Ubuntu-3ubuntu0.6"
+http_responses:
+  404: "<html><head><title>404 Not Found</title></head><body><center><h1>404 Not Found</h1></center><hr><center>nginx/1.18.0 (Ubuntu)</center></body></html>"
+  200: "<html><head><title>Index of /</title></head><body><h1>Index of /</h1><hr><pre><a href=\"../\">../</a>\n<a href=\"config/\">config/</a>\n<a href=\"backup/\">backup/</a>\n<a href=\"admin/\">admin/</a>\n<a href=\"db/\">db/</a></pre><hr></body></html>"
+
+attack_signatures:
+  - name: "SQL Injection"
+    pattern: "('|\"|;|--|union.*select|select.*from|insert\\s+into|drop\\s+table|alter\\s+table)"
+    weight: 25
+
+  - name: "SQL Injection Advanced"
+    pattern: "(benchmark\\s*\\(|sleep\\s*\\(|waitfor\\s+delay|pg_sleep|information_schema)"
+    weight: 30
+
+  - name: "XSS"
+    pattern: "(<script|javascript:|onerror=|onload=|<img\\s+src=x|<svg.*onload|alert\\()"
+    weight: 20
+
+  - name: "Path Traversal"
+    pattern: "(\\.\\./|\\.\\./\\./|\\.\\.\\\\/|%2e%2e%2f|%252e%252e%252f|/etc/passwd|/etc/shadow|C:\\\\Windows\\\\System32)"
+    weight: 35
+
+  - name: "Command Injection"
+    pattern: "(;\\s*(ls|cat|id|whoami|uname|wget|curl|bash|sh|python)|&&|\\|\\||`[^`]+`|\\$\\([^)]+\\))"
+    weight: 40
+
+  - name: "Log4Shell (CVE-2021-44228)"
+    pattern: "(\\$\\{jndi:(ldap|rmi|dns|nis|iiop|corba|nds|http):)"
+    weight: 50
+
+  - name: "PHP Remote Code Execution"
+    pattern: "(eval\\s*\\(|base64_decode\\s*\\(|system\\s*\\(|passthru\\s*\\(|shell_exec\\s*\\(|popen\\s*\\(|proc_open\\s*\\()"
+    weight: 45
+
+  - name: "Shellshock (CVE-2014-6271)"
+    pattern: "(\\(\\s*\\)\\s*\\{\\s*[:;]\\s*\\}\\s*;)"
+    weight: 40
+
+  - name: "Sensitive File Access"
+    pattern: "(\\.env|\\.git/config|\\.aws/credentials|\\.ssh/id_rsa|wp-config\\.php|config\\.php|database\\.yml)"
+    weight: 30
+
+  - name: "NoSQL Injection"
+    pattern: "(\\$gt|\\$ne|\\$where|\\$regex|\\$or|\\$and|\\$nin|\\$exists)"
+    weight: 25
+
+  - name: "XML External Entity (XXE)"
+    pattern: "(<!ENTITY|SYSTEM\\s+[\"']file:|<!DOCTYPE.*\\[|<!\\[CDATA\\[)"
+    weight: 35
+
+  - name: "Server-Side Template Injection (SSTI)"
+    pattern: "(\\{\\{.*\\}\\}|\\{%.*%\\}|\\$\\{.*\\}|#\\{.*\\})"
+    weight: 30
+
+  - name: "Network Scanner Signature"
+    pattern: "(Nmap|Zgrab|Masscan|censys|shodan|nikto|nuclei|dirbuster|gobuster|feroxbuster)"
+    weight: 5
+
+  - name: "WordPress Attack"
+    pattern: "(wp-login|wp-admin|xmlrpc\\.php|wp-content/uploads|wp-includes)"
+    weight: 15
+
+  - name: "Credential Stuffing Keywords"
+    pattern: "(admin:admin|root:root|admin:password|test:test|pi:raspberry|admin:123456)"
+    weight: 20
