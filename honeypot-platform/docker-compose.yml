@@ -99,7 +99,7 @@ services:
       - redis
 
   threat-intel:
-    build: ./services/threat-intel
+    build: ./services/threat_intel
     environment:
       KAFKA_BOOTSTRAP_SERVERS: kafka:29092
       ABUSEIPDB_API_KEY: ${ABUSEIPDB_API_KEY}

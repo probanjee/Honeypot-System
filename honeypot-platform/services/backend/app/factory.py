@@ -27,12 +27,39 @@ def create_app():
 
     @app.on_event("startup")
     async def startup():
+        from app.core.config import settings
+        import logging
+        logger = logging.getLogger("backend-startup")
+        active_provider = "Supabase" if settings.USE_SUPABASE else "PostgreSQL (SQLAlchemy)"
+        logger.info(f"🗄️ Active Database Provider: {active_provider}")
+
         # Create tables
         async with engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
         
         # Start background task to consume enriched attacks and save to DB
         asyncio.create_task(consume_enriched_attacks())
+
+    @app.get("/health/database")
+    async def get_db_health():
+        from app.adapters.postgres_adapter import PostgresAdapter
+        from app.adapters.supabase_adapter import SupabaseAdapter
+        from app.core.config import settings
+        
+        postgres = PostgresAdapter()
+        supabase = SupabaseAdapter()
+        
+        postgres_status = await postgres.status()
+        supabase_status = await supabase.status()
+        
+        active_provider = "supabase" if settings.USE_SUPABASE else "postgres"
+        
+        return {
+            "status": "ok",
+            "active_provider": active_provider,
+            "postgres": postgres_status,
+            "supabase": supabase_status
+        }
 
     return app
 

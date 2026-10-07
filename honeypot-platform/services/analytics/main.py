@@ -46,7 +46,7 @@ class AnalyticsService:
         df['timestamp'] = pd.to_datetime(df['timestamp'])
         
         # Group by 10s intervals
-        counts = df.resample('10S', on='timestamp').count()['session_id']
+        counts = df.resample('10S', on='timestamp').size()
         
         if len(counts) < 5: return
         

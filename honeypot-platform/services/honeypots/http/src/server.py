@@ -5,7 +5,7 @@ from kafka import KafkaProducer
 
 sys.path.insert(0, "/app")
 
-from src.handlers import HTTPHoneypotHandler
+from handlers import HTTPHoneypotHandler
 
 KAFKA_SERVERS = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "localhost:9092")
 HTTP_PORT = int(os.getenv("HTTP_PORT", 8080))

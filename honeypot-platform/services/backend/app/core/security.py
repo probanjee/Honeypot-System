@@ -26,7 +26,8 @@ def create_jwt(data: dict, expires_delta: Optional[timedelta] = None) -> str:
 
 def decode_jwt(token: str) -> dict:
     try:
-        payload = jwt.decode(token, settings.JWT_SECRET, algorithms=[settings.ALGORITHM])
+        secret = settings.SUPABASE_JWT_SECRET if settings.USE_SUPABASE else settings.JWT_SECRET
+        payload = jwt.decode(token, secret, algorithms=[settings.ALGORITHM])
         return payload
     except JWTError:
         return {}

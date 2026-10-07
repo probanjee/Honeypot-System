@@ -1,8 +1,24 @@
 const Match = require('../models/Match.model');
+const supabase = require('../config/supabase');
 
 const getAllMatches = async (req, res) => {
     try {
         const { status, game, limit = 20 } = req.query;
+        
+        if (process.env.USE_SUPABASE === 'true') {
+            let query = supabase.from('matches').select('*').order('scheduled_at', { ascending: false }).limit(parseInt(limit));
+            if (status) query = query.eq('status', status);
+            
+            const { data, error } = await query;
+            if (error) return res.status(500).json({ error: error.message });
+            
+            const matches = data.map(m => ({
+                _id: m.id, team1: m.team_a, team2: m.team_b, score: m.score, status: m.status, startTime: m.scheduled_at,
+                gameTitle: m.score?.gameTitle || 'Unknown Game', streamUrl: m.score?.streamUrl || ''
+            }));
+            return res.json({ matches, count: matches.length });
+        }
+
         const filter = {};
         if (status) filter.status = status;
         if (game)   filter.gameTitle = new RegExp(game, 'i');
@@ -19,6 +35,15 @@ const getAllMatches = async (req, res) => {
 
 const getMatchById = async (req, res) => {
     try {
+        if (process.env.USE_SUPABASE === 'true') {
+            const { data, error } = await supabase.from('matches').select('*').eq('id', req.params.id).single();
+            if (error || !data) return res.status(404).json({ error: 'Match not found' });
+            return res.json({ match: {
+                _id: data.id, team1: data.team_a, team2: data.team_b, score: data.score, status: data.status, startTime: data.scheduled_at,
+                gameTitle: data.score?.gameTitle || 'Unknown Game', streamUrl: data.score?.streamUrl || ''
+            } });
+        }
+
         const match = await Match.findById(req.params.id).lean();
         if (!match) return res.status(404).json({ error: 'Match not found' });
         return res.json({ match });
@@ -33,6 +58,15 @@ const createMatch = async (req, res) => {
         if (!gameTitle || !team1 || !team2 || !startTime) {
             return res.status(400).json({ error: 'gameTitle, team1, team2, startTime are required' });
         }
+        
+        if (process.env.USE_SUPABASE === 'true') {
+            const { data, error } = await supabase.from('matches').insert([{
+                team_a: team1, team_b: team2, scheduled_at: startTime, status: 'scheduled', score: { gameTitle, streamUrl }
+            }]).select().single();
+            if (error) return res.status(500).json({ error: error.message });
+            return res.status(201).json({ match: data });
+        }
+
         const match = await Match.create({ gameTitle, team1, team2, startTime, streamUrl, status: 'upcoming' });
         return res.status(201).json({ match });
     } catch (err) {
@@ -43,12 +77,30 @@ const createMatch = async (req, res) => {
 const updateScore = async (req, res) => {
     try {
         const { score, status } = req.body;
+        
+        if (process.env.USE_SUPABASE === 'true') {
+            let updates = {};
+            if (score) updates.score = score;
+            if (status) updates.status = status;
+            
+            const { data, error } = await supabase.from('matches').update(updates).eq('id', req.params.id).select().single();
+            if (error || !data) return res.status(404).json({ error: 'Match not found' });
+            
+            const mappedMatch = {
+                _id: data.id, team1: data.team_a, team2: data.team_b, score: data.score, status: data.status, startTime: data.scheduled_at,
+                gameTitle: data.score?.gameTitle || 'Unknown Game', streamUrl: data.score?.streamUrl || ''
+            };
+            broadcastMatchUpdate(mappedMatch);
+            return res.json({ match: mappedMatch });
+        }
+
         const match = await Match.findByIdAndUpdate(
             req.params.id,
             { score, ...(status ? { status } : {}) },
             { new: true }
         );
         if (!match) return res.status(404).json({ error: 'Match not found' });
+        broadcastMatchUpdate(match);
         return res.json({ match });
     } catch (err) {
         return res.status(500).json({ error: err.message });

@@ -9,16 +9,17 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.108.2",
+    "@tanstack/react-query": "^4.29.0",
+    "axios": "^1.4.0",
+    "clsx": "^1.2.1",
+    "lucide-react": "^0.263.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.14.0",
-    "axios": "^1.4.0",
     "recharts": "^2.7.0",
-    "@tanstack/react-query": "^4.29.0",
-    "lucide-react": "^0.263.0",
-    "clsx": "^1.2.1",
-    "tailwind-merge": "^1.13.0",
-    "socket.io-client": "^4.7.0"
+    "socket.io-client": "^4.7.0",
+    "tailwind-merge": "^1.13.0"
   },
   "devDependencies": {
     "@types/react": "^18.2.0",

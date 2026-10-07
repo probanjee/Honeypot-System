@@ -59,6 +59,33 @@ app.use('/dashboard', dashboardRoutes);
 app.use('/matches', matchRoutes);
 app.use('/announcements', announcementRoutes);
 
+// ── Health Routes ──────────────────────────────────────────────────────────────
+app.get('/health/database', async (req, res) => {
+    try {
+        const MongoDBAdapter = require('./adapters/database/mongodb.adapter');
+        const SupabaseAdapter = require('./adapters/database/supabase.adapter');
+
+        const mongo = new MongoDBAdapter();
+        const supabase = new SupabaseAdapter();
+
+        const mongoStatus = await mongo.status();
+        const supabaseStatus = await supabase.status();
+        
+        const activeProvider = process.env.USE_SUPABASE === 'true' ? 'supabase' : 'mongodb';
+        
+        console.log(`[Healthcheck] Database status checked. Active Provider: ${activeProvider}. MongoDB: ${mongoStatus.status}, Supabase: ${supabaseStatus.status}`);
+
+        res.json({
+            status: 'ok',
+            active_provider: activeProvider,
+            mongodb: mongoStatus,
+            supabase: supabaseStatus
+        });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // ── 404 fallback ───────────────────────────────────────────────────────────────
 app.use((req, res) => {
     res.status(404).json({ error: 'Not found' });
@@ -68,6 +95,8 @@ app.use((req, res) => {
 connectDB().then(() => {
     app.listen(config.port, () => {
         console.log(`✅  Nowhere Esports Intranet running → http://localhost:${config.port}`);
+        const activeProvider = process.env.USE_SUPABASE === 'true' ? 'Supabase' : 'MongoDB';
+        console.log(`🗄️  Active Database Provider: ${activeProvider}`);
         console.log(`🛡️  Honeypot SSE stream → http://localhost:${config.port}/honeypot/events`);
     });
 }).catch(err => {

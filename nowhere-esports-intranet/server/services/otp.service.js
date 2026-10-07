@@ -18,7 +18,12 @@ const generateOTP = async (email) => {
 };
 
 const verifyOTP = async (email, token) => {
-    const otpDoc = await OTPToken.findOne({ email, token, used: false });
+    const otpDoc = await OTPToken.findOne({ 
+        email, 
+        token, 
+        used: false,
+        expiresAt: { $gt: new Date() }
+    });
     if (!otpDoc) return false;
     
     otpDoc.used = true;

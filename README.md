@@ -26,6 +26,12 @@ VIGILANCE pairs a purpose-built **target application** (Nowhere Esports Intranet
 
 ---
 
+## Architecture Documentation
+
+The upgraded target-state architecture for the Nowhere Esports Intranet is documented in [docs/nowhere-esports-intranet-architecture.md](./docs/nowhere-esports-intranet-architecture.md). It defines the planned React/Vite/TypeScript frontend, Express API, Supabase PostgreSQL/Auth/Realtime/Storage design, RBAC/RLS model, deception assets, VIGILANCE telemetry flow, API catalog, deployment plan, roadmap, and testing strategy.
+
+---
+
 ## Detection & Analysis Chain
 
 ![Detection & Analysis Chain](./detection_chain.jpg)
@@ -116,6 +122,7 @@ Weights accumulate per request and are clamped to a 0–100 severity score. Addi
 | **MongoDB** | Document store on the target side. Raw attack logs persisted by the honeypot middleware. |
 | **Redis 7** | Cache layer and rate-limiter. Sliding-window counters for API rate limiting, JSON response caching with configurable TTL. |
 | **Apache Kafka** | Event backbone. Decouples producers (honeypots) from consumers (ingestion, analytics, alerting, backend). |
+| **Supabase** | Cloud Postgres / Auth system (Optional integration via `USE_SUPABASE=true` feature flag). |
 
 ---
 

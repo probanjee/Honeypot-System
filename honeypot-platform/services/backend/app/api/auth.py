@@ -36,6 +36,9 @@ async def login(body: LoginRequest):
     return TokenResponse(access_token=token)
 
 
+from app.core.config import settings
+from app.core.supabase import get_supabase
+
 @router.get("/me")
 async def me(credentials: Optional[HTTPAuthorizationCredentials] = Depends(bearer)):
     if not credentials:
@@ -43,4 +46,18 @@ async def me(credentials: Optional[HTTPAuthorizationCredentials] = Depends(beare
     payload = decode_jwt(credentials.credentials)
     if not payload:
         raise HTTPException(status_code=401, detail="Invalid token")
-    return {"username": payload.get("sub"), "role": payload.get("role")}
+    
+    user_id = payload.get("sub")
+    role = payload.get("role", "user")
+
+    if settings.USE_SUPABASE:
+        supabase = get_supabase()
+        if supabase:
+            try:
+                response = supabase.table('profiles').select('role').eq('id', user_id).execute()
+                if response.data and len(response.data) > 0:
+                    role = response.data[0]['role']
+            except Exception:
+                pass
+
+    return {"username": user_id, "role": role}

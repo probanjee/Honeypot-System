@@ -156,7 +156,7 @@ const LogsPage = ({ attacks, connected }: any) => (
 // ── Shell ─────────────────────────────────────────────────────────────────────
 const Shell = () => {
   const { theme } = useTheme();
-  const { attacks, connected, stats } = useHoneypotStream(200);
+  const { attacks, connected, stats } = useHoneypotStream();
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', background: 'var(--bg-base)', transition: 'all 0.35s' }}>
@@ -228,11 +228,55 @@ const Shell = () => {
   );
 };
 
+import { supabase } from './lib/supabase';
+import { AuthProvider, useAuth } from './hooks/useAuth';
+
+const LoginScreen = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) setError(error.message);
+    setLoading(false);
+  };
+
+  return (
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-base)' }}>
+      <form onSubmit={handleLogin} className="glass" style={{ padding: '32px', width: '100%', maxWidth: '400px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <h2 style={{ fontSize: '24px', fontWeight: 'bold', color: 'var(--text-1)', textAlign: 'center', marginBottom: '8px' }}>VIGILANCE Login</h2>
+        {error && <div style={{ color: 'var(--neon-red)', fontSize: '14px', textAlign: 'center' }}>{error}</div>}
+        <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} required style={{ background: 'rgba(0,0,0,0.2)', color: 'var(--text-1)', padding: '12px', border: '1px solid var(--border)', borderRadius: '8px' }} />
+        <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required style={{ background: 'rgba(0,0,0,0.2)', color: 'var(--text-1)', padding: '12px', border: '1px solid var(--border)', borderRadius: '8px' }} />
+        <button type="submit" disabled={loading} style={{ background: 'var(--neon-blue)', color: '#000', padding: '12px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer' }}>
+          {loading ? 'Logging in...' : 'Sign In'}
+        </button>
+      </form>
+    </div>
+  );
+};
+
+const AuthGate = ({ children }: { children: React.ReactNode }) => {
+  const { session, loading } = useAuth();
+  if (loading) return <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-base)' }}><div className="pulse-dot" /></div>;
+  if (!session) return <LoginScreen />;
+  return <>{children}</>;
+};
+
 const App = () => (
   <ThemeProvider>
-    <BrowserRouter>
-      <Shell />
-    </BrowserRouter>
+    <AuthProvider>
+      <BrowserRouter>
+        <AuthGate>
+          <Shell />
+        </AuthGate>
+      </BrowserRouter>
+    </AuthProvider>
   </ThemeProvider>
 );
 

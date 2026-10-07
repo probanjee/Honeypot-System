@@ -29,7 +29,7 @@ export function useHoneypotStream() {
 
   useEffect(() => {
     let eventSource: EventSource | null = null;
-    let statsInterval: NodeJS.Timeout;
+    let statsInterval: any;
 
     const connectSSE = () => {
       eventSource = new EventSource('http://localhost:3000/honeypot/events');

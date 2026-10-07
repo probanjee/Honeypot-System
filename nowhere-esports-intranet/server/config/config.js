@@ -1,7 +1,7 @@
 module.exports = {
-    port:        process.env.PORT                 || 3001,
+    port:        process.env.PORT                 || 3000,
     mongodbUri:  process.env.MONGODB_URI          || 'mongodb://localhost:27017/nowhere-esports',
-    jwtSecret:   process.env.JWT_SECRET           || 'nowhere-esports-super-secret-jwt-key',
+    jwtSecret:   (process.env.USE_SUPABASE === 'true' ? process.env.SUPABASE_JWT_SECRET : process.env.JWT_SECRET) || 'nowhere-esports-super-secret-jwt-key',
     googleClientId:     process.env.GOOGLE_CLIENT_ID     || '',
     googleClientSecret: process.env.GOOGLE_CLIENT_SECRET || '',
     emailHost:   process.env.EMAIL_HOST           || 'smtp.ethereal.email',

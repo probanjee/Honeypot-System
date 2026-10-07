@@ -2,7 +2,7 @@ import pytest
 import sys
 import os
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../../services/ingestion"))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "../../services/ingestion"))
 
 from processors.attack_processor import sanitize_payload, extract_ips, enrich_with_geoip
 

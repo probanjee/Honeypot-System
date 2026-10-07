@@ -4,13 +4,26 @@ const User = require('../models/User.model');
 
 const login = async (req, res) => {
     const { email, password } = req.body;
-    const user = await authService.login(email, password);
+    const userOrSession = await authService.login(email, password);
     
-    if (!user) {
+    if (!userOrSession) {
         return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    // Generate OTP for 2FA
+    if (process.env.USE_SUPABASE === 'true') {
+        // userOrSession is { user, session }
+        const jwtToken = authService.generateToken(userOrSession);
+        return res.json({ 
+            token: jwtToken, 
+            user: { 
+                id: userOrSession.user.id, 
+                name: userOrSession.user.user_metadata?.display_name || email, 
+                role: 'user' // Note: Actual role should be fetched from profiles, but 'user' suffices for now or we fetch it later
+            } 
+        });
+    }
+
+    // Legacy Flow: Generate OTP for 2FA
     await otpService.generateOTP(email);
     
     res.json({ message: 'OTP sent to your email', email });

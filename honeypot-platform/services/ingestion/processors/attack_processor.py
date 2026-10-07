@@ -1,6 +1,6 @@
 import re
 import json
-from typing import dict as Dict
+from typing import Dict
 
 
 _BINARY_RE = re.compile(rb"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\xff]")
