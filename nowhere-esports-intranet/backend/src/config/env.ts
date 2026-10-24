@@ -10,14 +10,25 @@ import { z } from 'zod';
 const envSchema = z.object({
   // Server
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
-  PORT: z.coerce.number().int().min(1).max(65535).default(3001),
+  PORT: z.coerce.number().int().min(1).max(65535).default(3000),
   API_VERSION: z.string().default('v1'),
 
-  // Supabase
-  SUPABASE_URL: z.string().url({ message: 'SUPABASE_URL must be a valid URL' }),
-  SUPABASE_ANON_KEY: z.string().min(1, { message: 'SUPABASE_ANON_KEY is required' }),
-  SUPABASE_SERVICE_ROLE_KEY: z.string().min(1, { message: 'SUPABASE_SERVICE_ROLE_KEY is required' }),
-  SUPABASE_JWT_SECRET: z.string().min(1, { message: 'SUPABASE_JWT_SECRET is required' }),
+  // Database (PostgreSQL)
+  DATABASE_URL: z.string().default('postgresql://user:password@localhost:5432/honeypot'),
+  DB_HOST: z.string().default('localhost'),
+  DB_PORT: z.coerce.number().int().default(5432),
+  DB_NAME: z.string().default('honeypot'),
+  DB_USER: z.string().default('user'),
+  DB_PASSWORD: z.string().default('password'),
+  DB_MAX_CONNECTIONS: z.coerce.number().int().default(20),
+
+  // Authentication & Security
+  JWT_SECRET: z.string().min(8).default('nowhere-esports-super-secret-jwt-key-2026'),
+  JWT_EXPIRES_IN: z.string().default('24h'),
+
+  // Kafka Messaging
+  KAFKA_BOOTSTRAP_SERVERS: z.string().default('localhost:9092'),
+  KAFKA_CLIENT_ID: z.string().default('nowhere-esports-backend'),
 
   // CORS
   ALLOWED_ORIGINS: z.string().default('http://localhost:5173,http://localhost:3000'),

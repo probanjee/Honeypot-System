@@ -5,7 +5,10 @@ from kafka import KafkaProducer
 
 sys.path.insert(0, "/app")
 
-from handlers import HTTPHoneypotHandler
+try:
+    from handlers import HTTPHoneypotHandler
+except ImportError:
+    from services.honeypots.http.src.handlers import HTTPHoneypotHandler
 
 KAFKA_SERVERS = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "localhost:9092")
 HTTP_PORT = int(os.getenv("HTTP_PORT", 8080))

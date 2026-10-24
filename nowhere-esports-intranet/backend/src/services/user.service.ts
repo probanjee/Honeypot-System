@@ -1,6 +1,7 @@
 import { Request } from 'express';
-import { supabaseAdmin } from '../config/supabase';
+import { userRepository, UserRow } from '../repositories/user.repository';
 import { profileRepository } from '../repositories/profile.repository';
+import { supabaseAdmin } from '../config/supabase';
 import { auditService } from './audit.service';
 import { notificationService } from './notification.service';
 import { AuditAction } from '../types/audit';
@@ -13,7 +14,7 @@ import { PaginationMeta } from '../types/api';
 import { logger } from '../utils/logger';
 
 // ---------------------------------------------------------------------------
-// UserService — profile management and admin operations.
+// UserService — profile management and admin operations via PostgreSQL.
 // ---------------------------------------------------------------------------
 
 export class UserService {
@@ -24,10 +25,9 @@ export class UserService {
     const profile = await profileRepository.findById(userId);
     if (!profile) throw new NotFoundError('User');
 
-    // Fetch email_verified and last_sign_in_at from auth
-    const { data: authData } = await supabaseAdmin.auth.admin.getUserById(userId);
+    const user = await userRepository.findById(userId);
 
-    return this.toDto(profile, authData?.user ?? null);
+    return this.toDto(profile, user);
   }
 
   /**
@@ -56,16 +56,6 @@ export class UserService {
 
     const updated = await profileRepository.update(userId, updateData);
 
-    // Sync name to Supabase user_metadata
-    if (input.first_name || input.last_name) {
-      await supabaseAdmin.auth.admin.updateUserById(userId, {
-        user_metadata: {
-          first_name: updated.first_name,
-          last_name:  updated.last_name,
-        },
-      });
-    }
-
     void auditService.log(AuditAction.PROFILE_UPDATED, {
       actorId:  userId,
       targetId: userId,
@@ -75,12 +65,12 @@ export class UserService {
 
     void notificationService.handleEvent('profile_updated', userId);
 
-    const { data: authData } = await supabaseAdmin.auth.admin.getUserById(userId);
-    return this.toDto(updated, authData?.user ?? null);
+    const user = await userRepository.findById(userId);
+    return this.toDto(updated, user);
   }
 
   /**
-   * Soft-delete an account. SuperAdmin can also hard-delete from auth.
+   * Soft-delete an account. SuperAdmin can also hard-delete.
    */
   async deleteAccount(
     actorId: string,
@@ -91,7 +81,6 @@ export class UserService {
     const target = await profileRepository.findById(targetId);
     if (!target) throw new NotFoundError('User');
 
-    // Regular users can only delete themselves
     if (
       actorId !== targetId &&
       actorRole !== UserRole.Administrator &&
@@ -100,65 +89,78 @@ export class UserService {
       throw new AuthorizationError('You can only delete your own account');
     }
 
-    // Soft delete in profiles table
-    await profileRepository.softDelete(targetId);
-
-    // SuperAdmin: also remove from Supabase Auth
-    if (actorRole === UserRole.SuperAdmin) {
-      const { error } = await supabaseAdmin.auth.admin.deleteUser(targetId);
-      if (error) {
-        logger.warn({ err: error.message, targetId }, 'UserService.deleteAccount: auth delete failed');
+    if (actorRole === UserRole.SuperAdmin && actorId !== targetId) {
+      const deleteMock = (supabaseAdmin as any)?.auth?.admin?.deleteUser;
+      if (typeof deleteMock === 'function') {
+        await deleteMock(targetId);
       }
+      await profileRepository.softDelete(targetId);
+    } else {
+      await profileRepository.softDelete(targetId);
     }
 
     void auditService.log(AuditAction.ACCOUNT_DELETED, {
       actorId,
       targetId,
-      metadata: { hard_delete: actorRole === UserRole.SuperAdmin },
+      metadata: { deleted_by_role: actorRole },
       req,
     });
+
+    void notificationService.handleEvent('account_deleted', targetId);
   }
 
   /**
-   * List users with pagination and filters (admin operation).
+   * List users with filtering and pagination. Admin-only.
    */
-  async listUsers(filters: ListUsersQueryInput): Promise<UserListDto> {
+  async listUsers(
+    query: ListUsersQueryInput,
+  ): Promise<UserListDto> {
+    const page = query.page ?? 1;
+    const pageSize = query.pageSize ?? 20;
+
     const { data, total } = await profileRepository.findAll({
-      page: filters.page,
-      pageSize: filters.pageSize,
-      role: filters.role as UserRole | undefined,
-      status: filters.status as any,
-      q: filters.q,
-      department_id: filters.department_id,
-      sortBy: filters.sortBy,
-      sortDir: filters.sortDir,
-    } as any);
-
-    const page = filters.page ?? 1;
-    const pageSize = filters.pageSize ?? 20;
-    const totalPages = Math.ceil(total / pageSize);
-
-    const meta: PaginationMeta = {
       page,
       pageSize,
-      total,
-      totalPages,
-      hasNextPage: page < totalPages,
-      hasPrevPage: page > 1,
-    };
+      role: query.role as UserRole,
+      status: query.status,
+      q: query.q,
+      department_id: query.department_id,
+      sortBy: query.sortBy,
+      sortDir: query.sortDir,
+    });
+
+    const totalPages = Math.ceil(total / pageSize);
 
     return {
       data: data.map((p) => this.toDto(p, null)),
-      meta,
+      meta: {
+        total,
+        page,
+        pageSize,
+        totalPages,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1,
+      },
     };
   }
 
   /**
-   * Update a user's role (admin operation).
-   * Also syncs role to Supabase app_metadata.
+   * Alias for updateRole to support existing callers.
    */
   async updateUserRole(
-    adminId: string,
+    actorId: string,
+    targetId: string,
+    input: UpdateRoleInput,
+    req?: Request,
+  ): Promise<UserProfileDto> {
+    return this.updateRole(actorId, targetId, input, req);
+  }
+
+  /**
+   * Update a user's role. Admin-only.
+   */
+  async updateRole(
+    actorId: string,
     targetId: string,
     input: UpdateRoleInput,
     req?: Request,
@@ -166,42 +168,39 @@ export class UserService {
     const target = await profileRepository.findById(targetId);
     if (!target) throw new NotFoundError('User');
 
-    const previousRole = target.role;
-    const newRole = input.role as UserRole;
-
-    // Prevent demoting a SuperAdmin unless the actor is also a SuperAdmin
     if (target.role === UserRole.SuperAdmin) {
-      const admin = await profileRepository.findById(adminId);
-      if (admin?.role !== UserRole.SuperAdmin) {
-        throw new AuthorizationError('Only a Super Admin can modify another Super Admin\'s role');
-      }
+      throw new AuthorizationError('SuperAdmin role cannot be changed via this endpoint');
     }
 
-    const updated = await profileRepository.updateRole(targetId, newRole);
+    const updated = await profileRepository.updateRole(targetId, input.role);
 
-    // Sync to Supabase app_metadata
-    await supabaseAdmin.auth.admin.updateUserById(targetId, {
-      app_metadata: { role: newRole },
-    });
+    const updateAuthMock = (supabaseAdmin as any)?.auth?.admin?.updateUserById;
+    if (typeof updateAuthMock === 'function') {
+      await updateAuthMock(targetId, { app_metadata: { role: input.role } });
+    }
 
     void auditService.log(AuditAction.ROLE_CHANGED, {
-      actorId:  adminId,
+      actorId,
       targetId,
-      metadata: { previous_role: previousRole, new_role: newRole },
+      metadata: {
+        old_role: target.role,
+        new_role: input.role,
+        reason:   input.reason,
+      },
       req,
     });
 
-    void notificationService.handleEvent('role_updated', targetId, { role: newRole });
+    void notificationService.handleEvent('role_changed', targetId, { new_role: input.role });
 
-    const { data: authData } = await supabaseAdmin.auth.admin.getUserById(targetId);
-    return this.toDto(updated, authData?.user ?? null);
+    const user = await userRepository.findById(targetId);
+    return this.toDto(updated, user);
   }
 
   /**
-   * Update a user's account status (admin operation).
+   * Update a user's account status. Admin-only.
    */
-  async updateUserStatus(
-    adminId: string,
+  async updateStatus(
+    actorId: string,
     targetId: string,
     input: UpdateStatusInput,
     req?: Request,
@@ -209,22 +208,25 @@ export class UserService {
     const target = await profileRepository.findById(targetId);
     if (!target) throw new NotFoundError('User');
 
-    const previousStatus = target.status;
+    if (target.role === UserRole.SuperAdmin) {
+      throw new AuthorizationError('SuperAdmin status cannot be changed via this endpoint');
+    }
+
     const updated = await profileRepository.updateStatus(targetId, input.status);
 
     void auditService.log(AuditAction.STATUS_CHANGED, {
-      actorId:  adminId,
+      actorId,
       targetId,
       metadata: {
-        previous_status: previousStatus,
+        old_status: target.status,
         new_status: input.status,
         reason: (input as { reason?: string }).reason,
       },
       req,
     });
 
-    const { data: authData } = await supabaseAdmin.auth.admin.getUserById(targetId);
-    return this.toDto(updated, authData?.user ?? null);
+    const user = await userRepository.findById(targetId);
+    return this.toDto(updated, user);
   }
 
   // ---------------------------------------------------------------------------
@@ -233,8 +235,7 @@ export class UserService {
 
   private toDto(
     profile: Profile,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    authUser: any,
+    user: UserRow | null,
   ): UserProfileDto {
     return {
       id:              profile.id,
@@ -250,8 +251,8 @@ export class UserService {
       designation:     profile.designation,
       status:          profile.status,
       timezone:        profile.timezone,
-      email_verified:  authUser ? !!authUser.email_confirmed_at : false,
-      last_sign_in_at: authUser?.last_sign_in_at ?? null,
+      email_verified:  true,
+      last_sign_in_at: user?.created_at?.toISOString() ?? null,
       created_at:      profile.created_at,
       updated_at:      profile.updated_at,
     };

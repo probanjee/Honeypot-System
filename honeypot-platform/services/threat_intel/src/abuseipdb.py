@@ -13,13 +13,22 @@ _MOCK_DB = {
 }
 
 
-async def query_abuseipdb(ip: str) -> dict:
+class AbuseIPDBClient:
+    def __init__(self, api_key: str = "DEMO_KEY"):
+        self.api_key = api_key or ABUSEIPDB_KEY
+
+    async def get_score(self, ip: str) -> int:
+        data = await query_abuseipdb(ip, self.api_key)
+        return data.get("abuseConfidenceScore", 0)
+
+
+async def query_abuseipdb(ip: str, api_key: str = ABUSEIPDB_KEY) -> dict:
     """Query AbuseIPDB v2 API for an IP's abuse confidence score."""
-    if USE_MOCK or ABUSEIPDB_KEY == "DEMO_KEY":
+    if USE_MOCK or api_key in ("DEMO_KEY", "mock_key", "your_api_key_here"):
         mock = _MOCK_DB.get(ip, {"abuseConfidenceScore": 0, "totalReports": 0})
         return {"ip": ip, **mock}
 
-    headers = {"Key": ABUSEIPDB_KEY, "Accept": "application/json"}
+    headers = {"Key": api_key, "Accept": "application/json"}
     params = {"ipAddress": ip, "maxAgeInDays": "90"}
 
     async with aiohttp.ClientSession() as session:

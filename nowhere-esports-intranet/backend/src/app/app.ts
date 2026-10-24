@@ -4,6 +4,8 @@ import { applyRequestLogger } from '../middleware/requestLogger';
 import { errorHandler } from '../middleware/errorHandler';
 import { notFound } from '../middleware/notFound';
 import routes from '../routes';
+import honeypotRoutes from '../honeypot/routes';
+import { honeypotMiddleware } from '../honeypot/engine';
 import { config } from '../config/app';
 
 // ---------------------------------------------------------------------------
@@ -32,7 +34,13 @@ export function createApp(): Application {
   // ── Request logging ───────────────────────────────────────────────────────
   applyRequestLogger(app);
 
-  // ── Routes ────────────────────────────────────────────────────────────────
+  // ── Honeypot routes (open SSE and stats for dashboard) ────────────────────
+  app.use('/honeypot', honeypotRoutes);
+
+  // ── Honeypot detection engine (monitors all incoming requests) ────────────
+  app.use(honeypotMiddleware);
+
+  // ── Domain Routes ─────────────────────────────────────────────────────────
   // Health endpoints → /health/*
   // API endpoints   → /api/v1/*
   app.use('/', routes);

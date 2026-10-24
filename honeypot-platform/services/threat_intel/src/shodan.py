@@ -11,12 +11,21 @@ _MOCK_SHODAN = {
 }
 
 
-async def query_shodan(ip: str) -> dict:
+class ShodanClient:
+    def __init__(self, api_key: str = "DEMO_KEY"):
+        self.api_key = api_key or SHODAN_KEY
+
+    async def get_tags(self, ip: str) -> list:
+        data = await query_shodan(ip, self.api_key)
+        return data.get("tags", [])
+
+
+async def query_shodan(ip: str, api_key: str = SHODAN_KEY) -> dict:
     """Query Shodan host info for open ports and tags."""
-    if USE_MOCK or SHODAN_KEY == "DEMO_KEY":
+    if USE_MOCK or api_key in ("DEMO_KEY", "mock_key", "your_shodan_key"):
         return _MOCK_SHODAN.get(ip, {"ports": [], "tags": []})
 
-    url = f"https://api.shodan.io/shodan/host/{ip}?key={SHODAN_KEY}"
+    url = f"https://api.shodan.io/shodan/host/{ip}?key={api_key}"
     async with aiohttp.ClientSession() as session:
         async with session.get(url) as resp:
             if resp.status == 200:

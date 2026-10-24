@@ -70,7 +70,7 @@ class AnalyticsService:
 
         # Cleanup window
         now = pd.Timestamp.now(tz='UTC')
-        self.window = [a for a in self.window if (now - pd.to_datetime(a['timestamp'])).total_seconds() < self.window_size]
+        self.window = [a for a in self.window if (now - pd.to_datetime(a['timestamp'], utc=True)).total_seconds() < self.window_size]
 
 if __name__ == "__main__":
     bootstrap = os.getenv("KAFKA_BOOTSTRAP_SERVERS", "localhost:9092")

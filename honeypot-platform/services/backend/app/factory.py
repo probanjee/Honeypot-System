@@ -65,20 +65,34 @@ def create_app():
 
 async def consume_enriched_attacks():
     from app.core.config import settings
-    consumer = KafkaConsumer(
-        'enriched-attacks',
-        bootstrap_servers=settings.KAFKA_BOOTSTRAP_SERVERS,
-        group_id='backend-group',
-        value_deserializer=lambda m: json.loads(m.decode('utf-8'))
-    )
-    
+    from app.api.websocket import manager
+    import logging
+    logger = logging.getLogger("enriched-consumer")
+
     repo = AttackRepository()
-    
+
     while True:
-        msg_pack = consumer.poll(timeout_ms=1000)
-        for tp, messages in msg_pack.items():
-            for msg in messages:
-                data = msg.value
-                async with async_session() as session:
-                    await repo.save_attack(session, AttackCreate(**data))
-        await asyncio.sleep(0.1)
+        try:
+            consumer = KafkaConsumer(
+                'enriched-attacks',
+                bootstrap_servers=settings.KAFKA_BOOTSTRAP_SERVERS,
+                group_id='backend-group',
+                value_deserializer=lambda m: json.loads(m.decode('utf-8')),
+                consumer_timeout_ms=1000
+            )
+            logger.info("Connected to Kafka enriched-attacks topic")
+            while True:
+                msg_pack = consumer.poll(timeout_ms=1000)
+                for tp, messages in msg_pack.items():
+                    for msg in messages:
+                        data = msg.value
+                        try:
+                            async with async_session() as session:
+                                await repo.save_attack(session, AttackCreate(**data))
+                            await manager.broadcast(json.dumps(data))
+                        except Exception as e:
+                            logger.error(f"Error processing attack message: {e}")
+                await asyncio.sleep(0.1)
+        except Exception as e:
+            logger.warning(f"Kafka consumer connection retry in 5s: {e}")
+            await asyncio.sleep(5)

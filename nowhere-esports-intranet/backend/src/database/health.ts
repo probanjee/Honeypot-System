@@ -1,8 +1,8 @@
-import { supabaseAdmin } from './client';
+import { supabaseAdmin } from '../config/supabase';
 import { logger } from '../utils/logger';
 
 // ---------------------------------------------------------------------------
-// Database health check — lightweight Supabase connectivity test.
+// Database health check — tests database connectivity.
 // Used by GET /api/v1/health/database
 // ---------------------------------------------------------------------------
 
@@ -10,21 +10,19 @@ export type DatabaseHealthStatus = {
   status: 'healthy' | 'unhealthy';
   latencyMs?: number;
   error?: string;
-  provider: 'supabase';
+  provider: string;
 };
 
 export async function checkDatabaseHealth(): Promise<DatabaseHealthStatus> {
   const start = Date.now();
 
   try {
-    // Lightweight query — fetch a single row from a system table
     const { error } = await supabaseAdmin
-      .from('_realtime')
+      .from('users')
       .select('id')
       .limit(1)
       .maybeSingle();
 
-    // If the table doesn't exist (PGRST116), Supabase is still reachable
     const isHealthy = !error || error.code === 'PGRST116' || error.code === '42P01';
 
     if (!isHealthy) {

@@ -1,12 +1,13 @@
 {
   "name": "nowhere-esports-intranet",
   "version": "1.0.0",
-  "main": "server/index.js",
+  "main": "backend/dist/server.js",
   "scripts": {
-    "start": "node server/index.js",
-    "dev": "nodemon server/index.js",
-    "seed": "node scripts/seed.js",
-    "test": "jest"
+    "start": "npm --prefix backend start",
+    "dev": "npm --prefix backend dev",
+    "build": "npm --prefix backend build",
+    "test": "npm --prefix backend test",
+    "typecheck": "npm --prefix backend typecheck"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.108.2",

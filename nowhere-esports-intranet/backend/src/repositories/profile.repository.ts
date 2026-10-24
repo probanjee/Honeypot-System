@@ -1,4 +1,4 @@
-import { supabaseAdmin } from '../config/supabase';
+import { query } from '../database/pool';
 import {
   Profile,
   CreateProfileData,
@@ -10,195 +10,202 @@ import { DatabaseError, NotFoundError } from '../errors';
 import { logger } from '../utils/logger';
 
 // ---------------------------------------------------------------------------
-// ProfileRepository — all Supabase access for the profiles table.
-// Uses supabaseAdmin (service role) so RLS is bypassed server-side.
-// RLS is enforced for direct client access only.
+// ProfileRepository — Native PostgreSQL implementation for profiles table.
 // ---------------------------------------------------------------------------
-
-const TABLE = 'profiles';
 
 export class ProfileRepository {
   /**
    * Find a profile by its user UUID.
    */
   async findById(id: string): Promise<Profile | null> {
-    const { data, error } = await supabaseAdmin
-      .from(TABLE)
-      .select('*')
-      .eq('id', id)
-      .maybeSingle();
-
-    if (error) {
+    try {
+      const res = await query<Profile>('SELECT * FROM profiles WHERE id = $1', [id]);
+      return res.rows[0] ?? null;
+    } catch (error: any) {
       logger.error({ err: error, userId: id }, 'ProfileRepository.findById failed');
       throw new DatabaseError(error.message);
     }
-
-    return data as Profile | null;
   }
 
   /**
    * Find a profile by email address.
    */
   async findByEmail(email: string): Promise<Profile | null> {
-    const { data, error } = await supabaseAdmin
-      .from(TABLE)
-      .select('*')
-      .eq('email', email.toLowerCase())
-      .maybeSingle();
-
-    if (error) {
+    try {
+      const res = await query<Profile>('SELECT * FROM profiles WHERE LOWER(email) = LOWER($1)', [email]);
+      return res.rows[0] ?? null;
+    } catch (error: any) {
       logger.error({ err: error, email }, 'ProfileRepository.findByEmail failed');
       throw new DatabaseError(error.message);
     }
-
-    return data as Profile | null;
   }
 
   /**
    * List profiles with pagination and optional filters.
    */
   async findAll(filters: UserListFilters = {}): Promise<{ data: Profile[]; total: number }> {
-    const {
-      page = 1,
-      pageSize = 20,
-      role,
-      status,
-      q,
-      department_id,
-      sortBy = 'created_at',
-      sortDir = 'desc',
-    } = filters as UserListFilters & { sortBy?: string; sortDir?: string };
+    try {
+      const {
+        page = 1,
+        pageSize = 20,
+        role,
+        status,
+        q,
+        department_id,
+        sortBy = 'created_at',
+        sortDir = 'desc',
+      } = filters as UserListFilters & { sortBy?: string; sortDir?: string };
 
-    const from = (page - 1) * pageSize;
-    const to = from + pageSize - 1;
+      const conditions: string[] = [];
+      const params: any[] = [];
+      let paramIndex = 1;
 
-    let query = supabaseAdmin
-      .from(TABLE)
-      .select('*', { count: 'exact' });
+      if (role) {
+        conditions.push(`role = $${paramIndex++}`);
+        params.push(role);
+      }
+      if (status) {
+        conditions.push(`status = $${paramIndex++}`);
+        params.push(status);
+      }
+      if (department_id) {
+        conditions.push(`department_id = $${paramIndex++}`);
+        params.push(department_id);
+      }
+      if (q) {
+        conditions.push(`(email ILIKE $${paramIndex} OR first_name ILIKE $${paramIndex} OR last_name ILIKE $${paramIndex} OR employee_id ILIKE $${paramIndex})`);
+        params.push(`%${q}%`);
+        paramIndex++;
+      }
 
-    if (role)          query = query.eq('role', role);
-    if (status)        query = query.eq('status', status);
-    if (department_id) query = query.eq('department_id', department_id);
+      const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
 
-    if (q) {
-      query = query.or(
-        `email.ilike.%${q}%,first_name.ilike.%${q}%,last_name.ilike.%${q}%,employee_id.ilike.%${q}%`,
-      );
-    }
+      // Count total
+      const countRes = await query(`SELECT COUNT(*) as count FROM profiles ${whereClause}`, params);
+      const total = parseInt(countRes.rows[0]?.count || '0', 10);
 
-    query = query
-      .order(sortBy ?? 'created_at', { ascending: sortDir === 'asc' })
-      .range(from, to);
+      // Pagination & Ordering
+      const validSortColumns = ['created_at', 'email', 'first_name', 'last_name', 'role', 'status'];
+      const safeSortBy = validSortColumns.includes(sortBy) ? sortBy : 'created_at';
+      const safeSortDir = sortDir.toLowerCase() === 'asc' ? 'ASC' : 'DESC';
 
-    const { data, error, count } = await query;
+      const offset = (page - 1) * pageSize;
+      const dataSql = `SELECT * FROM profiles ${whereClause} ORDER BY ${safeSortBy} ${safeSortDir} LIMIT $${paramIndex++} OFFSET $${paramIndex++}`;
+      params.push(pageSize, offset);
 
-    if (error) {
+      const dataRes = await query<Profile>(dataSql, params);
+      return { data: dataRes.rows, total };
+    } catch (error: any) {
       logger.error({ err: error, filters }, 'ProfileRepository.findAll failed');
       throw new DatabaseError(error.message);
     }
-
-    return { data: (data ?? []) as Profile[], total: count ?? 0 };
   }
 
   /**
    * Create a new profile record.
    */
   async create(input: CreateProfileData): Promise<Profile> {
-    const { data, error } = await supabaseAdmin
-      .from(TABLE)
-      .insert({
-        id:         input.id,
-        email:      input.email.toLowerCase(),
-        first_name: input.first_name ?? '',
-        last_name:  input.last_name ?? '',
-        role:       input.role ?? UserRole.Employee,
-        status:     'active',
-        timezone:   'UTC',
-      })
-      .select()
-      .single();
-
-    if (error) {
+    try {
+      const sql = `
+        INSERT INTO profiles (id, email, first_name, last_name, role, status, timezone)
+        VALUES ($1, LOWER($2), $3, $4, $5, 'active', 'UTC')
+        RETURNING *
+      `;
+      const params = [
+        input.id,
+        input.email,
+        input.first_name ?? '',
+        input.last_name ?? '',
+        input.role ?? UserRole.Employee,
+      ];
+      const res = await query<Profile>(sql, params);
+      return res.rows[0];
+    } catch (error: any) {
       logger.error({ err: error, input }, 'ProfileRepository.create failed');
       throw new DatabaseError(error.message);
     }
-
-    return data as Profile;
   }
 
   /**
    * Update a profile by its user UUID.
    */
   async update(id: string, input: UpdateProfileData): Promise<Profile> {
-    const { data, error } = await supabaseAdmin
-      .from(TABLE)
-      .update(input)
-      .eq('id', id)
-      .select()
-      .single();
+    try {
+      const updates: string[] = [];
+      const params: any[] = [id];
+      let paramIndex = 2;
 
-    if (error) {
+      for (const [key, value] of Object.entries(input)) {
+        if (value !== undefined) {
+          updates.push(`${key} = $${paramIndex++}`);
+          params.push(value);
+        }
+      }
+
+      if (updates.length === 0) {
+        const existing = await this.findById(id);
+        if (!existing) throw new NotFoundError('Profile');
+        return existing;
+      }
+
+      const sql = `UPDATE profiles SET ${updates.join(', ')}, updated_at = NOW() WHERE id = $1 RETURNING *`;
+      const res = await query<Profile>(sql, params);
+
+      if (res.rows.length === 0) {
+        throw new NotFoundError('Profile');
+      }
+
+      return res.rows[0];
+    } catch (error: any) {
+      if (error instanceof NotFoundError) throw error;
       logger.error({ err: error, userId: id }, 'ProfileRepository.update failed');
       throw new DatabaseError(error.message);
     }
-
-    if (!data) throw new NotFoundError('Profile');
-
-    return data as Profile;
   }
 
   /**
    * Update a profile's role.
    */
   async updateRole(id: string, role: UserRole): Promise<Profile> {
-    const { data, error } = await supabaseAdmin
-      .from(TABLE)
-      .update({ role })
-      .eq('id', id)
-      .select()
-      .single();
-
-    if (error) {
+    try {
+      const res = await query<Profile>(
+        'UPDATE profiles SET role = $2, updated_at = NOW() WHERE id = $1 RETURNING *',
+        [id, role]
+      );
+      if (res.rows.length === 0) throw new NotFoundError('Profile');
+      return res.rows[0];
+    } catch (error: any) {
+      if (error instanceof NotFoundError) throw error;
       logger.error({ err: error, userId: id, role }, 'ProfileRepository.updateRole failed');
       throw new DatabaseError(error.message);
     }
-
-    if (!data) throw new NotFoundError('Profile');
-
-    return data as Profile;
   }
 
   /**
    * Update a profile's status.
    */
   async updateStatus(id: string, status: string): Promise<Profile> {
-    const { data, error } = await supabaseAdmin
-      .from(TABLE)
-      .update({ status })
-      .eq('id', id)
-      .select()
-      .single();
-
-    if (error) {
+    try {
+      const res = await query<Profile>(
+        'UPDATE profiles SET status = $2, updated_at = NOW() WHERE id = $1 RETURNING *',
+        [id, status]
+      );
+      if (res.rows.length === 0) throw new NotFoundError('Profile');
+      return res.rows[0];
+    } catch (error: any) {
+      if (error instanceof NotFoundError) throw error;
       logger.error({ err: error, userId: id, status }, 'ProfileRepository.updateStatus failed');
       throw new DatabaseError(error.message);
     }
-
-    if (!data) throw new NotFoundError('Profile');
-
-    return data as Profile;
   }
 
   /**
    * Soft delete — sets status to 'inactive'.
    */
   async softDelete(id: string): Promise<void> {
-    const { error } = await supabaseAdmin
-      .from(TABLE)
-      .update({ status: 'inactive' })
-      .eq('id', id);
-
-    if (error) {
+    try {
+      await query("UPDATE profiles SET status = 'inactive', updated_at = NOW() WHERE id = $1", [id]);
+    } catch (error: any) {
       logger.error({ err: error, userId: id }, 'ProfileRepository.softDelete failed');
       throw new DatabaseError(error.message);
     }

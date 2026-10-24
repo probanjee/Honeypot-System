@@ -10,10 +10,8 @@ import { vi } from 'vitest';
 // ── Set test environment variables ────────────────────────────────────────
 process.env['NODE_ENV']                 = 'test';
 process.env['PORT']                     = '3099';
-process.env['SUPABASE_URL']             = 'https://test.supabase.co';
-process.env['SUPABASE_ANON_KEY']        = 'test-anon-key';
-process.env['SUPABASE_SERVICE_ROLE_KEY'] = 'test-service-role-key';
-process.env['SUPABASE_JWT_SECRET']      = 'test-jwt-secret';
+process.env['DATABASE_URL']             = 'postgresql://user:password@localhost:5432/honeypot';
+process.env['JWT_SECRET']               = 'test-jwt-secret-at-least-32-chars-long';
 process.env['ALLOWED_ORIGINS']          = 'http://localhost:5173';
 process.env['LOG_LEVEL']                = 'silent';
 process.env['LOG_PRETTY']               = 'false';
@@ -58,8 +56,53 @@ vi.mock('../src/config/supabase', () => ({
     rpc: vi.fn(),
   },
   supabaseUser: {
-    auth: {
-      getUser: vi.fn(),
-    },
+    from: vi.fn(),
   },
 }));
+
+// ── Mock PostgreSQL pool and UserRepository ──────────────────────────────
+vi.mock('../src/database/pool', () => ({
+  pool: {
+    query: vi.fn().mockResolvedValue({ rows: [], rowCount: 0 }),
+    connect: vi.fn().mockResolvedValue({
+      query: vi.fn().mockResolvedValue({ rows: [] }),
+      release: vi.fn(),
+    }),
+    on: vi.fn(),
+  },
+  query: vi.fn().mockResolvedValue({ rows: [], rowCount: 0 }),
+  withTransaction: vi.fn((cb: any) => cb({ query: vi.fn() })),
+  checkDatabaseHealth: vi.fn().mockResolvedValue(true),
+}));
+
+vi.mock('../src/repositories/user.repository', () => ({
+  userRepository: {
+    findById: vi.fn().mockResolvedValue({
+      id: '00000000-0000-0000-0000-000000000001',
+      email: 'test@nowhere.gg',
+      password_hash: '$2a$10$eWkZ0y3qgVj1Z2rT/1W96u5Qh5xG.T0E.Rz5WjH1sL7bA1k2y3z4.',
+      role: 'employee',
+      first_name: 'Test',
+      last_name: 'User',
+      is_active: true,
+      created_at: new Date(),
+      updated_at: new Date(),
+    }),
+    findByEmail: vi.fn().mockResolvedValue(null),
+    create: vi.fn().mockImplementation((u: any) =>
+      Promise.resolve({
+        id: '00000000-0000-0000-0000-000000000001',
+        email: u.email,
+        password_hash: u.passwordHash,
+        role: u.role,
+        first_name: u.firstName || '',
+        last_name: u.lastName || '',
+        is_active: true,
+        created_at: new Date(),
+        updated_at: new Date(),
+      }),
+    ),
+    updatePassword: vi.fn().mockResolvedValue(undefined),
+  },
+}));
+

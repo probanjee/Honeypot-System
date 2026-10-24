@@ -1,16 +1,21 @@
 import { Request, Response, NextFunction } from 'express';
-import { supabaseAdmin } from '../config/supabase';
+import jwt from 'jsonwebtoken';
+import { env } from '../config/env';
 import { AuthUser } from '../types/auth';
 import { UserRole, isValidRole } from '../constants/roles';
 import { logger } from '../utils/logger';
 
 // ---------------------------------------------------------------------------
-// optionalAuth — non-blocking JWT verification middleware.
-//
-// Attaches req.user if a valid Bearer token is present.
-// If the token is absent, invalid, or expired — silently continues.
-// Use on routes that serve both authenticated and public users.
+// optionalAuth — non-blocking native JWT verification middleware.
 // ---------------------------------------------------------------------------
+
+interface CustomJwtPayload {
+  id: string;
+  email: string;
+  role: string;
+  first_name?: string;
+  last_name?: string;
+}
 
 export async function optionalAuth(
   req: Request,
@@ -26,31 +31,30 @@ export async function optionalAuth(
   const token = authHeader.slice(7);
 
   try {
-    const { data, error } = await supabaseAdmin.auth.getUser(token);
+    const decoded = jwt.verify(token, env.JWT_SECRET) as CustomJwtPayload;
 
-    if (error || !data.user) {
-      logger.debug({ requestId: req.requestId }, 'optionalAuth: token invalid, continuing unauthenticated');
+    if (!decoded || !decoded.id) {
       return next();
     }
 
-    const supabaseUser = data.user;
-    const rawRole = supabaseUser.app_metadata?.role as unknown;
+    const rawRole = decoded.role as unknown;
     const role: UserRole = isValidRole(rawRole) ? rawRole : UserRole.Employee;
 
     const authUser: AuthUser = {
-      id: supabaseUser.id,
-      email: supabaseUser.email ?? '',
+      id: decoded.id,
+      email: decoded.email ?? '',
       role,
-      email_verified: !!supabaseUser.email_confirmed_at,
-      app_metadata: supabaseUser.app_metadata ?? {},
-      user_metadata: supabaseUser.user_metadata ?? {},
-      last_sign_in_at: supabaseUser.last_sign_in_at ?? undefined,
+      email_verified: true,
+      app_metadata: { role },
+      user_metadata: {
+        first_name: decoded.first_name || '',
+        last_name: decoded.last_name || '',
+      },
     };
 
     req.user = authUser;
   } catch {
-    // Silent failure — optional auth should never block requests
-    logger.debug({ requestId: req.requestId }, 'optionalAuth: unexpected error, continuing unauthenticated');
+    logger.debug({ requestId: req.requestId }, 'optionalAuth: invalid token, continuing unauthenticated');
   }
 
   next();

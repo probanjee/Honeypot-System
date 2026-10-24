@@ -11,6 +11,7 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ../nowhere-esports-intranet/backend/database/init_postgresql.sql:/docker-entrypoint-initdb.d/init_postgresql.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U user -d honeypot"]
       interval: 5s
@@ -117,7 +118,7 @@ services:
   frontend:
     build: ./frontend
     ports:
-      - "3000:80"
+      - "5173:80"
     depends_on:
       - backend
 
@@ -128,6 +129,28 @@ services:
     depends_on:
       - backend
       - frontend
+
+  nowhere-esports:
+    build:
+      context: ../nowhere-esports-intranet/backend
+      dockerfile: Dockerfile
+    environment:
+      PORT: 3000
+      DATABASE_URL: postgresql://user:password@postgres:5432/honeypot
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: honeypot
+      DB_USER: user
+      DB_PASSWORD: password
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      JWT_SECRET: nowhere-esports-super-secret-jwt-key-2026
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+    ports:
+      - "3000:3000"
 
 volumes:
   postgres_data:
