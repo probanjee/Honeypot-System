@@ -1,3 +1,0 @@
-asyncio
-pyyaml
-kafka-python

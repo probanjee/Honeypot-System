@@ -1,3 +1,0 @@
-aiohttp
-kafka-python
-slack_sdk
