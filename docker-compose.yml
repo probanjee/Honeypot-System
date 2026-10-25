@@ -80,6 +80,28 @@ services:
     networks:
       - vigilance-net
 
+  # ── 4. PostgreSQL 16 Canonical Store ───────────────────────────────────────
+  postgres:
+    image: postgres:16-alpine
+    container_name: vigilance-postgres
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:5432:5432"
+    environment:
+      POSTGRES_USER: vigilance_user
+      POSTGRES_PASSWORD: vigilance_password
+      POSTGRES_DB: vigilance_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U vigilance_user -d vigilance_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    networks:
+      - vigilance-net
+
 networks:
   vigilance-net:
     driver: bridge
@@ -88,4 +110,6 @@ volumes:
   mongodb_data:
     driver: local
   kafka_data:
+    driver: local
+  postgres_data:
     driver: local
