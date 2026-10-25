@@ -1,0 +1,76 @@
+# VIGILANCE System-Wide Configuration Baseline
+# Phase 0 Architecture Blueprint
+
+environment: "development"
+project_name: "vigilance"
+
+ports:
+  target_honeypot: 3000
+  backend_api: 8000
+  frontend_dashboard: 5173
+  mongodb: 27017
+  postgresql: 5432
+  kafka: 9092
+  redis: 6379
+
+storage:
+  mongodb:
+    database: "vigilance_evidence"
+    collection_raw_attacks: "raw_evidence"
+    retention_days: 30
+  postgresql:
+    database: "vigilance_analytical"
+    user: "vigilance_admin"
+    pool_min_size: 5
+    pool_max_size: 20
+  redis:
+    threat_intel_ttl_seconds: 86400  # 24 hours
+    rate_limit_window_seconds: 60
+
+kafka:
+  bootstrap_servers: "localhost:9092"
+  client_id_prefix: "vigilance"
+  mode: "kraft"
+  topics:
+    raw_attacks:
+      name: "raw-attacks"
+      partitions: 3
+      replication_factor: 1
+      retention_ms: 604800000  # 7 days
+      key_strategy: "source_ip"
+    enriched_attacks:
+      name: "enriched-attacks"
+      partitions: 3
+      replication_factor: 1
+      retention_ms: 604800000  # 7 days
+      key_strategy: "event_id"
+    alerts:
+      name: "alerts"
+      partitions: 1
+      replication_factor: 1
+      retention_ms: 2592000000  # 30 days
+      key_strategy: "alert_type"
+    dead_letter_raw:
+      name: "raw-attacks-dlq"
+      partitions: 1
+      replication_factor: 1
+
+anomaly_detection:
+  sliding_window_minutes: 30
+  bucket_size_minutes: 1
+  mad_modified_z_threshold: 3.5
+  min_observations_for_mad: 10
+  fallback_spike_threshold_events: 10
+  min_bucket_count_warmup: 5
+
+severity:
+  ranges:
+    informational: [0, 19]
+    low: [20, 39]
+    medium: [40, 59]
+    high: [60, 79]
+    critical: [80, 100]
+  context_modifiers:
+    admin_canary_path_bonus: 15
+    scanner_agent_bonus: 15
+    multi_vector_bonus: 20

@@ -1,0 +1,50 @@
+<%- include('../layouts/header', { title: 'Internal Hub' }) %>
+
+<div style="margin-bottom: 2rem;">
+  <h1 style="font-size: 2.2rem; font-weight: 800; margin-bottom: 0.5rem; background: linear-gradient(90deg, #fff, var(--text-muted)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+    Welcome to Nowhere Esports Intranet
+  </h1>
+  <p style="color: var(--text-muted); font-size: 1.1rem;">
+    Internal operations, tournament bracket management, and official caster schedules.
+  </p>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+  <div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+      <h2 style="font-size: 1.3rem;">Apex Masters Spring 2026</h2>
+      <span style="background: rgba(0, 230, 118, 0.2); color: var(--success); padding: 0.2rem 0.6rem; border-radius: 4px; font-size: 0.8rem; font-weight: 600;">ACTIVE</span>
+    </div>
+    <p style="color: var(--text-muted); margin-bottom: 1rem;">64 teams competing across NA & EMEA. Semifinals stream begins 18:00 UTC.</p>
+    <div style="display: flex; justify-content: space-between; font-size: 0.9rem; color: var(--accent-cyan);">
+      <span>Prize Pool: $250,000 USD</span>
+      <a href="/tournaments" style="color: var(--accent-cyan); text-decoration: none; font-weight: 600;">View Bracket &rarr;</a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+      <h2 style="font-size: 1.3rem;">Valorant Invitational Major</h2>
+      <span style="background: rgba(255, 179, 0, 0.2); color: var(--warning); padding: 0.2rem 0.6rem; border-radius: 4px; font-size: 0.8rem; font-weight: 600;">REGISTRATION</span>
+    </div>
+    <p style="color: var(--text-muted); margin-bottom: 1rem;">Regional qualifiers open for franchised rosters and verified collegiate squads.</p>
+    <div style="display: flex; justify-content: space-between; font-size: 0.9rem; color: var(--accent-cyan);">
+      <span>Slots: 16 Teams</span>
+      <a href="/tournaments" style="color: var(--accent-cyan); text-decoration: none; font-weight: 600;">Register &rarr;</a>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <h2 style="font-size: 1.2rem; margin-bottom: 1rem;">Internal Staff Notices</h2>
+  <ul style="list-style-type: none; display: flex; flex-direction: column; gap: 0.75rem;">
+    <li style="border-left: 3px solid var(--accent-cyan); padding-left: 1rem;">
+      <strong>Broadcast Patch 2.4.1 Released:</strong> Production booths must update OBS streaming plugins prior to tournament day 2.
+    </li>
+    <li style="border-left: 3px solid var(--accent); padding-left: 1rem;">
+      <strong>Security Reminder:</strong> Two-factor authentication is required on all caster VPN endpoints. Do not share credentials.
+    </li>
+  </ul>
+</div>
+
+<%- include('../layouts/footer') %>

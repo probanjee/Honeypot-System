@@ -1,0 +1,29 @@
+<%- include('../layouts/header', { title: 'Staff Roster & Directory' }) %>
+
+<div style="margin-bottom: 2rem;">
+  <h1 style="font-size: 2rem; font-weight: 800;">Staff & Production Directory</h1>
+  <p style="color: var(--text-muted);">Confidential internal roster. Contact admins via secure company Discord.</p>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+  <% staff.forEach(function(s) { %>
+    <div class="card">
+      <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+        <div style="width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, var(--border), var(--accent)); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.2rem;">
+          <%= s.name.charAt(0) %>
+        </div>
+        <div>
+          <h2 style="font-size: 1.1rem; font-weight: 700;"><%= s.name %></h2>
+          <div style="color: var(--accent-cyan); font-size: 0.85rem;"><%= s.role %></div>
+        </div>
+      </div>
+      <div style="font-size: 0.85rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 0.3rem;">
+        <div><strong>Department:</strong> <%= s.department %></div>
+        <div><strong>Email:</strong> <%= s.email %></div>
+        <div><strong>Clearance:</strong> <span style="color: #ffb300;"><%= s.clearance %></span></div>
+      </div>
+    </div>
+  <% }); %>
+</div>
+
+<%- include('../layouts/footer') %>

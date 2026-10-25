@@ -1,0 +1,14 @@
+<%- include('../layouts/header', { title: '401 Unauthorized' }) %>
+
+<div style="max-width: 600px; margin: 4rem auto; text-align: center;">
+  <div class="card" style="padding: 3rem 2rem;">
+    <div style="font-size: 3.5rem; font-weight: 900; color: var(--danger); margin-bottom: 0.5rem;">401</div>
+    <h1 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem;"><%= title || 'Authentication Required' %></h1>
+    <p style="color: var(--text-muted); margin-bottom: 2rem;">
+      <%= message || 'The requested Nowhere Esports resource requires a valid session token or administrative credentials.' %>
+    </p>
+    <a href="/login" class="btn-login" style="display: inline-block;">Return to Login Portal</a>
+  </div>
+</div>
+
+<%- include('../layouts/footer') %>

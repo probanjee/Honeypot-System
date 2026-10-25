@@ -1,0 +1,14 @@
+<%- include('../layouts/header', { title: '403 Forbidden' }) %>
+
+<div style="max-width: 600px; margin: 4rem auto; text-align: center;">
+  <div class="card" style="padding: 3rem 2rem; border-color: rgba(255, 23, 68, 0.4);">
+    <div style="font-size: 3.5rem; font-weight: 900; color: var(--danger); margin-bottom: 0.5rem;">403</div>
+    <h1 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem;"><%= title || 'Access Forbidden' %></h1>
+    <p style="color: var(--text-muted); margin-bottom: 2rem;">
+      <%= message || 'Access to this internal Nowhere Esports resource or canary trap is strictly restricted. This security incident has been logged.' %>
+    </p>
+    <a href="/" class="btn-login" style="display: inline-block;">Return to Safe Hub</a>
+  </div>
+</div>
+
+<%- include('../layouts/footer') %>
