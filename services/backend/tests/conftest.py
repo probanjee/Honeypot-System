@@ -21,7 +21,7 @@ if backend_root not in sys.path:
 
 from src.models.base import Base
 from src.models.attack import Attack, AttackSignature, ThreatActor
-from src.database import get_db
+from src.database import get_db, get_session_factory
 from src.main import app
 from src.config import settings
 
@@ -65,7 +65,16 @@ async def async_client(test_db_session: AsyncSession) -> AsyncGenerator[AsyncCli
     async def override_get_db():
         yield test_db_session
 
+    session_factory = async_sessionmaker(
+        bind=test_db_session.bind,
+        autocommit=False,
+        autoflush=False,
+        expire_on_commit=False,
+        class_=AsyncSession
+    )
+
     app.dependency_overrides[get_db] = override_get_db
+    app.dependency_overrides[get_session_factory] = lambda: session_factory
 
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://testserver") as client:

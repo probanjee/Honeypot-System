@@ -14,6 +14,7 @@ import structlog
 from .config import settings
 from .core.logging import setup_logging
 from .services.sse_broadcaster import broadcaster
+from .services.kafka_consumer import kafka_sse_consumer
 from .api.v1.router import api_v1_router
 
 setup_logging()
@@ -30,10 +31,12 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         cors_origins=settings.cors_origins
     )
     await broadcaster.start()
+    await kafka_sse_consumer.start()
     try:
         yield
     finally:
         logger.info("vigilance_backend_shutting_down")
+        await kafka_sse_consumer.stop()
         await broadcaster.stop()
 
 

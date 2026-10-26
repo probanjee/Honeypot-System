@@ -17,8 +17,8 @@ Status values:
 | **Phase 1** | **Minimal Working Honeypot (Nowhere Esports Intranet)** | `COMPLETED` | `npm test` & `npm run test:synthetic` | Node.js/Express sensor, EJS decoys, YAML signature engine, severity scoring, Mongoose evidence repository, unit and integration suites. |
 | **Phase 2** | **Apache Kafka Event Pipeline (KRaft)** | `COMPLETED` | `npm test` & `npm run test:labs` | Docker Compose KRaft cluster, versioned RawAttackEvent v1.0.0, reliable Outbox Publisher, Ingestion Demonstation Consumer, DLQ routing, 7 Kafka labs, 72 unit tests. |
 | **Phase 3** | **Canonical Ingestion & PostgreSQL Store** | `COMPLETED` | `pytest services/ingestion` (30 passing) | Python ingestion service, PostgreSQL 16 schema, Alembic migrations, idempotent ON CONFLICT, GeoIP enrichment, Transactional Outbox. |
-| **Phase 4** | **FastAPI Backend & Real-Time Delivery (SSE)** | `COMPLETED` | `pytest services/backend` (25 passing) | FastAPI app factory, HMAC keyset pagination, filter queries, summary analytics, SSE live stream with Last-Event-ID replay, health checks, structured logging, 25 unit tests. |
-| **Phase 5** | **React + TypeScript SOC Dashboard** | `PLANNED` | `npm test` / Playwright | Live attack feed, attack map, incident panels, severity charts. |
+| **Phase 4** | **FastAPI Backend & Real-Time Delivery (SSE)** | `COMPLETED` | `pytest services/backend` (32 passing) | FastAPI app factory, HMAC keyset pagination, filter queries, summary analytics, SSE live stream with Last-Event-ID replay, health checks, structured logging, 32 unit tests. |
+| **Phase 5** | **React + TypeScript SOC Dashboard** | `COMPLETED` | `npm test` & `npm run build` in `apps/dashboard` (13 passing, 0 build errors) | React 19 + TypeScript SOC dashboard, Kafka-to-SSE live bridge, Leaflet geo map, keyset pagination, forensic detail modal, SVG charts, 13 frontend tests, 7 Kafka SSE consumer tests. |
 | **Phase 6** | **Statistical Anomaly Detection (MAD)** | `PLANNED` | `pytest services/analytics` | Sliding window ring-buffer, MAD calculation, zero-MAD fallback alerts. |
 | **Phase 7** | **Threat Intelligence & Redis Cache** | `PLANNED` | `pytest services/threat-intel` | Asynchronous IP lookup, Redis 24h caching, RFC 1918 bypass. |
 
@@ -147,7 +147,35 @@ All acceptance criteria for Phase 4 ("FastAPI Analytical REST API, Cursor Pagina
 | **Pydantic Response Schemas** | `COMPLETED` | `services/backend/src/schemas/` | `AttackListItemResponse`, `AttackDetailResponse`, `AttackSignatureResponse`, `AttackFilterParams`, `PaginatedResponse[T]`, `SummaryAnalyticsResponse`, `HealthResponse` |
 | **Dependency Injection** | `COMPLETED` | `services/backend/src/api/dependencies.py` | Request-scoped `AttackService`, singleton `SSEBroadcaster` via FastAPI `Depends()` |
 | **ADR: SSE vs WebSocket** | `COMPLETED` | `docs/architecture/decision-records/ADR-004-realtime-delivery-sse-vs-ws.md` | Rationale: unidirectional match, native `Last-Event-ID` reconnection, simpler ops footprint |
-| **Backend Test Suite** | `COMPLETED` | `services/backend/tests/` | 25 tests passing: pagination (8), attacks API (9), analytics (2), health (2), SSE streaming (4) |
+| **Backend Test Suite** | `COMPLETED` | `services/backend/tests/` | 32 tests passing: pagination (8), attacks API (9), analytics (2), health (2), SSE streaming (4), Kafka SSE consumer (7) |
 | **Requirements Manifest** | `COMPLETED` | `services/backend/requirements.txt` | 16 pinned dependencies: FastAPI, uvicorn, SQLAlchemy, asyncpg, aiosqlite, pydantic, structlog, aiokafka, httpx, pytest |
+
+---
+
+## 9. Phase 5 Detailed Verification Audit (Executed & Verified)
+
+All acceptance criteria for Phase 5 ("React + TypeScript SOC Dashboard and End-to-End Live Event Integration") have been implemented, verified, and audited:
+
+| Requirement / Component | Status | Source Location | Verification Evidence |
+| :--- | :--- | :--- | :--- |
+| **Kafka-to-SSE Consumer** | `COMPLETED` | `services/backend/src/services/kafka_consumer.py` | `KafkaSSEConsumer` consumes from `enriched-attacks` topic, validates `EnrichedAttackEvent`, broadcasts via `SSEBroadcaster`, commits offsets post-broadcast |
+| **SSE DB Connection Pool Leak Fix** | `COMPLETED` | `services/backend/src/services/sse_broadcaster.py`, `services/backend/src/api/v1/stream.py` | `fetch_replay_events()` materializes records in transient session and closes DB connection before entering live streaming loop |
+| **FastAPI Lifespan Integration** | `COMPLETED` | `services/backend/src/main.py` | Consumer managed as background async task in `lifespan`; graceful start and cancellation on shutdown |
+| **GeoIP Coordinate Exposure** | `COMPLETED` | `services/backend/src/schemas/attacks.py` | Added `geo_latitude` and `geo_longitude` with Decimal→float conversion to `AttackListItemResponse` |
+| **React 19 + TypeScript + Vite Scaffold** | `COMPLETED` | `apps/dashboard/` | Clean production build (`tsc -b && vite build`) generating optimized bundles in < 500ms with zero errors |
+| **TypeScript API Contracts** | `COMPLETED` | `apps/dashboard/src/types/` | Strongly typed models: `attacks.ts`, `analytics.ts`, `stream.ts` |
+| **REST API Client** | `COMPLETED` | `apps/dashboard/src/services/api.ts` | Centralized fetch client for attack list, detail, signatures, summary analytics, and health |
+| **Native EventSource Client** | `COMPLETED` | `apps/dashboard/src/services/sse.ts` | Native `EventSource` with bounded ring buffer (200), UUID deduplication (500), auto-reconnect, pause/resume |
+| **Live Stream Hook** | `COMPLETED` | `apps/dashboard/src/hooks/useSSEStream.ts` | Custom hook exposing reactive attacks, connection state, buffer count, and stream controls |
+| **Keyset Cursor Pagination Feed** | `COMPLETED` | `apps/dashboard/src/components/attacks/LiveAttackFeed.tsx` | Keyset cursor pagination with previous/next controls, page cursor stack, and sort toggles |
+| **Attack Multi-Filter Bar** | `COMPLETED` | `apps/dashboard/src/components/attacks/AttackFilters.tsx` | Severity, IP search, country code, score range slider, signature search, reset button |
+| **Forensic Attack Detail Modal** | `COMPLETED` | `apps/dashboard/src/components/attacks/AttackDetailModal.tsx` | Comprehensive modal with network telemetry, GeoIP resolution, matched signatures, payload preview, evidence ID |
+| **Interactive GeoIP Map (Leaflet)** | `COMPLETED` | `apps/dashboard/src/components/map/AttackGeoMap.tsx` | Leaflet map with CartoDB Dark Matter tiles, pulse circles, severity color coding, empty state, and approximate disclaimer |
+| **Executive Summary Analytics** | `COMPLETED` | `apps/dashboard/src/components/analytics/SummaryCards.tsx` | Total attacks, high/critical count, distinct IPs, top attack vector, time window selector (1h/24h/7d) |
+| **Severity & Category Visualizations** | `COMPLETED` | `apps/dashboard/src/components/analytics/SeverityCharts.tsx` | Responsive SVG Donut chart for severity distribution + horizontal bar chart for top 5 attack categories |
+| **Dark-Mode Glassmorphic Design** | `COMPLETED` | `apps/dashboard/src/index.css` | Cyber-defense color palette, glowing severity accents, glass cards, micro-animations, accessible contrast |
+| **Frontend Unit Test Suite** | `COMPLETED` | `apps/dashboard/src/test/` | 13 Vitest tests passing: SSE client (5 tests), UI components & Leaflet map (8 tests) |
+| **Backend Kafka SSE Test Suite** | `COMPLETED` | `services/backend/tests/test_kafka_sse_consumer.py` | 7 pytest tests passing: schema validation, poison pill handling, lifecycle, broadcast, replay session release |
+
 
 

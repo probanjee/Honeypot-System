@@ -36,7 +36,16 @@ class AttackListItemResponse(BaseModel):
     geo_country: str
     geo_country_code: str
     geo_city: str
+    geo_latitude: Optional[float] = None
+    geo_longitude: Optional[float] = None
     geoip_status: str
+
+    @field_validator("geo_latitude", "geo_longitude", mode="before")
+    @classmethod
+    def convert_decimal_to_float(cls, v):
+        if v is not None and isinstance(v, (Decimal, str)):
+            return float(v)
+        return v
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -45,19 +54,10 @@ class AttackDetailResponse(AttackListItemResponse):
     user_agent: Optional[str] = None
     detection_summary: Dict[str, Any] = Field(default_factory=dict)
     processing_metadata: Dict[str, Any] = Field(default_factory=dict)
-    geo_latitude: Optional[float] = None
-    geo_longitude: Optional[float] = None
     threat_actor_id: Optional[uuid.UUID] = None
     mongo_raw_id: str
     schema_version: str
     signatures: List[AttackSignatureResponse] = Field(default_factory=list)
-
-    @field_validator("geo_latitude", "geo_longitude", mode="before")
-    @classmethod
-    def convert_decimal_to_float(cls, v):
-        if v is not None and isinstance(v, (Decimal, str)):
-            return float(v)
-        return v
 
     model_config = ConfigDict(from_attributes=True)
 

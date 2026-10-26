@@ -3,12 +3,11 @@ Server-Sent Events (SSE) Live Attack Stream Endpoint
 Delivers near-real-time attack notifications over persistent HTTP streaming.
 """
 
-from typing import Optional
+from typing import Optional, Any
 from fastapi import APIRouter, Depends, Header, Request
 from fastapi.responses import StreamingResponse
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from ...database import get_db
+from ...database import get_session_factory
 from ...services.sse_broadcaster import SSEBroadcaster
 from ..dependencies import get_event_broadcaster
 
@@ -27,13 +26,19 @@ router = APIRouter(prefix="/attacks", tags=["Streaming"])
 async def stream_attack_events(
     request: Request,
     last_event_id: Optional[str] = Header(None, alias="Last-Event-ID"),
-    db: AsyncSession = Depends(get_db),
+    session_factory: Any = Depends(get_session_factory),
     broadcaster: SSEBroadcaster = Depends(get_event_broadcaster)
 ) -> StreamingResponse:
+    # 1. Materialize historical replay items in a transient, short-lived session (if requested)
+    replayed_events = []
+    if last_event_id:
+        async with session_factory() as session:
+            replayed_events = await broadcaster.fetch_replay_events(session, last_event_id)
+
+    # 2. Stream without retaining any open database session
     generator = broadcaster.stream_for_client(
         request=request,
-        db_session=db,
-        last_event_id=last_event_id
+        initial_events=replayed_events
     )
 
     return StreamingResponse(

@@ -9,7 +9,7 @@ import json
 import uuid
 from collections import deque
 from datetime import datetime, timezone
-from typing import AsyncGenerator, Dict, Any, Optional, Set
+from typing import AsyncGenerator, Dict, Any, Optional, Set, List
 import structlog
 from fastapi import Request
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -100,19 +100,49 @@ class SSEBroadcaster:
         """Keepalive comment line to prevent reverse-proxy timeouts."""
         return ": keepalive\n\n"
 
+    @staticmethod
+    async def fetch_replay_events(
+        db_session: AsyncSession,
+        last_event_id: str
+    ) -> List[Dict[str, Any]]:
+        """
+        Queries historical events for Last-Event-ID replay and materializes the result set.
+        Executed in a transient, short-lived DB transaction so connections are not held open.
+        """
+        try:
+            last_uuid = uuid.UUID(last_event_id.strip())
+            repo = AttackRepository(db_session)
+            last_attack = await repo.get_by_id(last_uuid)
+            if not last_attack:
+                return []
+            replayed_attacks = await repo.get_attacks_after(
+                since_timestamp=last_attack.timestamp,
+                since_id=last_attack.id,
+                limit=settings.sse_replay_max_records
+            )
+            return [
+                AttackListItemResponse.model_validate(attack).model_dump(mode="json")
+                for attack in replayed_attacks
+            ]
+        except Exception as exc:
+            logger.warning("sse_replay_query_failed", last_event_id=last_event_id, error=str(exc))
+            return []
+
     async def stream_for_client(
         self,
         request: Request,
-        db_session: AsyncSession,
-        last_event_id: Optional[str] = None
+        db_session: Optional[AsyncSession] = None,
+        last_event_id: Optional[str] = None,
+        initial_events: Optional[List[Dict[str, Any]]] = None
     ) -> AsyncGenerator[str, None]:
         """
         SSE Generator for an individual HTTP client connection.
         Handles:
-        1. Last-Event-ID historical replay from PostgreSQL.
+        1. Last-Event-ID historical replay (materialized and yielded before live loop).
         2. Bounded deduplication buffer across replay-to-live handoff.
         3. Periodic keepalive heartbeats.
         4. Graceful cancellation and cleanup upon client disconnection.
+        5. Zero DB sessions held during live stream.
         """
         client_queue = await self.register()
         recent_seen_ids: deque = deque(maxlen=500)
@@ -129,45 +159,48 @@ class SSEBroadcaster:
             seen_set.add(eid)
             return True
 
-        repo = AttackRepository(db_session)
+        # ── 1. Replay Phase: materialize replayed items and yield ───────────
+        replayed_items: List[Dict[str, Any]] = []
+        if initial_events is not None:
+            replayed_items = initial_events
+        elif last_event_id and db_session is not None:
+            replayed_items = await self.fetch_replay_events(db_session, last_event_id)
+
+        disconnect_task = asyncio.create_task(request.is_disconnected())
 
         try:
-            # ── 1. Replay Phase (if Last-Event-ID provided) ─────────────────────
-            if last_event_id:
-                try:
-                    last_uuid = uuid.UUID(last_event_id.strip())
-                    last_attack = await repo.get_by_id(last_uuid)
-                    if last_attack:
-                        replayed_attacks = await repo.get_attacks_after(
-                            since_timestamp=last_attack.timestamp,
-                            since_id=last_attack.id,
-                            limit=settings.sse_replay_max_records
-                        )
-                        for attack in replayed_attacks:
-                            eid_str = str(attack.id)
-                            mark_seen(eid_str)
-                            item_data = AttackListItemResponse.model_validate(attack).model_dump(mode="json")
-                            yield self.format_sse_message(
-                                event_id=eid_str,
-                                event_type="attack.created",
-                                data=item_data
-                            )
-                except Exception as exc:
-                    logger.warning("sse_replay_failed", last_event_id=last_event_id, error=str(exc))
+            for item_data in replayed_items:
+                eid_str = str(item_data.get("id") or item_data.get("event_id"))
+                mark_seen(eid_str)
+                yield self.format_sse_message(
+                    event_id=eid_str,
+                    event_type="attack.created",
+                    data=item_data
+                )
 
-            # ── 2. Live Stream Phase with Heartbeats ───────────────────────────
+            # Flush initial handshake comment to confirm stream establishment to clients and proxies
+            yield ": connected\n\n"
+
+            # ── 2. Live Stream Phase with Heartbeats (ZERO DB connection held) ─
             while True:
-                if await request.is_disconnected():
+                if disconnect_task.done() and disconnect_task.result():
                     logger.info("sse_client_disconnected_detected")
                     break
 
-                try:
-                    # Wait for live event or heartbeat timeout
-                    event_data = await asyncio.wait_for(
-                        client_queue.get(),
-                        timeout=settings.sse_heartbeat_interval_seconds
-                    )
+                queue_task = asyncio.create_task(client_queue.get())
+                done, pending = await asyncio.wait(
+                    [queue_task, disconnect_task],
+                    timeout=settings.sse_heartbeat_interval_seconds,
+                    return_when=asyncio.FIRST_COMPLETED
+                )
 
+                if disconnect_task in done and disconnect_task.result():
+                    queue_task.cancel()
+                    logger.info("sse_client_disconnected_detected")
+                    break
+
+                if queue_task in done:
+                    event_data = queue_task.result()
                     eid_str = str(event_data.get("id") or event_data.get("event_id"))
                     # Deduplicate in case event arrived during replay
                     if mark_seen(eid_str):
@@ -176,13 +209,15 @@ class SSEBroadcaster:
                             event_type="attack.created",
                             data=event_data
                         )
-                except asyncio.TimeoutError:
-                    # Send periodic keepalive comment to maintain connection
+                else:
+                    queue_task.cancel()
                     yield self.format_keepalive()
 
         except asyncio.CancelledError:
             logger.info("sse_client_connection_cancelled")
         finally:
+            if not disconnect_task.done():
+                disconnect_task.cancel()
             await self.unregister(client_queue)
 
 
