@@ -84,6 +84,9 @@ class Attack(Base):
         "AttackSignature", back_populates="attack", cascade="all, delete-orphan", lazy="selectin"
     )
     threat_actor: Mapped[Optional["ThreatActor"]] = relationship("ThreatActor", back_populates="attacks")
+    outbox_records: Mapped[List["EnrichedOutbox"]] = relationship(
+        "EnrichedOutbox", back_populates="attack", cascade="all, delete-orphan", lazy="selectin"
+    )
 
     __table_args__ = (
         Index("idx_attacks_timestamp_desc", timestamp.desc()),
@@ -161,6 +164,8 @@ class EnrichedOutbox(Base):
     retry_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     last_error: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=func.now(), nullable=False)
+
+    attack: Mapped["Attack"] = relationship("Attack", back_populates="outbox_records")
 
     __table_args__ = (
         Index("idx_enriched_outbox_status_ts", "publish_status", "created_at"),

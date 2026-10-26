@@ -16,8 +16,8 @@ Status values:
 | **Phase 0** | **Principal Architecture & Engineering Planning** | `COMPLETED` | `python scripts/verify-phase0.py` | ADRs, schemas, rule configs, MAD math, learning guides, operations guides. |
 | **Phase 1** | **Minimal Working Honeypot (Nowhere Esports Intranet)** | `COMPLETED` | `npm test` & `npm run test:synthetic` | Node.js/Express sensor, EJS decoys, YAML signature engine, severity scoring, Mongoose evidence repository, unit and integration suites. |
 | **Phase 2** | **Apache Kafka Event Pipeline (KRaft)** | `COMPLETED` | `npm test` & `npm run test:labs` | Docker Compose KRaft cluster, versioned RawAttackEvent v1.0.0, reliable Outbox Publisher, Ingestion Demonstation Consumer, DLQ routing, 7 Kafka labs, 72 unit tests. |
-| **Phase 3** | **Canonical Ingestion & PostgreSQL Store** | `PLANNED` | `pytest services/ingestion` | Ingestion consumer, schema validation, idempotent upsert (`ON CONFLICT`). |
-| **Phase 4** | **FastAPI Backend & Real-Time Delivery (SSE)** | `PLANNED` | `pytest services/backend` | REST endpoints, pagination, SSE live stream, health checks. |
+| **Phase 3** | **Canonical Ingestion & PostgreSQL Store** | `COMPLETED` | `pytest services/ingestion` (30 passing) | Python ingestion service, PostgreSQL 16 schema, Alembic migrations, idempotent ON CONFLICT, GeoIP enrichment, Transactional Outbox. |
+| **Phase 4** | **FastAPI Backend & Real-Time Delivery (SSE)** | `COMPLETED` | `pytest services/backend` (25 passing) | FastAPI app factory, HMAC keyset pagination, filter queries, summary analytics, SSE live stream with Last-Event-ID replay, health checks, structured logging, 25 unit tests. |
 | **Phase 5** | **React + TypeScript SOC Dashboard** | `PLANNED` | `npm test` / Playwright | Live attack feed, attack map, incident panels, severity charts. |
 | **Phase 6** | **Statistical Anomaly Detection (MAD)** | `PLANNED` | `pytest services/analytics` | Sliding window ring-buffer, MAD calculation, zero-MAD fallback alerts. |
 | **Phase 7** | **Threat Intelligence & Redis Cache** | `PLANNED` | `pytest services/threat-intel` | Asynchronous IP lookup, Redis 24h caching, RFC 1918 bypass. |
@@ -97,5 +97,57 @@ All acceptance criteria for Phase 2 ("Apache Kafka Event Pipeline") have been im
 | **Dead-Letter Queue (DLQ)** | `COMPLETED` | `apps/nowhere-intranet/src/kafka/ingestionConsumer.ts`| Poison pills & schema violations routed to `raw-attacks-dlq` with failure headers |
 | **Kafka Learning Labs Suite** | `COMPLETED` | `apps/nowhere-intranet/scripts/kafka-labs/lab-runner.ts`| `npm run test:labs` (7 runnable labs: producer/consumer, key routing, partitions, offsets, duplicates, broker outage, lag) |
 | **Total Test Verification** | `COMPLETED` | `apps/nowhere-intranet/tests/` | 72 unit tests passing in 768ms; live integration test with service availability check |
+
+---
+
+## 7. Phase 3 Detailed Verification Audit (Executed & Verified)
+
+All acceptance criteria for Phase 3 ("Canonical Ingestion, PostgreSQL, and GeoIP Enrichment") have been implemented, verified, and audited:
+
+| Requirement / Component | Status | Source Location | Verification Evidence |
+| :--- | :--- | :--- | :--- |
+| **PostgreSQL 16 Schema & Alembic** | `COMPLETED` | `services/ingestion/alembic/versions/` | Revision `001_canonical_schema.py` creating `attacks`, `attack_signatures`, `threat_actors`, `system_metrics`, `enriched_outbox` |
+| **SQLAlchemy 2.0 Async Models** | `COMPLETED` | `services/ingestion/src/models/attack.py` | Full Mapped declarative models with GUID TypeDecorator, JSONB support, relationships and cascade deletions |
+| **Event Contract Validation** | `COMPLETED` | `services/ingestion/src/models/events.py` | Pydantic v2 schemas (`RawAttackEvent`, `EnrichedAttackEvent`), bounds enforcement (0-100), UUID validation |
+| **GeoIP Enrichment & Screening** | `COMPLETED` | `services/ingestion/src/geoip/service.py` | `ipaddress` RFC 1918, loopback, multicast, link-local screening (`SKIPPED_PRIVATE`), degraded fallback (`UNAVAILABLE`), mock override (`ENRICHED`) |
+| **PostgreSQL Idempotency** | `COMPLETED` | `services/ingestion/src/service.py` | `INSERT ... ON CONFLICT (id) DO NOTHING` prevents duplicate canonical attacks and duplicate signatures |
+| **Transactional Outbox Worker** | `COMPLETED` | `services/ingestion/src/outbox.py` | `enriched_outbox` table, worker claiming (`FOR UPDATE SKIP LOCKED`), retry counters, abandoned claim recovery |
+| **Failure Scenario A (DB Outage)** | `COMPLETED` | `services/ingestion/tests/test_service_pipeline.py` | Offset is NOT committed if DB transaction fails; rollback prevents partial attack records |
+| **Failure Scenario B (Crash Recovery)** | `COMPLETED` | `services/ingestion/tests/test_service_pipeline.py` | Outbox record survives process termination; new worker claims and publishes to `enriched-attacks` |
+| **Failure Scenario C & D (Redelivery)** | `COMPLETED` | `services/ingestion/tests/test_service_pipeline.py` | Idempotent DB constraint suppresses duplicates, logs telemetry, and cleanly commits raw offset |
+| **DLQ Quarantine of Poison Pills** | `COMPLETED` | `services/ingestion/src/service.py` | Invalid payloads / schemas routed to `raw-attacks-dlq` with failure diagnostics; offset committed |
+| **Ingestion Test Suite** | `COMPLETED` | `services/ingestion/tests/` | 30 tests passing in 0.44s across events, geoip, idempotency, outbox, and pipeline |
+
+---
+
+## 8. Phase 4 Detailed Verification Audit (Executed & Verified)
+
+All acceptance criteria for Phase 4 ("FastAPI Analytical REST API, Cursor Pagination, and Server-Sent Events") have been implemented, verified, and audited:
+
+| Requirement / Component | Status | Source Location | Verification Evidence |
+| :--- | :--- | :--- | :--- |
+| **FastAPI App Factory & Lifespan** | `COMPLETED` | `services/backend/src/main.py` | `create_app()` factory with async lifespan, CORS middleware, global error handlers (validation 422, generic 500 with no stack trace leak) |
+| **Pydantic v2 Environment Settings** | `COMPLETED` | `services/backend/src/config.py` | `pydantic-settings` driven config: DB, CORS, Kafka, SSE, pagination bounds, cursor HMAC secret |
+| **Async SQLAlchemy 2.0 Session Factory** | `COMPLETED` | `services/backend/src/database.py` | `asyncpg` for PostgreSQL, `aiosqlite` for isolated testing, connection pooling with `pool_pre_ping`, automatic rollback on exceptions |
+| **SQLAlchemy Models (Phase 3 Parity)** | `COMPLETED` | `services/backend/src/models/attack.py` | Attack, AttackSignature, ThreatActor, SystemMetric, EnrichedOutbox with GUID TypeDecorator for cross-dialect UUID support |
+| **HMAC-Signed Keyset Cursor Pagination** | `COMPLETED` | `services/backend/src/core/security.py` | `encode_cursor` / `decode_cursor` with `hmac.compare_digest` constant-time comparison, base64url encoding, tamper detection |
+| **Attack List with Multi-Filter Queries** | `COMPLETED` | `services/backend/src/repositories/attack_repo.py` | Filters: severity, score range, signature (ID/name/category), source IP, country code, time bounds; keyset cursor clause with tie-breaker UUID |
+| **Attack Detail Endpoint** | `COMPLETED` | `services/backend/src/api/v1/attacks.py` | `GET /api/v1/attacks/{attack_id}` with eager-loaded signatures, 404 on missing, Decimal→float conversion for geo coordinates |
+| **Attack Signatures Endpoint** | `COMPLETED` | `services/backend/src/api/v1/attacks.py` | `GET /api/v1/attacks/{attack_id}/signatures` with weight-descending order |
+| **Summary Analytics Endpoint** | `COMPLETED` | `services/backend/src/api/v1/analytics.py` | `GET /api/v1/analytics/summary` with server-side SQL aggregations: total attacks, distinct sources, severity breakdown, top 10 categories/signatures/countries, relative time windows (1h/24h/7d) |
+| **Health Check with DB Probe** | `COMPLETED` | `services/backend/src/api/v1/health.py` | `GET /api/v1/health` returns component-level status (PostgreSQL latency, SSE broadcaster), HTTP 503 on DB failure |
+| **SSE Live Stream Endpoint** | `COMPLETED` | `services/backend/src/api/v1/stream.py` | `GET /api/v1/attacks/stream` with `text/event-stream`, `Cache-Control: no-cache`, `X-Accel-Buffering: no` |
+| **SSE Last-Event-ID Replay** | `COMPLETED` | `services/backend/src/services/sse_broadcaster.py` | PostgreSQL replay of missed events on reconnection, bounded to `sse_replay_max_records` (default 50) |
+| **SSE Bounded Client Queues** | `COMPLETED` | `services/backend/src/services/sse_broadcaster.py` | Per-client `asyncio.Queue(maxsize=100)`, oldest-message drop on full queue to prevent slow-client memory leaks |
+| **SSE Keepalive Heartbeats** | `COMPLETED` | `services/backend/src/services/sse_broadcaster.py` | 15-second `: keepalive\n\n` comment lines to prevent reverse-proxy timeouts |
+| **SSE Replay→Live Deduplication** | `COMPLETED` | `services/backend/src/services/sse_broadcaster.py` | Bounded `deque(maxlen=500)` + `set` deduplication buffer across replay-to-live handoff |
+| **Route Precedence (Stream vs UUID)** | `COMPLETED` | `services/backend/src/api/v1/router.py` | `stream_router` mounted before `attacks_router` so `/attacks/stream` takes precedence over `/attacks/{attack_id}` |
+| **Structured Logging (structlog)** | `COMPLETED` | `services/backend/src/core/logging.py` | JSON-formatted structured logging throughout all modules |
+| **CORS Security** | `COMPLETED` | `services/backend/src/main.py` | Origins restricted to `localhost:3000`, `127.0.0.1:3000`, `localhost:5173`, `127.0.0.1:5173`; no wildcard `*` |
+| **Pydantic Response Schemas** | `COMPLETED` | `services/backend/src/schemas/` | `AttackListItemResponse`, `AttackDetailResponse`, `AttackSignatureResponse`, `AttackFilterParams`, `PaginatedResponse[T]`, `SummaryAnalyticsResponse`, `HealthResponse` |
+| **Dependency Injection** | `COMPLETED` | `services/backend/src/api/dependencies.py` | Request-scoped `AttackService`, singleton `SSEBroadcaster` via FastAPI `Depends()` |
+| **ADR: SSE vs WebSocket** | `COMPLETED` | `docs/architecture/decision-records/ADR-004-realtime-delivery-sse-vs-ws.md` | Rationale: unidirectional match, native `Last-Event-ID` reconnection, simpler ops footprint |
+| **Backend Test Suite** | `COMPLETED` | `services/backend/tests/` | 25 tests passing: pagination (8), attacks API (9), analytics (2), health (2), SSE streaming (4) |
+| **Requirements Manifest** | `COMPLETED` | `services/backend/requirements.txt` | 16 pinned dependencies: FastAPI, uvicorn, SQLAlchemy, asyncpg, aiosqlite, pydantic, structlog, aiokafka, httpx, pytest |
 
 

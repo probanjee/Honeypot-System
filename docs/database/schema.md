@@ -7,108 +7,134 @@ This document details the multi-database design of VIGILANCE:
 
 ---
 
-## 1. PostgreSQL Schema (Analytical Database)
+## 1. PostgreSQL 16 Schema (Canonical Relational Store)
 
-### Tables Overview
-- `attacks`: Canonical, normalized security events.
-- `attack_signatures`: Normalization table mapping matched rule IDs to attacks.
-- `anomaly_alerts`: Explainable statistical alerts emitted by the analytics service.
-- `threat_intel_cache`: Durable local store for IP reputation query results.
-- `service_heartbeats`: Microservice liveness and consumer lag telemetry.
+Managed by Alembic versioned migrations located in `services/ingestion/alembic/`.
+Driver: Asynchronous `asyncpg` via SQLAlchemy 2.0.
 
-### DDL Specification
+### 1.1 Tables Overview
+- **`attacks`**: Canonical analytical record for every unique attack detected by sensor nodes.
+- **`attack_signatures`**: Normalized junction table recording each detection rule matched by an attack.
+- **`threat_actors`**: Attribution grouping table linking repeated patterns/entities to attacks without conflating IP addresses with human identities.
+- **`system_metrics`**: Time-bucketed operational and statistical metrics for analytical aggregation.
+- **`enriched_outbox`**: Transactional outbox table guaranteeing atomic PostgreSQL commit and reliable Kafka publication to `enriched-attacks`.
+
+### 1.2 DDL Specification (Revision: `001_canonical_schema`)
 
 ```sql
--- Enable UUID generation extension
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+-- ── 1. Threat Actors (Source/Actor Attribution Groups) ───────────────────────
+CREATE TABLE IF NOT EXISTS threat_actors (
+    id UUID PRIMARY KEY,
+    actor_name VARCHAR(100) NOT NULL UNIQUE,
+    threat_type VARCHAR(50) NOT NULL DEFAULT 'UNKNOWN',
+    attribution_confidence VARCHAR(20) NOT NULL DEFAULT 'LOW',
+    attribution_notes TEXT NOT NULL,
+    first_seen TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    last_seen TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
 
--- ── 1. Canonical Attacks Table ────────────────────────────────────────────────
+-- ── 2. Attacks (Canonical Analytical Store) ──────────────────────────────────
 CREATE TABLE IF NOT EXISTS attacks (
-    id UUID PRIMARY KEY,                                      -- Matches event_id (UUIDv4)
-    mongo_raw_id VARCHAR(64) NOT NULL,                       -- MongoDB ObjectId string
-    timestamp TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, -- Capture timestamp
-    source_ip VARCHAR(45) NOT NULL,                          -- IPv4 or IPv6 string
+    id UUID PRIMARY KEY,                                      -- Stable event ID (UUIDv4)
+    mongo_raw_id VARCHAR(64) NOT NULL,                       -- Foreign reference to MongoDB raw evidence
+    timestamp TIMESTAMPTZ NOT NULL,                          -- Sensor detection timestamp (UTC)
+    ingested_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP, -- Pipeline persistence timestamp
+    source_ip VARCHAR(45) NOT NULL,                          -- Client IP address
     source_port INTEGER NOT NULL DEFAULT 0,
     is_private_ip BOOLEAN NOT NULL DEFAULT FALSE,
-    method VARCHAR(10) NOT NULL,                             -- GET, POST, PUT, DELETE, etc.
-    path VARCHAR(2048) NOT NULL,                             -- Target URI path
+    http_method VARCHAR(10) NOT NULL,
+    request_path TEXT NOT NULL,
     protocol VARCHAR(20) NOT NULL DEFAULT 'HTTP/1.1',
-    attack_category VARCHAR(64) NOT NULL,                    -- Primary category (e.g. SQL_INJECTION)
+    primary_category VARCHAR(64) NOT NULL,                    -- Highest-weight detection category
     severity_score INTEGER NOT NULL CHECK (severity_score BETWEEN 0 AND 100),
-    severity_level VARCHAR(20) NOT NULL CHECK (severity_level IN ('INFORMATIONAL', 'LOW', 'MEDIUM', 'HIGH', 'CRITICAL')),
-    matched_signatures TEXT[] NOT NULL DEFAULT '{}',         -- Array of Rule IDs (e.g. {'SIG-SQLI-001'})
+    severity_level VARCHAR(20) NOT NULL,
     user_agent TEXT,
-    raw_payload TEXT,                                        -- Redacted & truncated safe preview
-    headers JSONB NOT NULL DEFAULT '{}'::jsonb,              -- Sanitized header snapshot
+    detection_summary JSONB NOT NULL DEFAULT '{}'::jsonb,    -- Rule counts and matched ID list
+    processing_metadata JSONB NOT NULL DEFAULT '{}'::jsonb,  -- Ingestion service version metadata
     
-    -- GeoIP Enrichment
-    geo_country VARCHAR(100) DEFAULT 'Unknown',
-    geo_country_code VARCHAR(2) DEFAULT 'XX',
-    geo_city VARCHAR(100) DEFAULT 'Unknown',
+    -- GeoIP Enrichment (Decoupled from Canonical Event Validity)
+    geo_country VARCHAR(100) NOT NULL DEFAULT 'Unknown',
+    geo_country_code VARCHAR(2) NOT NULL DEFAULT 'XX',
+    geo_city VARCHAR(100) NOT NULL DEFAULT 'Unknown',
     geo_latitude NUMERIC(9, 6),
     geo_longitude NUMERIC(9, 6),
+    geoip_status VARCHAR(30) NOT NULL DEFAULT 'UNAVAILABLE', -- ENRICHED, SKIPPED_PRIVATE, UNAVAILABLE
     
-    -- Threat Intelligence
-    threat_intel_score INTEGER,                              -- 0-100 reputation score
-    threat_intel_status VARCHAR(30) DEFAULT 'UNAVAILABLE',
-    
-    -- Status
-    status VARCHAR(30) NOT NULL DEFAULT 'UNRESOLVED' CHECK (status IN ('UNRESOLVED', 'INVESTIGATING', 'RESOLVED', 'FALSE_POSITIVE')),
-    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+    threat_actor_id UUID REFERENCES threat_actors(id) ON DELETE SET NULL,
+    schema_version VARCHAR(10) NOT NULL DEFAULT '1.0.0'
 );
 
 -- Targeted Analytical Indexes
+CREATE INDEX IF NOT EXISTS idx_attacks_mongo_raw_id ON attacks (mongo_raw_id);
 CREATE INDEX IF NOT EXISTS idx_attacks_timestamp_desc ON attacks (timestamp DESC);
-CREATE INDEX IF NOT EXISTS idx_attacks_source_ip ON attacks (source_ip);
+CREATE INDEX IF NOT EXISTS idx_attacks_source_ip_ts ON attacks (source_ip, timestamp DESC);
+CREATE INDEX IF NOT EXISTS idx_attacks_primary_category ON attacks (primary_category);
 CREATE INDEX IF NOT EXISTS idx_attacks_severity_score ON attacks (severity_score DESC);
-CREATE INDEX IF NOT EXISTS idx_attacks_category ON attacks (attack_category);
-CREATE INDEX IF NOT EXISTS idx_attacks_geo_country ON attacks (geo_country_code);
-CREATE INDEX IF NOT EXISTS idx_attacks_mongo_raw ON attacks (mongo_raw_id);
+CREATE INDEX IF NOT EXISTS idx_attacks_geo_country_code ON attacks (geo_country_code);
 
--- ── 2. Attack Signatures (Junction / Granular Table) ──────────────────────────
+-- ── 3. Attack Signatures (Granular Matched Rules) ────────────────────────────
 CREATE TABLE IF NOT EXISTS attack_signatures (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id UUID PRIMARY KEY,
     attack_id UUID NOT NULL REFERENCES attacks(id) ON DELETE CASCADE,
-    rule_id VARCHAR(64) NOT NULL,
+    signature_id VARCHAR(64) NOT NULL,
     rule_name VARCHAR(255) NOT NULL,
     category VARCHAR(64) NOT NULL,
     weight INTEGER NOT NULL,
-    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT uq_attack_signatures_attack_rule UNIQUE (attack_id, signature_id)
 );
 
 CREATE INDEX IF NOT EXISTS idx_attack_signatures_attack_id ON attack_signatures (attack_id);
-CREATE INDEX IF NOT EXISTS idx_attack_signatures_rule_id ON attack_signatures (rule_id);
+CREATE INDEX IF NOT EXISTS idx_attack_signatures_signature_id ON attack_signatures (signature_id);
 
--- ── 3. Anomaly Alerts Table ───────────────────────────────────────────────────
-CREATE TABLE IF NOT EXISTS anomaly_alerts (
-    id UUID PRIMARY KEY,                                      -- Matches alert_id (UUIDv4)
-    timestamp TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    alert_type VARCHAR(64) NOT NULL,                         -- TRAFFIC_VOLUME_SPIKE, etc.
-    severity VARCHAR(20) NOT NULL CHECK (severity IN ('LOW', 'MEDIUM', 'HIGH', 'CRITICAL')),
-    metric VARCHAR(64) NOT NULL,                             -- events_per_minute
-    observed_value NUMERIC(12, 4) NOT NULL,
-    baseline_median NUMERIC(12, 4) NOT NULL,
-    mad NUMERIC(12, 4) NOT NULL,
-    modified_z_score NUMERIC(12, 4) NOT NULL,
-    threshold NUMERIC(12, 4) NOT NULL,
-    window_size_minutes INTEGER NOT NULL,
-    explanation TEXT NOT NULL,
-    acknowledged BOOLEAN NOT NULL DEFAULT FALSE,
-    acknowledged_by VARCHAR(100),
+-- ── 4. System Metrics (Operational Window Aggregations) ──────────────────────
+CREATE TABLE IF NOT EXISTS system_metrics (
+    id UUID PRIMARY KEY,
+    metric_name VARCHAR(64) NOT NULL,
+    metric_grain VARCHAR(20) NOT NULL DEFAULT '1m',          -- Grain: 1m, 5m, 1h, 1d
+    window_start TIMESTAMPTZ NOT NULL,
+    metric_value NUMERIC(14, 4) NOT NULL,
+    labels JSONB NOT NULL DEFAULT '{}'::jsonb,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT uq_system_metrics_window UNIQUE (metric_name, metric_grain, window_start)
+);
+
+CREATE INDEX IF NOT EXISTS idx_system_metrics_name_window ON system_metrics (metric_name, window_start);
+
+-- ── 5. Enriched Outbox (Transactional Outbox for enriched-attacks) ───────────
+CREATE TABLE IF NOT EXISTS enriched_outbox (
+    id UUID PRIMARY KEY,
+    event_id UUID NOT NULL REFERENCES attacks(id) ON DELETE CASCADE,
+    topic VARCHAR(64) NOT NULL DEFAULT 'enriched-attacks',
+    payload JSONB NOT NULL,
+    publish_status VARCHAR(20) NOT NULL DEFAULT 'PENDING',   -- PENDING, CLAIMED, PUBLISHED, FAILED
+    claimed_at TIMESTAMPTZ,
+    claimed_by VARCHAR(64),
+    published_at TIMESTAMPTZ,
+    retry_count INTEGER NOT NULL DEFAULT 0,
+    last_error TEXT,
     created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE INDEX IF NOT EXISTS idx_alerts_timestamp_desc ON anomaly_alerts (timestamp DESC);
-CREATE INDEX IF NOT EXISTS idx_alerts_acknowledged ON anomaly_alerts (acknowledged);
+CREATE INDEX IF NOT EXISTS idx_enriched_outbox_status_ts ON enriched_outbox (publish_status, created_at);
+CREATE INDEX IF NOT EXISTS idx_enriched_outbox_event_id ON enriched_outbox (event_id);
+```
 
--- ── 4. Service Heartbeats Table ───────────────────────────────────────────────
-CREATE TABLE IF NOT EXISTS service_heartbeats (
-    service_name VARCHAR(64) PRIMARY KEY,
-    status VARCHAR(20) NOT NULL,
-    version VARCHAR(20) NOT NULL,
-    details JSONB NOT NULL DEFAULT '{}'::jsonb,
-    last_heartbeat TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
-);
+### 1.3 Index Selection Rationale & Query Plans
+| Index | Target Table & Columns | Expected Analytical Query Pattern | Rationale & Plan Behavior |
+| :--- | :--- | :--- | :--- |
+| `idx_attacks_timestamp_desc` | `attacks(timestamp DESC)` | Dashboard live timeline & range filtering (`WHERE timestamp >= NOW() - INTERVAL '1 hour'`) | B-tree index permits direct reverse index scan (`Index Scan Backward`), eliminating costly in-memory sorts (`Sort Key`). |
+| `idx_attacks_source_ip_ts` | `attacks(source_ip, timestamp DESC)` | Aggregated attacker profiling (`WHERE source_ip = :ip ORDER BY timestamp DESC`) | Composite B-tree index enables single-index lookup and ordering for per-IP threat dossiers without index hopping. |
+| `idx_attacks_primary_category`| `attacks(primary_category)` | Category aggregation charts (`SELECT primary_category, COUNT(*) GROUP BY 1`) | Enables fast index-only scans or hash aggregates for category breakdown cards on the frontend dashboard. |
+| `idx_attacks_geo_country_code`| `attacks(geo_country_code)` | World threat map aggregation (`SELECT geo_country_code, COUNT(*) GROUP BY 1`) | High-cardinality country code filtering and choropleth density generation. |
+| `idx_attack_signatures_attack_id`| `attack_signatures(attack_id)`| Drill-down modals fetching signatures for an event | Foreign-key index prevents sequential scans when querying child signatures for a specific incident. |
+| `idx_enriched_outbox_status_ts`| `enriched_outbox(publish_status, created_at)` | Outbox worker polling (`WHERE publish_status = 'PENDING' ORDER BY created_at LIMIT 50`) | Filtered lookup directly targets pending records in FIFO order, bypassing already-published outbox entries. |
+
+### 1.4 Database Migrations (Alembic)
+- **Tool**: Alembic with asynchronous `asyncpg` engine (`services/ingestion/alembic.ini`).
+- **Initialization**: Run `alembic upgrade head` from `services/ingestion/`.
+- **Inspection**: Run `alembic current` or `alembic history --verbose`.
+- **Rollback**: Run `alembic downgrade -1` to safely roll back the previous migration.
 ```
 
 ---
