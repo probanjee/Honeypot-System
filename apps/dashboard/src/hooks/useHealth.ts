@@ -32,11 +32,12 @@ export function useHealth(pollIntervalMs: number = 30000) {
   const checkHealth = useCallback(async () => {
     try {
       const data = await vigilanceApi.getHealth();
+      const isHealthy = typeof data?.status === 'string' && data.status.toLowerCase() === 'healthy';
       setHealth({
-        isBackendReachable: data.status === 'HEALTHY',
-        status: data.status,
-        version: data.version,
-        components: (data.components || {}) as HealthState['components'],
+        isBackendReachable: isHealthy,
+        status: data?.status ? data.status.toUpperCase() : 'UNKNOWN',
+        version: data?.version || '1.0.0',
+        components: (data?.components || {}) as HealthState['components'],
         lastChecked: new Date(),
         error: null,
       });

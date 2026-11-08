@@ -14,6 +14,7 @@ import type { AttackListItem } from '../../types/attacks';
 interface AttackGeoMapProps {
   attacks: AttackListItem[];
   onSelectAttack?: (attack: AttackListItem) => void;
+  theme?: 'light' | 'dark';
 }
 
 const SEVERITY_COLORS: Record<string, string> = {
@@ -24,9 +25,10 @@ const SEVERITY_COLORS: Record<string, string> = {
   INFORMATIONAL: '#3b82f6',
 };
 
-export const AttackGeoMap: React.FC<AttackGeoMapProps> = ({ attacks, onSelectAttack }) => {
+export const AttackGeoMap: React.FC<AttackGeoMapProps> = ({ attacks, onSelectAttack, theme = 'dark' }) => {
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
+  const tileLayersRef = useRef<L.LayerGroup | null>(null);
   const markersLayerRef = useRef<L.LayerGroup | null>(null);
   const [plottedCount, setPlottedCount] = useState<number>(0);
 
@@ -53,11 +55,8 @@ export const AttackGeoMap: React.FC<AttackGeoMapProps> = ({ attacks, onSelectAtt
         attributionControl: false,
       });
 
-      // CartoDB Dark Matter tile basemap for SOC aesthetics
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-        maxZoom: 19,
-        subdomains: 'abcd',
-      }).addTo(map);
+      const tileGroup = L.layerGroup().addTo(map);
+      tileLayersRef.current = tileGroup;
 
       const markersGroup = L.layerGroup().addTo(map);
       markersLayerRef.current = markersGroup;
@@ -69,9 +68,47 @@ export const AttackGeoMap: React.FC<AttackGeoMapProps> = ({ attacks, onSelectAtt
         mapInstanceRef.current.remove();
         mapInstanceRef.current = null;
         markersLayerRef.current = null;
+        tileLayersRef.current = null;
       }
     };
   }, []);
+
+  // 2. Update Basemap Tiles on Theme Change (Light = CARTO Voyager / Dark = CARTO Dark Matter)
+  useEffect(() => {
+    const tileGroup = tileLayersRef.current;
+    if (!tileGroup) return;
+
+    tileGroup.clearLayers();
+
+    const cartoKey = import.meta.env.VITE_CARTO_API_KEY || 'cb1_54jp_1_3545f77ce8554eefb8ed91dc';
+    const isLight = theme === 'light';
+
+    if (cartoKey) {
+      const tilePath = isLight ? 'rastertiles/voyager' : 'dark_all';
+      L.tileLayer(`https://{s}.basemaps.cartocdn.com/${tilePath}/{z}/{x}/{y}.png?key=${cartoKey}`, {
+        maxZoom: 19,
+        subdomains: 'abcd',
+        attribution: '&copy; CARTO &copy; OpenStreetMap contributors',
+      }).addTo(tileGroup);
+    } else {
+      if (isLight) {
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 18,
+          attribution: '&copy; OpenStreetMap contributors',
+        }).addTo(tileGroup);
+      } else {
+        L.tileLayer(
+          'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',
+          { maxZoom: 16 }
+        ).addTo(tileGroup);
+
+        L.tileLayer(
+          'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}',
+          { maxZoom: 16 }
+        ).addTo(tileGroup);
+      }
+    }
+  }, [theme]);
 
   // 2. Plot Attack Circle Markers
   useEffect(() => {

@@ -15,6 +15,7 @@ import {
   Server,
 } from 'lucide-react';
 import type { SSEConnectionStatus } from '../../types/stream';
+import { ThemeToggle } from './ThemeToggle';
 
 interface HeaderProps {
   backendReachable: boolean;
@@ -24,6 +25,8 @@ interface HeaderProps {
   onTogglePause: () => void;
   onRefreshAll: () => void;
   isRefreshing?: boolean;
+  theme?: 'light' | 'dark';
+  onToggleTheme?: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
@@ -34,6 +37,8 @@ export const Header: React.FC<HeaderProps> = ({
   onTogglePause,
   onRefreshAll,
   isRefreshing = false,
+  theme = 'dark',
+  onToggleTheme,
 }) => {
   const formatTime = (date: Date | null) => {
     if (!date) return 'Never';
@@ -56,36 +61,49 @@ export const Header: React.FC<HeaderProps> = ({
         <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
           <div
             style={{
-              width: '42px',
-              height: '42px',
+              width: '46px',
+              height: '46px',
               borderRadius: 'var(--radius-md)',
-              background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.2), rgba(37, 99, 235, 0.4))',
-              border: '1px solid rgba(56, 189, 248, 0.4)',
+              background: 'linear-gradient(135deg, rgba(56, 189, 248, 0.25), rgba(99, 102, 241, 0.35))',
+              border: '1px solid rgba(255, 255, 255, 0.25)',
+              borderTop: '1px solid rgba(255, 255, 255, 0.5)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              boxShadow: 'var(--shadow-glow)',
+              boxShadow: 'var(--shadow-glow), inset 0 1px 2px rgba(255, 255, 255, 0.3)',
             }}
           >
-            <ShieldAlert size={24} color="#38bdf8" />
+            <ShieldAlert size={26} color="#38bdf8" />
           </div>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <h1 style={{ fontSize: '1.25rem', fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+              <h1
+                style={{
+                  fontSize: '1.35rem',
+                  fontWeight: 800,
+                  letterSpacing: '0.06em',
+                  textTransform: 'uppercase',
+                  background: 'var(--brand-title-gradient)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                }}
+              >
                 VIGILANCE
               </h1>
               <span
                 className="mono"
                 style={{
                   fontSize: '0.6875rem',
-                  padding: '2px 6px',
-                  borderRadius: 'var(--radius-sm)',
-                  background: 'rgba(56, 189, 248, 0.1)',
-                  color: '#38bdf8',
-                  border: '1px solid rgba(56, 189, 248, 0.25)',
+                  padding: '3px 8px',
+                  borderRadius: 'var(--radius-pill)',
+                  background: 'rgba(56, 189, 248, 0.12)',
+                  color: 'var(--card-val-cyan)',
+                  border: '1px solid rgba(56, 189, 248, 0.35)',
+                  boxShadow: '0 0 12px rgba(56, 189, 248, 0.2)',
+                  fontWeight: 600,
                 }}
               >
-                SOC DASHBOARD v1.0
+                SOC OS 27
               </span>
             </div>
             <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>
@@ -95,17 +113,19 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         {/* Center: System Connection Monitors */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '20px', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
           {/* Backend Status */}
           <div
             style={{
               display: 'flex',
               alignItems: 'center',
               gap: '8px',
-              padding: '6px 12px',
-              borderRadius: 'var(--radius-md)',
-              background: 'var(--bg-surface-elevated)',
+              padding: '6px 14px',
+              borderRadius: 'var(--radius-pill)',
+              background: 'var(--pill-bg)',
               border: '1px solid var(--border-subtle)',
+              borderTop: '1px solid var(--border-strong)',
+              boxShadow: 'inset 0 1px 1px rgba(255, 255, 255, 0.1)',
             }}
           >
             <Server size={15} color="var(--text-muted)" />
@@ -122,13 +142,15 @@ export const Header: React.FC<HeaderProps> = ({
               display: 'flex',
               alignItems: 'center',
               gap: '8px',
-              padding: '6px 12px',
-              borderRadius: 'var(--radius-md)',
-              background: 'var(--bg-surface-elevated)',
+              padding: '6px 14px',
+              borderRadius: 'var(--radius-pill)',
+              background: 'var(--pill-bg)',
               border: '1px solid var(--border-subtle)',
+              borderTop: '1px solid var(--border-strong)',
+              boxShadow: 'inset 0 1px 1px rgba(255, 255, 255, 0.1)',
             }}
           >
-            <Radio size={15} color={streamStatus === 'CONNECTED' ? '#10b981' : 'var(--text-muted)'} />
+            <Radio size={15} color={streamStatus === 'CONNECTED' ? '#30d158' : 'var(--text-muted)'} />
             <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Kafka → SSE:</span>
             <span className={`pulse-dot ${streamStatus}`} />
             <span className="mono" style={{ fontSize: '0.75rem', fontWeight: 600 }}>
@@ -137,7 +159,17 @@ export const Header: React.FC<HeaderProps> = ({
           </div>
 
           {/* Last Refresh */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '6px 12px',
+              borderRadius: 'var(--radius-pill)',
+              background: 'var(--pill-bg)',
+              border: '1px solid var(--border-subtle)',
+            }}
+          >
             <Activity size={14} color="var(--text-muted)" />
             <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Updated:</span>
             <span className="mono" style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
@@ -147,7 +179,12 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         {/* Right: Actions */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          {/* Apple Liquid Glass Theme Toggle */}
+          {onToggleTheme && (
+            <ThemeToggle theme={theme} onToggle={onToggleTheme} />
+          )}
+
           {/* Stream Pause/Resume Toggle */}
           <button
             onClick={onTogglePause}

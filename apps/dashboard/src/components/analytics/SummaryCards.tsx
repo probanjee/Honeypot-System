@@ -55,19 +55,32 @@ export const SummaryCards: React.FC<SummaryCardsProps> = ({
           </span>
         </div>
 
-        <div style={{ display: 'flex', gap: '6px' }}>
+        <div
+          style={{
+            display: 'flex',
+            gap: '4px',
+            padding: '3px',
+            borderRadius: 'var(--radius-pill)',
+            background: 'var(--pill-bg)',
+            border: '1px solid var(--border-subtle)',
+            backdropFilter: 'blur(16px)',
+          }}
+        >
           {(['1h', '24h', '7d'] as TimeWindowOption[]).map((w) => (
             <button
               key={w}
               onClick={() => onChangeWindow(w)}
               className="soc-btn"
               style={{
-                padding: '4px 12px',
+                padding: '4px 14px',
                 fontSize: '0.75rem',
                 fontWeight: 600,
-                background: windowOption === w ? 'var(--severity-info-bg)' : 'var(--bg-surface-elevated)',
-                borderColor: windowOption === w ? '#38bdf8' : 'var(--border-subtle)',
-                color: windowOption === w ? '#38bdf8' : 'var(--text-secondary)',
+                borderRadius: 'var(--radius-pill)',
+                background: windowOption === w ? 'var(--tab-active-bg)' : 'transparent',
+                borderColor: windowOption === w ? 'var(--tab-active-border)' : 'transparent',
+                borderTopColor: windowOption === w ? 'rgba(255, 255, 255, 0.4)' : 'transparent',
+                color: windowOption === w ? 'var(--tab-active-text)' : 'var(--text-secondary)',
+                boxShadow: windowOption === w ? 'var(--tab-active-shadow)' : 'none',
               }}
             >
               {w === '1h' ? 'Last 1 Hour' : w === '24h' ? 'Last 24 Hours' : 'Last 7 Days'}
@@ -106,29 +119,38 @@ export const SummaryCards: React.FC<SummaryCardsProps> = ({
         }}
       >
         {/* Card 1: Total Attack Volume */}
-        <div className="soc-panel soc-panel-body" style={{ position: 'relative', overflow: 'hidden' }}>
+        <div
+          className="soc-panel soc-panel-body"
+          style={{
+            position: 'relative',
+            overflow: 'hidden',
+            background: 'var(--card-bg-cyan)',
+          }}
+        >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
             <div>
               <p style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--text-muted)' }}>
                 Total Attacks Detected
               </p>
-              <h2 className="mono" style={{ fontSize: '2rem', fontWeight: 700, marginTop: '4px' }}>
-                {loading && !summary ? '—' : summary?.total_attacks.toLocaleString() ?? '0'}
-              </h2>
+                <h2 className="mono" style={{ fontSize: '2rem', fontWeight: 700, marginTop: '4px', color: 'var(--card-val-cyan)' }}>
+                  {loading && !summary ? '—' : summary?.total_attacks.toLocaleString() ?? '0'}
+                </h2>
             </div>
             <div
               style={{
-                width: '38px',
-                height: '38px',
+                width: '42px',
+                height: '42px',
                 borderRadius: 'var(--radius-md)',
-                background: 'rgba(56, 189, 248, 0.1)',
-                border: '1px solid rgba(56, 189, 248, 0.3)',
+                background: 'var(--card-icon-bg-cyan)',
+                border: '1px solid var(--card-icon-border-cyan)',
+                borderTop: '1px solid rgba(255, 255, 255, 0.5)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
+                boxShadow: 'var(--card-icon-shadow-cyan)',
               }}
             >
-              <AlertTriangle size={20} color="#38bdf8" />
+              <AlertTriangle size={20} color="var(--card-val-cyan)" />
             </div>
           </div>
           <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '8px' }}>
@@ -137,7 +159,14 @@ export const SummaryCards: React.FC<SummaryCardsProps> = ({
         </div>
 
         {/* Card 2: Critical & High Severity */}
-        <div className="soc-panel soc-panel-body" style={{ position: 'relative', overflow: 'hidden' }}>
+        <div
+          className="soc-panel soc-panel-body"
+          style={{
+            position: 'relative',
+            overflow: 'hidden',
+            background: 'var(--card-bg-red)',
+          }}
+        >
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
             <div>
               <p style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--text-muted)' }}>
@@ -149,91 +178,111 @@ export const SummaryCards: React.FC<SummaryCardsProps> = ({
             </div>
             <div
               style={{
-                width: '38px',
-                height: '38px',
+                width: '42px',
+                height: '42px',
                 borderRadius: 'var(--radius-md)',
-                background: 'var(--severity-critical-bg)',
-                border: '1px solid rgba(239, 68, 68, 0.3)',
+                background: 'var(--card-icon-bg-red)',
+                border: '1px solid var(--card-icon-border-red)',
+                borderTop: '1px solid rgba(255, 255, 255, 0.5)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
+                boxShadow: 'var(--card-icon-shadow-red)',
               }}
             >
               <Flame size={20} color="var(--severity-critical)" />
             </div>
           </div>
           <div style={{ display: 'flex', gap: '12px', marginTop: '8px', fontSize: '0.75rem' }}>
-            <span style={{ color: 'var(--severity-critical)' }}>
-              Critical: <strong>{criticalCount}</strong>
-            </span>
-            <span style={{ color: 'var(--severity-high)' }}>
-              High: <strong>{highCount}</strong>
-            </span>
+              <span style={{ color: 'var(--severity-critical)', fontWeight: 600 }}>
+                Critical: <strong>{criticalCount}</strong>
+              </span>
+                <span style={{ color: 'var(--severity-high)', fontWeight: 600 }}>
+                  High: <strong>{highCount}</strong>
+                </span>
+              </div>
           </div>
-        </div>
 
-        {/* Card 3: Distinct Attacker IPs */}
-        <div className="soc-panel soc-panel-body" style={{ position: 'relative', overflow: 'hidden' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-            <div>
-              <p style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--text-muted)' }}>
-                Distinct Source IPs
-              </p>
-              <h2 className="mono" style={{ fontSize: '2rem', fontWeight: 700, color: '#a855f7', marginTop: '4px' }}>
-                {loading && !summary ? '—' : summary?.distinct_sources_count.toLocaleString() ?? '0'}
-              </h2>
+          {/* Card 3: Distinct Attacker IPs */}
+          <div
+            className="soc-panel soc-panel-body"
+            style={{
+              position: 'relative',
+              overflow: 'hidden',
+              background: 'var(--card-bg-purple)',
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <div>
+                <p style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--text-muted)' }}>
+                  Distinct Source IPs
+                </p>
+                  <h2 className="mono" style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--card-val-purple)', marginTop: '4px' }}>
+                    {loading && !summary ? '—' : summary?.distinct_sources_count.toLocaleString() ?? '0'}
+                  </h2>
+              </div>
+              <div
+                style={{
+                  width: '42px',
+                  height: '42px',
+                  borderRadius: 'var(--radius-md)',
+                  background: 'var(--card-icon-bg-purple)',
+                  border: '1px solid var(--card-icon-border-purple)',
+                  borderTop: '1px solid rgba(255, 255, 255, 0.5)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: 'var(--card-icon-shadow-purple)',
+                }}
+              >
+                <Users size={20} color="var(--card-val-purple)" />
+              </div>
             </div>
-            <div
-              style={{
-                width: '38px',
-                height: '38px',
-                borderRadius: 'var(--radius-md)',
-                background: 'rgba(168, 85, 247, 0.1)',
-                border: '1px solid rgba(168, 85, 247, 0.3)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <Users size={20} color="#a855f7" />
-            </div>
+            <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '8px' }}>
+              Unique origin network endpoints
+            </p>
           </div>
-          <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '8px' }}>
-            Unique origin network endpoints
-          </p>
-        </div>
 
-        {/* Card 4: Dominant Attack Vector */}
-        <div className="soc-panel soc-panel-body" style={{ position: 'relative', overflow: 'hidden' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-            <div>
-              <p style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--text-muted)' }}>
-                Top Vector
-              </p>
-              <h2 className="mono" style={{ fontSize: '1.25rem', fontWeight: 700, color: '#38bdf8', marginTop: '8px', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', maxWidth: '170px' }}>
-                {loading && !summary ? '—' : topCategory}
-              </h2>
+          {/* Card 4: Dominant Attack Vector */}
+          <div
+            className="soc-panel soc-panel-body"
+            style={{
+              position: 'relative',
+              overflow: 'hidden',
+              background: 'var(--card-bg-amber)',
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <div>
+                <p style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--text-muted)' }}>
+                  Top Vector
+                </p>
+                  <h2 className="mono" style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--card-val-amber)', marginTop: '8px', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', maxWidth: '170px' }}>
+                    {loading && !summary ? '—' : topCategory}
+                  </h2>
+              </div>
+              <div
+                style={{
+                  width: '42px',
+                  height: '42px',
+                  borderRadius: 'var(--radius-md)',
+                  background: 'var(--card-icon-bg-amber)',
+                  border: '1px solid var(--card-icon-border-amber)',
+                  borderTop: '1px solid rgba(255, 255, 255, 0.5)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: 'var(--card-icon-shadow-amber)',
+                }}
+              >
+                <Crosshair size={20} color="var(--card-val-amber)" />
+              </div>
             </div>
-            <div
-              style={{
-                width: '38px',
-                height: '38px',
-                borderRadius: 'var(--radius-md)',
-                background: 'rgba(56, 189, 248, 0.1)',
-                border: '1px solid rgba(56, 189, 248, 0.3)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <Crosshair size={20} color="#38bdf8" />
-            </div>
+            <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '8px' }}>
+              {topCategoryCount > 0 ? `${topCategoryCount} detections` : 'No category logged'}
+            </p>
           </div>
-          <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '8px' }}>
-            {topCategoryCount > 0 ? `${topCategoryCount} detections` : 'No category logged'}
-          </p>
         </div>
       </div>
-    </div>
-  );
+      );
 };

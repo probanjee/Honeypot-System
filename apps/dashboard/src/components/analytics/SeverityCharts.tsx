@@ -92,7 +92,7 @@ export const SeverityCharts: React.FC<SeverityChartsProps> = ({ summary, loading
                     cy="80"
                     r={donutRadius}
                     fill="transparent"
-                    stroke="rgba(255, 255, 255, 0.05)"
+                    stroke="var(--chart-track)"
                     strokeWidth={strokeWidth}
                   />
                   {/* Slices */}
@@ -205,7 +205,7 @@ export const SeverityCharts: React.FC<SeverityChartsProps> = ({ summary, loading
                       style={{
                         width: '100%',
                         height: '6px',
-                        backgroundColor: 'rgba(255, 255, 255, 0.05)',
+                        backgroundColor: 'var(--chart-track)',
                         borderRadius: '3px',
                         overflow: 'hidden',
                       }}

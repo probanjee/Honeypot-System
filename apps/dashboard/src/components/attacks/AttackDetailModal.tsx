@@ -65,8 +65,9 @@ export const AttackDetailModal: React.FC<AttackDetailModalProps> = ({ attack, on
         left: 0,
         right: 0,
         bottom: 0,
-        backgroundColor: 'rgba(0, 0, 0, 0.75)',
-        backdropFilter: 'blur(6px)',
+        backgroundColor: 'var(--modal-backdrop)',
+        backdropFilter: 'blur(28px) saturate(190%)',
+        WebkitBackdropFilter: 'blur(28px) saturate(190%)',
         zIndex: 1000,
         display: 'flex',
         alignItems: 'center',
@@ -83,9 +84,12 @@ export const AttackDetailModal: React.FC<AttackDetailModalProps> = ({ attack, on
           maxHeight: '85vh',
           display: 'flex',
           flexDirection: 'column',
-          backgroundColor: 'var(--bg-surface)',
-          borderRadius: 'var(--radius-lg)',
-          boxShadow: '0 20px 50px rgba(0,0,0,0.8), 0 0 0 1px var(--border-strong)',
+          backgroundColor: 'var(--bg-surface-elevated)',
+          borderRadius: 'var(--radius-xl)',
+          border: '1px solid var(--border-subtle)',
+          borderTop: '1px solid var(--border-specular)',
+          boxShadow: 'var(--shadow-glass)',
+          overflow: 'hidden',
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -93,9 +97,10 @@ export const AttackDetailModal: React.FC<AttackDetailModalProps> = ({ attack, on
         <div
           className="soc-panel-header"
           style={{
-            background: 'var(--bg-surface-elevated)',
-            borderTopLeftRadius: 'var(--radius-lg)',
-            borderTopRightRadius: 'var(--radius-lg)',
+            background: 'rgba(255, 255, 255, 0.03)',
+            borderTopLeftRadius: 'var(--radius-xl)',
+            borderTopRightRadius: 'var(--radius-xl)',
+            padding: '18px 24px',
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>

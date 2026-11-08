@@ -6,6 +6,7 @@
 
 import React, { useState } from 'react';
 import { Header } from './components/layout/Header';
+import { LoadingScreen } from './components/layout/LoadingScreen';
 import { SummaryCards } from './components/analytics/SummaryCards';
 import { SeverityCharts } from './components/analytics/SeverityCharts';
 import { AttackGeoMap } from './components/map/AttackGeoMap';
@@ -60,6 +61,26 @@ export const App: React.FC = () => {
   // 5. Selected Attack for Forensic Detail Modal
   const [selectedAttack, setSelectedAttack] = useState<AttackListItem | null>(null);
 
+  // 6. Startup Glass Loading Screen
+  const [showLoadingScreen, setShowLoadingScreen] = useState<boolean>(true);
+
+  // 7. Theme Management (Liquid Glass Dark & Light)
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    return (localStorage.getItem('vigilance_theme') as 'light' | 'dark') || 'dark';
+  });
+
+  const toggleTheme = () => {
+    setTheme((prev) => {
+      const next = prev === 'dark' ? 'light' : 'dark';
+      localStorage.setItem('vigilance_theme', next);
+      return next;
+    });
+  };
+
+  React.useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+  }, [theme]);
+
   // Global Refresh Handler
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
   const handleRefreshAll = async () => {
@@ -80,8 +101,12 @@ export const App: React.FC = () => {
   }, [liveAttacks, historicalAttacks]);
 
   return (
-    <div style={{ maxWidth: '1600px', margin: '0 auto', padding: '24px 20px' }}>
-      {/* 1. Header & Live Connection Status */}
+    <>
+      {showLoadingScreen && (
+        <LoadingScreen onLoaded={() => setShowLoadingScreen(false)} minDurationMs={1800} />
+      )}
+      <div style={{ maxWidth: '1600px', margin: '0 auto', padding: '24px 20px' }}>
+        {/* 1. Header & Live Connection Status */}
       <Header
         backendReachable={isBackendReachable}
         streamStatus={streamState.status}
@@ -90,6 +115,8 @@ export const App: React.FC = () => {
         onTogglePause={onTogglePause}
         onRefreshAll={handleRefreshAll}
         isRefreshing={isRefreshing}
+        theme={theme}
+        onToggleTheme={toggleTheme}
       />
 
       {/* 2. Analytical Summary Metrics */}
@@ -107,6 +134,7 @@ export const App: React.FC = () => {
       <AttackGeoMap
         attacks={combinedMapAttacks}
         onSelectAttack={(attack) => setSelectedAttack(attack)}
+        theme={theme}
       />
 
       {/* 4. Bottom Section: Search & Filters + Live Attack Feed Table */}
@@ -144,6 +172,7 @@ export const App: React.FC = () => {
         onClose={() => setSelectedAttack(null)}
       />
     </div>
+    </>
   );
 };
 

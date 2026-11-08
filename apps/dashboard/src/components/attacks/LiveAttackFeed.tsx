@@ -63,23 +63,36 @@ export const LiveAttackFeed: React.FC<LiveAttackFeedProps> = ({
     <div className="soc-panel" style={{ marginBottom: '24px' }}>
       {/* Feed Mode Tabs & Counters */}
       <div className="soc-panel-header" style={{ flexWrap: 'wrap', gap: '10px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '4px',
+            padding: '3px',
+            borderRadius: 'var(--radius-pill)',
+            background: 'var(--pill-bg)',
+            border: '1px solid var(--border-subtle)',
+            backdropFilter: 'blur(12px)',
+          }}
+        >
           {/* Tab 1: Live Feed */}
           <button
             onClick={() => setActiveTab('live')}
             style={{
-              background: 'transparent',
-              border: 'none',
+              background: activeTab === 'live' ? 'var(--tab-active-bg)' : 'transparent',
+              border: activeTab === 'live' ? '1px solid var(--tab-active-border)' : '1px solid transparent',
+              borderTopColor: activeTab === 'live' ? 'rgba(255, 255, 255, 0.4)' : 'transparent',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
-              gap: '6px',
-              padding: '6px 12px',
-              borderRadius: 'var(--radius-md)',
-              color: activeTab === 'live' ? '#38bdf8' : 'var(--text-muted)',
-              backgroundColor: activeTab === 'live' ? 'rgba(56, 189, 248, 0.1)' : 'transparent',
+              gap: '8px',
+              padding: '6px 14px',
+              borderRadius: 'var(--radius-pill)',
+              color: activeTab === 'live' ? 'var(--tab-active-text)' : 'var(--text-muted)',
               fontWeight: 600,
               fontSize: '0.8125rem',
+              transition: 'all 0.2s ease',
+              boxShadow: activeTab === 'live' ? 'var(--tab-active-shadow)' : 'none',
             }}
           >
             <Radio size={14} color={activeTab === 'live' ? '#38bdf8' : 'currentColor'} />
@@ -88,9 +101,9 @@ export const LiveAttackFeed: React.FC<LiveAttackFeedProps> = ({
               className="mono"
               style={{
                 fontSize: '0.6875rem',
-                padding: '1px 6px',
-                borderRadius: '10px',
-                background: 'var(--bg-surface-elevated)',
+                padding: '2px 8px',
+                borderRadius: 'var(--radius-pill)',
+                background: 'rgba(255, 255, 255, 0.1)',
                 color: 'var(--text-primary)',
               }}
             >
@@ -102,18 +115,20 @@ export const LiveAttackFeed: React.FC<LiveAttackFeedProps> = ({
           <button
             onClick={() => setActiveTab('history')}
             style={{
-              background: 'transparent',
-              border: 'none',
+              background: activeTab === 'history' ? 'var(--tab-active-bg)' : 'transparent',
+              border: activeTab === 'history' ? '1px solid var(--tab-active-border)' : '1px solid transparent',
+              borderTopColor: activeTab === 'history' ? 'rgba(255, 255, 255, 0.4)' : 'transparent',
               cursor: 'pointer',
               display: 'flex',
               alignItems: 'center',
-              gap: '6px',
-              padding: '6px 12px',
-              borderRadius: 'var(--radius-md)',
-              color: activeTab === 'history' ? '#38bdf8' : 'var(--text-muted)',
-              backgroundColor: activeTab === 'history' ? 'rgba(56, 189, 248, 0.1)' : 'transparent',
+              gap: '8px',
+              padding: '6px 14px',
+              borderRadius: 'var(--radius-pill)',
+              color: activeTab === 'history' ? 'var(--tab-active-text)' : 'var(--text-muted)',
               fontWeight: 600,
               fontSize: '0.8125rem',
+              transition: 'all 0.2s ease',
+              boxShadow: activeTab === 'history' ? 'var(--tab-active-shadow)' : 'none',
             }}
           >
             <History size={14} color={activeTab === 'history' ? '#38bdf8' : 'currentColor'} />
@@ -122,9 +137,9 @@ export const LiveAttackFeed: React.FC<LiveAttackFeedProps> = ({
               className="mono"
               style={{
                 fontSize: '0.6875rem',
-                padding: '1px 6px',
-                borderRadius: '10px',
-                background: 'var(--bg-surface-elevated)',
+                padding: '2px 8px',
+                borderRadius: 'var(--radius-pill)',
+                background: 'rgba(255, 255, 255, 0.1)',
                 color: 'var(--text-primary)',
               }}
             >
@@ -208,7 +223,9 @@ export const LiveAttackFeed: React.FC<LiveAttackFeedProps> = ({
                 fontSize: '0.6875rem',
                 textTransform: 'uppercase',
                 letterSpacing: '0.05em',
-                background: 'rgba(0, 0, 0, 0.3)',
+                background: 'var(--bg-table-header)',
+                backdropFilter: 'blur(16px)',
+                WebkitBackdropFilter: 'blur(16px)',
                 position: 'sticky',
                 top: 0,
                 zIndex: 10,

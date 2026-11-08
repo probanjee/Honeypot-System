@@ -49,8 +49,8 @@ export const AttackFiltersBar: React.FC<AttackFiltersProps> = ({
         justifyContent: 'space-between',
         flexWrap: 'wrap',
         gap: '12px',
-        padding: '12px 18px',
-        background: 'var(--bg-surface)',
+        padding: '14px 22px',
+        background: 'var(--filter-bar-bg)',
         borderBottom: '1px solid var(--border-subtle)',
       }}
     >

@@ -1,7 +1,4 @@
-"""
-Pydantic Schemas for VIGILANCE Event Contracts (Draft 7, schema_version 1.0.0)
-Specification: docs/api/event-schemas.md
-"""
+
 
 from typing import List, Dict, Any, Optional, Literal
 from pydantic import BaseModel, Field, field_validator
