@@ -46,10 +46,7 @@ export interface ValidationResult {
 const UUID_V4_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const VALID_SEVERITIES = new Set(['INFORMATIONAL', 'LOW', 'MEDIUM', 'HIGH', 'CRITICAL']);
 
-/**
- * Validates an arbitrary payload against the RawAttackEvent v1.0.0 contract.
- * Returns detailed structural errors without throwing runtime exceptions.
- */
+
 export function validateRawAttackEvent(payload: unknown): ValidationResult {
   const errors: string[] = [];
 

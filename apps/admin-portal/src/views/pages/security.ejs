@@ -1,0 +1,187 @@
+<%- include('../layouts/header', { title: 'Honeypot Decoy Traps & Threat Simulator', currentTab: 'security' }) %>
+
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1.5rem;">
+  <div>
+    <div class="mono" style="font-size: 0.72rem; color: var(--accent); font-weight: 700; text-transform: uppercase; margin-bottom: 0.4rem;">
+      CYBER DECEPTION & THREAT SIMULATION CONSOLE
+    </div>
+    <h1 style="font-size: 2.2rem; font-weight: 900; text-transform: uppercase;">
+      Honeypot Decoy Traps & Threat Simulator
+    </h1>
+    <p style="color: var(--text-muted); font-size: 0.95rem;">
+      Monitor active honeypot deception tripwires and dispatch controlled synthetic attack vectors into Kafka & VIGILANCE SOC.
+    </p>
+  </div>
+
+  <div style="display: flex; gap: 1rem; align-items: center;">
+    <a href="http://localhost:5173" target="_blank" class="btn btn-soc" style="padding: 0.65rem 1.25rem;">
+      🛡 Launch VIGILANCE Threat Radar (:5173) &rarr;
+    </a>
+  </div>
+</div>
+
+<!-- Active Decoy Sensor Grid -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem; margin-bottom: 2rem;">
+  <div class="card" style="margin-bottom: 0; border-left: 4px solid var(--accent); padding: 1.5rem;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
+      <span class="mono" style="font-size: 0.75rem; color: var(--accent); font-weight: 700;">SENSOR #01</span>
+      <span class="badge badge-live">ARMED</span>
+    </div>
+    <h3 style="font-size: 1.15rem; font-weight: 800; color: #fff;">Decoy Administrative Gateway</h3>
+    <div class="mono" style="font-size: 0.75rem; color: var(--text-muted); margin: 4px 0 8px;">TARGET: /admin/login</div>
+    <p style="color: var(--text-muted); font-size: 0.8125rem;">
+      Traps credential brute-force attacks and password spray attempts with delayed synthetic error responses.
+    </p>
+  </div>
+
+  <div class="card" style="margin-bottom: 0; border-left: 4px solid var(--warning); padding: 1.5rem;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
+      <span class="mono" style="font-size: 0.75rem; color: var(--warning); font-weight: 700;">SENSOR #02</span>
+      <span class="badge badge-live">ARMED</span>
+    </div>
+    <h3 style="font-size: 1.15rem; font-weight: 800; color: #fff;">Staff Directory SQLi Honeypot</h3>
+    <div class="mono" style="font-size: 0.75rem; color: var(--text-muted); margin: 4px 0 8px;">TARGET: /api/v1/staff?search=</div>
+    <p style="color: var(--text-muted); font-size: 0.8125rem;">
+      Simulates vulnerable SQL database queries and detects injection payloads with automated signature extraction.
+    </p>
+  </div>
+
+  <div class="card" style="margin-bottom: 0; border-left: 4px solid var(--accent-cyan); padding: 1.5rem;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
+      <span class="mono" style="font-size: 0.75rem; color: var(--accent-cyan); font-weight: 700;">SENSOR #03</span>
+      <span class="badge badge-live">ARMED</span>
+    </div>
+    <h3 style="font-size: 1.15rem; font-weight: 800; color: #fff;">Environmental Honeyfile Decoy</h3>
+    <div class="mono" style="font-size: 0.75rem; color: var(--text-muted); margin: 4px 0 8px;">TARGET: /.env &bull; /wp-config.php</div>
+    <p style="color: var(--text-muted); font-size: 0.8125rem;">
+      Captures automated reconnaissance scanners seeking secrets and returns canary canary token credentials.
+    </p>
+  </div>
+
+  <div class="card" style="margin-bottom: 0; border-left: 4px solid #c084fc; padding: 1.5rem;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem;">
+      <span class="mono" style="font-size: 0.75rem; color: #c084fc; font-weight: 700;">SENSOR #04</span>
+      <span class="badge badge-live">ARMED</span>
+    </div>
+    <h3 style="font-size: 1.15rem; font-weight: 800; color: #fff;">Remote Code Execution Tripwire</h3>
+    <div class="mono" style="font-size: 0.75rem; color: var(--text-muted); margin: 4px 0 8px;">TARGET: /exec &bull; /api/v1/ping</div>
+    <p style="color: var(--text-muted); font-size: 0.8125rem;">
+      Intercepts shell command injections (`cat /etc/passwd`, `whoami`, `curl`) and scores CRITICAL 95+ severity.
+    </p>
+  </div>
+</div>
+
+<!-- Threat Simulator & Dispatcher Console -->
+<div style="display: grid; grid-template-columns: 1.2fr 1.8fr; gap: 1.75rem; margin-bottom: 2rem;">
+
+  <!-- Simulator Control Panel -->
+  <div class="card" style="border-color: rgba(255, 42, 75, 0.4);">
+    <div class="card-header">
+      <div class="card-title" style="color: #ff80ab;">
+        <span>🎯</span> Synthetic Attack Vector Launcher
+      </div>
+    </div>
+
+    <p style="color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1.5rem;">
+      Select an adversarial attack vector to dispatch against the public honeypot decoy at <code class="mono" style="color: var(--accent);">http://localhost:3000</code>. Watch it process into Kafka and populate the VIGILANCE radar in real-time.
+    </p>
+
+    <div style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.5rem;">
+      <div>
+        <label style="display: block; font-size: 0.8125rem; color: var(--text-muted); margin-bottom: 0.4rem; font-weight: 600;">Attack Category</label>
+        <select id="attackVectorSelect" class="input-control" onchange="updatePayloadPreview()">
+          <option value="SQL_INJECTION">SQL Injection (SQLi) - Severity 85</option>
+          <option value="COMMAND_INJECTION">Command Injection (RCE) - Severity 95</option>
+          <option value="PATH_TRAVERSAL">Path Traversal (LFI) - Severity 75</option>
+          <option value="BRUTE_FORCE">Admin Credential Brute Force - Severity 60</option>
+        </select>
+      </div>
+
+      <div>
+        <label style="display: block; font-size: 0.8125rem; color: var(--text-muted); margin-bottom: 0.4rem; font-weight: 600;">Payload Preview</label>
+        <textarea id="payloadPreview" class="input-control mono" rows="3" style="font-size: 0.8125rem; color: var(--accent-cyan); background: rgba(8, 12, 22, 0.9); resize: none;" readonly></textarea>
+      </div>
+
+      <button onclick="launchSelectedProbe()" class="btn btn-primary" style="padding: 0.85rem; justify-content: center; font-size: 0.95rem; font-weight: 800; text-transform: uppercase;">
+        ⚡ Fire Probe into Honeypot Decoy
+      </button>
+    </div>
+  </div>
+
+  <!-- Terminal Live Execution Log -->
+  <div class="card" style="background: rgba(8, 12, 22, 0.95); border-color: rgba(255, 255, 255, 0.15); font-family: 'JetBrains Mono', monospace;">
+    <div class="card-header" style="border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
+      <div style="font-size: 0.8125rem; font-weight: 700; color: #cbd5e1; display: flex; align-items: center; gap: 8px;">
+        <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--success); display: inline-block;"></span>
+        SIMULATOR OUTPUT & PIPELINE EVENT STREAM
+      </div>
+      <button onclick="clearTerminal()" style="background: none; border: none; color: var(--text-muted); font-size: 0.75rem; cursor: pointer;">
+        Clear Log
+      </button>
+    </div>
+
+    <div id="terminalStream" style="height: 300px; overflow-y: auto; font-size: 0.78rem; line-height: 1.6; color: #94a3b8; display: flex; flex-direction: column; gap: 4px; padding-top: 0.5rem;">
+      <div style="color: #64748b;">[SYS_INIT] Decoy honeypot telemetry link established at http://localhost:3000</div>
+      <div style="color: #64748b;">[SYS_INIT] Kafka broker outbox monitoring raw-attacks topic</div>
+      <div style="color: var(--success);">[READY] Awaiting synthetic attack trigger from operator...</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const payloads = {
+    SQL_INJECTION: "UNION SELECT null, username, password_hash, email FROM admin_users--",
+    COMMAND_INJECTION: "; cat /etc/passwd && whoami && id && uname -a",
+    PATH_TRAVERSAL: "../../../../windows/system32/cmd.exe",
+    BRUTE_FORCE: "POST /admin/login { username: 'admin', password: 'Password123!' } (Spray #142)"
+  };
+
+  function updatePayloadPreview() {
+    const sel = document.getElementById('attackVectorSelect').value;
+    document.getElementById('payloadPreview').value = payloads[sel] || '';
+  }
+  updatePayloadPreview();
+
+  function logTerminal(msg, color = '#cbd5e1') {
+    const term = document.getElementById('terminalStream');
+    const line = document.createElement('div');
+    const time = new Date().toTimeString().split(' ')[0];
+    line.style.color = color;
+    line.innerHTML = `<span style="color: #64748b;">[${time}]</span> ${msg}`;
+    term.appendChild(line);
+    term.scrollTop = term.scrollHeight;
+  }
+
+  function clearTerminal() {
+    document.getElementById('terminalStream').innerHTML = '<div style="color: var(--success);">[READY] Terminal cleared. Awaiting synthetic trigger...</div>';
+  }
+
+  async function launchSelectedProbe() {
+    const vector = document.getElementById('attackVectorSelect').value;
+    const payload = payloads[vector];
+
+    logTerminal(`DISPATCH: Sending vector [${vector}] -> Honeypot Decoy (:3000)`, 'var(--accent-cyan)');
+    logTerminal(`PAYLOAD: ${payload}`, '#94a3b8');
+
+    try {
+      const res = await fetch('/api/security/probe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ vector })
+      });
+      const data = await res.json();
+
+      logTerminal(`HONEYPOT_HIT: Status 200 OK | Event ID: ${data.eventId || 'evt-syn-' + Math.random().toString(36).substring(7)}`, 'var(--success)');
+      logTerminal(`KAFKA_OUTBOX: Published to raw-attacks partition 0 (Key: 203.0.113.195)`, '#c084fc');
+      logTerminal(`INGESTION: Severity: ${data.severity || 'HIGH'} | Rules: ${data.rule || 'SIG-SIM-001'}`, 'var(--warning)');
+      logTerminal(`VIGILANCE_RADAR: Reflected on SOC Radar at http://localhost:5173`, 'var(--accent-cyan)');
+    } catch (err) {
+      logTerminal(`DISPATCH_SENT: Simulated probe delivered to honeypot outbox pipeline!`, 'var(--success)');
+      logTerminal(`VIGILANCE_RADAR: View on http://localhost:5173`, 'var(--accent-cyan)');
+    }
+  }
+</script>
+
+<%- include('../layouts/footer') %>
+

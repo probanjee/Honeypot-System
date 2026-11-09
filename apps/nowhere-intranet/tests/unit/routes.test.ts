@@ -55,6 +55,26 @@ describe('Decoy Routes & Detection Middleware (Unit Tests)', () => {
       expect(res.body.data.game).toBe('Apex Legends');
     });
 
+    it('serves pro rosters page with HTTP 200', async () => {
+      const res = await request(app).get('/rosters');
+      expect(res.status).toBe(200);
+      expect(res.text).toContain('Nowhere Esports Pro Squads');
+      expect(mockRepo.getAllRecords().length).toBe(0);
+    });
+
+    it('serves operations control center page with HTTP 200', async () => {
+      const res = await request(app).get('/control');
+      expect(res.status).toBe(200);
+      expect(res.text).toContain('OPERATIONS & TOURNAMENT COMMAND CENTER');
+      expect(mockRepo.getAllRecords().length).toBe(0);
+    });
+
+    it('serves operations control center via /admin/control with HTTP 200', async () => {
+      const res = await request(app).get('/admin/control');
+      expect(res.status).toBe(200);
+      expect(res.text).toContain('OPERATIONS & TOURNAMENT COMMAND CENTER');
+    });
+
     it('returns mock staff JSON API with HTTP 200', async () => {
       const res = await request(app).get('/api/v1/staff');
       expect(res.status).toBe(200);

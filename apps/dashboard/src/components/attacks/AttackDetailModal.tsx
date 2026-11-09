@@ -1,8 +1,4 @@
-/**
- * Forensic Attack Detail Modal (Phase 5)
- * Deep-dive panel displaying complete incident metadata, matched detection signatures,
- * GeoIP attributes, and forensic evidence tracking.
- */
+
 
 import React, { useEffect, useState } from 'react';
 import {

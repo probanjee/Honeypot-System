@@ -5,6 +5,7 @@
 
 import express from 'express';
 import path from 'node:path';
+import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { configureBodyParsers } from './middleware/bodyParser.js';
 import { createDetectionMiddleware } from './middleware/detectionMiddleware.js';
@@ -33,8 +34,20 @@ export function createApp(optionsOrRepo: AppOptions | IEvidenceRepository): expr
   const app = express();
 
   // 1. Configure EJS view engine
+  const viewsPath = fs.existsSync(path.join(__dirname, 'views'))
+    ? path.join(__dirname, 'views')
+    : path.join(__dirname, '..', 'src', 'views');
   app.set('view engine', 'ejs');
-  app.set('views', path.join(__dirname, 'views'));
+  app.set('views', viewsPath);
+
+  // 1b. Static asset serving for Nowhere Esports logo, styles, and media
+  if (fs.existsSync(path.join(__dirname, 'public'))) {
+    app.use(express.static(path.join(__dirname, 'public')));
+  }
+  if (fs.existsSync(path.join(__dirname, '..', 'src', 'public'))) {
+    app.use(express.static(path.join(__dirname, '..', 'src', 'public')));
+  }
+  app.use(express.static(path.join(__dirname, '..', 'public')));
 
   // 2. Configure bounded body parsers (4KB hard limit)
   configureBodyParsers(app, options.maxBodySizeBytes || 4096);

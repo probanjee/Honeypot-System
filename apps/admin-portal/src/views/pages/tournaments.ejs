@@ -1,0 +1,142 @@
+<%- include('../layouts/header', { title: 'Tournament Operations & Match Scheduling', currentTab: 'tournaments' }) %>
+
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1.5rem;">
+  <div>
+    <div class="mono" style="font-size: 0.72rem; color: var(--accent); font-weight: 700; text-transform: uppercase; margin-bottom: 0.4rem;">
+      TOURNAMENT OPERATIONS & MATCH CONTROLLER
+    </div>
+    <h1 style="font-size: 2.2rem; font-weight: 900; text-transform: uppercase;">
+      Official Circuit Tournaments
+    </h1>
+    <p style="color: var(--text-muted); font-size: 0.95rem;">
+      Manage official leagues, live match brackets, prize allocations, and server bindings.
+    </p>
+  </div>
+
+  <div style="display: flex; gap: 1rem; align-items: center;">
+    <button onclick="openAddModal()" class="btn btn-primary" style="padding: 0.65rem 1.25rem;">
+      + Register New Tournament
+    </button>
+  </div>
+</div>
+
+<!-- Modal for New Tournament -->
+<div id="addModal" style="display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(8px); z-index: 1000; align-items: center; justify-content: center;">
+  <div class="card" style="width: 100%; max-width: 540px; margin: 1rem; border-color: var(--border-red); box-shadow: 0 0 50px rgba(255, 42, 75, 0.25);">
+    <div class="card-header">
+      <div class="card-title">Register Circuit Tournament</div>
+      <button onclick="closeAddModal()" style="background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer;">&times;</button>
+    </div>
+    <form action="/tournaments" method="POST" style="display: flex; flex-direction: column; gap: 1.25rem;">
+      <div>
+        <label style="display: block; font-size: 0.8125rem; color: var(--text-muted); margin-bottom: 0.4rem; font-weight: 600;">Tournament Title</label>
+        <input type="text" name="title" required placeholder="e.g. Nowhere Apex Invitational" class="input-control">
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div>
+          <label style="display: block; font-size: 0.8125rem; color: var(--text-muted); margin-bottom: 0.4rem; font-weight: 600;">Game Title</label>
+          <select name="game" class="input-control" style="background: #080c16;">
+            <option value="Counter-Strike 2">Counter-Strike 2</option>
+            <option value="Valorant Champions">Valorant Champions</option>
+            <option value="Apex Legends">Apex Legends</option>
+            <option value="League of Legends">League of Legends</option>
+          </select>
+        </div>
+        <div>
+          <label style="display: block; font-size: 0.8125rem; color: var(--text-muted); margin-bottom: 0.4rem; font-weight: 600;">Region</label>
+          <input type="text" name="region" required placeholder="e.g. EU West / Cologne" class="input-control">
+        </div>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div>
+          <label style="display: block; font-size: 0.8125rem; color: var(--text-muted); margin-bottom: 0.4rem; font-weight: 600;">Prize Pool</label>
+          <input type="text" name="prize_pool" required placeholder="e.g. $500,000 USD" class="input-control">
+        </div>
+        <div>
+          <label style="display: block; font-size: 0.8125rem; color: var(--text-muted); margin-bottom: 0.4rem; font-weight: 600;">Format</label>
+          <input type="text" name="format" required placeholder="e.g. Double Elimination" class="input-control">
+        </div>
+      </div>
+      <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1rem;">
+        <button type="button" onclick="closeAddModal()" class="btn btn-public">Cancel</button>
+        <button type="submit" class="btn btn-primary">Create Tournament</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Tournaments Table -->
+<div class="card">
+  <table>
+    <thead>
+      <tr>
+        <th>ID / Title</th>
+        <th>Game & Division</th>
+        <th>Region</th>
+        <th>Prize Pool</th>
+        <th>Format</th>
+        <th>Status</th>
+        <th>Match Controls</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% tournaments.forEach(function(t) { %>
+        <tr>
+          <td>
+            <div class="mono" style="font-size: 0.75rem; color: var(--accent); font-weight: 700;"><%= t.id %></div>
+            <strong style="color: #fff; font-size: 1.05rem;"><%= t.title %></strong>
+          </td>
+          <td>
+            <div style="color: #fff; font-weight: 700;"><%= t.game %></div>
+            <div style="font-size: 0.75rem; color: var(--text-muted);"><%= t.division || 'Pro Division 1' %></div>
+          </td>
+          <td><span class="mono" style="color: #cbd5e1;"><%= t.region %></span></td>
+          <td class="mono" style="color: #fff; font-weight: 800; font-size: 0.95rem;"><%= t.prize_pool %></td>
+          <td><%= t.format %></td>
+          <td>
+            <span class="badge <%= t.status === 'LIVE' ? 'badge-live' : (t.status === 'UPCOMING' ? 'badge-cyan' : 'badge-warning') %>" id="badge-<%= t.id %>">
+              <%= t.status %>
+            </span>
+          </td>
+          <td>
+            <div style="display: flex; gap: 8px;">
+              <button onclick="toggleTournamentStatus('<%= t.id %>')" class="btn btn-public" style="padding: 0.4rem 0.75rem; font-size: 0.75rem;">
+                Toggle Status
+              </button>
+              <form action="/tournaments/<%= t.id %>/delete" method="POST" onsubmit="return confirm('Archive tournament <%= t.title %>?');" style="display: inline;">
+                <button type="submit" class="btn btn-public" style="padding: 0.4rem 0.75rem; font-size: 0.75rem; color: var(--danger);">
+                  Archive
+                </button>
+              </form>
+            </div>
+          </td>
+        </tr>
+      <% }); %>
+    </tbody>
+  </table>
+</div>
+
+<script>
+  function openAddModal() {
+    document.getElementById('addModal').style.display = 'flex';
+  }
+  function closeAddModal() {
+    document.getElementById('addModal').style.display = 'none';
+  }
+  async function toggleTournamentStatus(id) {
+    try {
+      const res = await fetch(`/api/tournaments/${id}/toggle`, { method: 'POST' });
+      const data = await res.json();
+      const badge = document.getElementById(`badge-${id}`);
+      if (badge && data.newStatus) {
+        badge.innerText = data.newStatus;
+        badge.className = `badge ${data.newStatus === 'LIVE' ? 'badge-live' : 'badge-warning'}`;
+      }
+    } catch (err) {
+      location.reload();
+    }
+  }
+</script>
+
+<%- include('../layouts/footer') %>
+

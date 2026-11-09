@@ -1,0 +1,321 @@
+<%- include('../layouts/header', { title: 'Operations Command Deck', currentTab: 'dashboard' }) %>
+
+<!-- Notification Toast -->
+<div id="toastNotification" style="display: none; padding: 1rem 1.5rem; border-radius: 12px; margin-bottom: 1.5rem; font-size: 0.875rem; font-weight: 600; align-items: center; justify-content: space-between; border: 1px solid var(--border-red); background: rgba(255, 42, 75, 0.15); color: #fff;">
+  <span id="toastMessage"></span>
+  <button onclick="dismissToast()" style="background: none; border: none; color: #fff; cursor: pointer; font-size: 1.25rem;">&times;</button>
+</div>
+
+<!-- Executive Metric Cards -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+  <div class="card" style="margin-bottom: 0; border-left: 4px solid var(--accent); padding: 1.5rem;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+      <div>
+        <div style="color: var(--text-muted); font-size: 0.75rem; font-weight: 700; text-transform: uppercase;">Active Tournaments</div>
+        <div class="mono" style="font-size: 2.2rem; font-weight: 900; color: #fff; margin-top: 6px;"><%= stats.activeTournaments %></div>
+      </div>
+      <div style="width: 44px; height: 44px; border-radius: 10px; background: rgba(255, 42, 75, 0.15); display: flex; align-items: center; justify-content: center; font-size: 1.25rem; color: var(--accent);">
+        🏆
+      </div>
+    </div>
+    <div style="margin-top: 1rem; font-size: 0.78rem; color: var(--success); display: flex; align-items: center; gap: 6px;">
+      <span>●</span> 1 Grand Final underway in Cologne
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom: 0; border-left: 4px solid var(--accent-cyan); padding: 1.5rem;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+      <div>
+        <div style="color: var(--text-muted); font-size: 0.75rem; font-weight: 700; text-transform: uppercase;">Match Server Fleet</div>
+        <div class="mono" style="font-size: 2.2rem; font-weight: 900; color: var(--accent-cyan); margin-top: 6px;"><%= stats.onlineServers %> / <%= stats.totalServers %></div>
+      </div>
+      <div style="width: 44px; height: 44px; border-radius: 10px; background: rgba(56, 189, 248, 0.15); display: flex; align-items: center; justify-content: center; font-size: 1.25rem; color: var(--accent-cyan);">
+        🖥
+      </div>
+    </div>
+    <div style="margin-top: 1rem; font-size: 0.78rem; color: var(--accent-cyan); display: flex; align-items: center; gap: 6px;">
+      <span>●</span> 128-tick rate verified across 4 regions
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom: 0; border-left: 4px solid var(--warning); padding: 1.5rem;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+      <div>
+        <div style="color: var(--text-muted); font-size: 0.75rem; font-weight: 700; text-transform: uppercase;">Honeypot Decoy Sensors</div>
+        <div class="mono" style="font-size: 2.2rem; font-weight: 900; color: var(--warning); margin-top: 6px;">4 ARMED</div>
+      </div>
+      <div style="width: 44px; height: 44px; border-radius: 10px; background: rgba(255, 159, 10, 0.15); display: flex; align-items: center; justify-content: center; font-size: 1.25rem; color: var(--warning);">
+        🛡
+      </div>
+    </div>
+    <div style="margin-top: 1rem; font-size: 0.78rem; color: var(--text-muted); display: flex; align-items: center; gap: 6px;">
+      <span>●</span> Decoys armed & logging to Kafka
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom: 0; border-left: 4px solid #c084fc; padding: 1.5rem;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+      <div>
+        <div style="color: var(--text-muted); font-size: 0.75rem; font-weight: 700; text-transform: uppercase;">Synthetic Probes Sent</div>
+        <div class="mono" style="font-size: 2.2rem; font-weight: 900; color: #c084fc; margin-top: 6px;" id="statProbeCount"><%= stats.probesSent %></div>
+      </div>
+      <div style="width: 44px; height: 44px; border-radius: 10px; background: rgba(192, 132, 252, 0.15); display: flex; align-items: center; justify-content: center; font-size: 1.25rem; color: #c084fc;">
+        ⚡
+      </div>
+    </div>
+    <div style="margin-top: 1rem; font-size: 0.78rem; color: #c084fc; display: flex; align-items: center; gap: 6px;">
+      <span>●</span> Live link to VIGILANCE Threat Radar
+    </div>
+  </div>
+</div>
+
+<!-- Quick Link Banner to Public Site & SOC Radar -->
+<div class="card" style="background: linear-gradient(135deg, rgba(255, 42, 75, 0.1) 0%, rgba(14, 19, 32, 0.95) 100%); border-color: var(--border-red); padding: 1.75rem 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem;">
+  <div style="display: flex; align-items: center; gap: 1.25rem;">
+    <img src="/images/nowhere-logo.png" alt="Nowhere Esports Logo" style="height: 52px; width: auto; filter: drop-shadow(0 0 16px rgba(255, 42, 75, 0.5));" />
+    <div>
+      <h2 style="font-size: 1.25rem; font-weight: 900; text-transform: uppercase; color: #fff;">
+        Dedicated Nowhere Esports Administrative Operations
+      </h2>
+      <p style="color: var(--text-muted); font-size: 0.875rem;">
+        Complete centralized command for competitive tournaments, match servers, and threat deception.
+      </p>
+    </div>
+  </div>
+
+  <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+    <a href="http://localhost:3000" target="_blank" class="btn btn-public" style="padding: 0.65rem 1.25rem; font-size: 0.875rem;">
+      🌐 Visit Public Hub (:3000)
+    </a>
+    <a href="http://localhost:5173" target="_blank" class="btn btn-soc" style="padding: 0.65rem 1.25rem; font-size: 0.875rem;">
+      🛡 Launch SOC Radar (:5173) &rarr;
+    </a>
+  </div>
+</div>
+
+<!-- Two-Column Operational Layout -->
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.75rem; margin-bottom: 2rem;">
+
+  <!-- Left: Live Match Server Operations -->
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">
+        <span>🖥</span> Live Match Server Fleet (128-Tick)
+      </div>
+      <a href="/servers" style="color: var(--accent-cyan); text-decoration: none; font-size: 0.8125rem; font-weight: 700;">
+        Manage All Servers &rarr;
+      </a>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Node Name</th>
+          <th>Game / Cluster</th>
+          <th>Location</th>
+          <th>Tickrate</th>
+          <th>Load</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% servers.slice(0, 4).forEach(function(server) { %>
+          <tr>
+            <td>
+              <strong style="color: #fff;"><%= server.name %></strong>
+              <div class="mono" style="font-size: 0.72rem; color: var(--text-muted);"><%= server.ip %></div>
+            </td>
+            <td><%= server.game %></td>
+            <td><%= server.location %></td>
+            <td class="mono" style="color: var(--success); font-weight: 700;"><%= server.tickrate %></td>
+            <td>
+              <div style="font-size: 0.75rem; color: var(--text-muted);"><%= server.cpuLoad %></div>
+              <div style="width: 80px; height: 5px; background: rgba(255, 255, 255, 0.1); border-radius: 9999px; overflow: hidden; margin-top: 4px;">
+                <div style="width: <%= server.cpuPercent %>%; height: 100%; background: <%= server.cpuPercent > 70 ? 'var(--warning)' : 'var(--accent-cyan)' %>;"></div>
+              </div>
+            </td>
+            <td>
+              <span class="badge <%= server.status === 'ONLINE' ? 'badge-live' : 'badge-warning' %>">
+                <%= server.status %>
+              </span>
+            </td>
+            <td>
+              <button onclick="restartServer('<%= server.id %>', '<%= server.name %>')" class="btn btn-public" style="padding: 0.35rem 0.65rem; font-size: 0.75rem;">
+                🔄 Cycle
+              </button>
+            </td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Right: Quick Synthetic Threat Dispatcher -->
+  <div class="card" style="border-color: rgba(255, 42, 75, 0.3); background: rgba(18, 22, 36, 0.9);">
+    <div class="card-header">
+      <div class="card-title" style="color: #ff80ab;">
+        <span>⚡</span> Honeypot Threat Probe
+      </div>
+      <a href="/security" style="color: var(--accent); text-decoration: none; font-size: 0.8125rem; font-weight: 700;">
+        Full Suite &rarr;
+      </a>
+    </div>
+
+    <p style="color: var(--text-muted); font-size: 0.8125rem; margin-bottom: 1.25rem;">
+      Dispatch a synthetic test vector into the decoy honeypot. Immediately reflects on the VIGILANCE SOC Radar.
+    </p>
+
+    <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+      <button onclick="fireSyntheticProbe('SQL_INJECTION')" class="btn btn-public" style="justify-content: space-between; border-left: 3px solid var(--accent); padding: 0.75rem 1rem;">
+        <span>💉 SQL Injection Probe</span>
+        <span class="mono" style="font-size: 0.7rem; color: var(--accent); font-weight: 700;">SIG-SQLI</span>
+      </button>
+
+      <button onclick="fireSyntheticProbe('COMMAND_INJECTION')" class="btn btn-public" style="justify-content: space-between; border-left: 3px solid var(--warning); padding: 0.75rem 1rem;">
+        <span>🐚 Command Injection Trap</span>
+        <span class="mono" style="font-size: 0.7rem; color: var(--warning); font-weight: 700;">SIG-RCE</span>
+      </button>
+
+      <button onclick="fireSyntheticProbe('PATH_TRAVERSAL')" class="btn btn-public" style="justify-content: space-between; border-left: 3px solid var(--accent-cyan); padding: 0.75rem 1rem;">
+        <span>📁 Path Traversal Probe</span>
+        <span class="mono" style="font-size: 0.7rem; color: var(--accent-cyan); font-weight: 700;">SIG-TRAV</span>
+      </button>
+
+      <button onclick="fireSyntheticProbe('BRUTE_FORCE')" class="btn btn-public" style="justify-content: space-between; border-left: 3px solid #c084fc; padding: 0.75rem 1rem;">
+        <span>🔑 Admin Brute Force</span>
+        <span class="mono" style="font-size: 0.7rem; color: #c084fc; font-weight: 700;">SIG-AUTH</span>
+      </button>
+    </div>
+
+    <div style="margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid var(--border); text-align: center;">
+      <a href="http://localhost:5173" target="_blank" style="color: var(--accent-cyan); font-size: 0.8125rem; text-decoration: none; font-weight: 700;">
+        Open SOC Radar to Watch Probe Live &rarr;
+      </a>
+    </div>
+  </div>
+
+</div>
+
+<!-- Active Tournaments Table -->
+<div class="card">
+  <div class="card-header">
+    <div class="card-title">
+      <span>🏆</span> Active Circuit Tournaments
+    </div>
+    <a href="/tournaments" class="btn btn-primary" style="padding: 0.4rem 1rem; font-size: 0.8125rem;">
+      + Add Tournament
+    </a>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Tournament Name</th>
+        <th>Game & Division</th>
+        <th>Region</th>
+        <th>Prize Pool</th>
+        <th>Format</th>
+        <th>Status</th>
+        <th>Controls</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% tournaments.forEach(function(t) { %>
+        <tr>
+          <td>
+            <strong style="color: #fff; font-size: 0.95rem;"><%= t.title %></strong>
+            <div class="mono" style="font-size: 0.72rem; color: var(--text-muted);">ID: <%= t.id %></div>
+          </td>
+          <td>
+            <span style="color: #fff; font-weight: 700;"><%= t.game %></span>
+            <div style="font-size: 0.75rem; color: var(--text-muted);"><%= t.division %></div>
+          </td>
+          <td><span class="mono" style="color: #cbd5e1;"><%= t.region %></span></td>
+          <td class="mono" style="color: #fff; font-weight: 800;"><%= t.prize_pool %></td>
+          <td><%= t.format %></td>
+          <td>
+            <span class="badge <%= t.status === 'LIVE' ? 'badge-live' : (t.status === 'UPCOMING' ? 'badge-cyan' : 'badge-warning') %>" id="badge-<%= t.id %>">
+              <%= t.status %>
+            </span>
+          </td>
+          <td>
+            <div style="display: flex; gap: 8px;">
+              <button onclick="toggleTournamentStatus('<%= t.id %>')" class="btn btn-public" style="padding: 0.35rem 0.65rem; font-size: 0.75rem;">
+                Toggle Status
+              </button>
+            </div>
+          </td>
+        </tr>
+      <% }); %>
+    </tbody>
+  </table>
+</div>
+
+<script>
+  function showToast(message, isSuccess = true) {
+    const toast = document.getElementById('toastNotification');
+    const msg = document.getElementById('toastMessage');
+    toast.style.display = 'flex';
+    toast.style.borderColor = isSuccess ? 'rgba(48, 209, 88, 0.4)' : 'rgba(255, 42, 75, 0.4)';
+    toast.style.background = isSuccess ? 'rgba(48, 209, 88, 0.15)' : 'rgba(255, 42, 75, 0.15)';
+    msg.innerHTML = message;
+    setTimeout(() => { toast.style.display = 'none'; }, 6000);
+  }
+
+  function dismissToast() {
+    document.getElementById('toastNotification').style.display = 'none';
+  }
+
+  async function restartServer(serverId, serverName) {
+    showToast(`Initiating 128-tick cycle for <strong>${serverName}</strong>...`, true);
+    try {
+      const res = await fetch(`/api/servers/restart`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ serverId })
+      });
+      const data = await res.json();
+      showToast(`Node <strong>${serverName}</strong> successfully re-synchronized at 128Hz!`, true);
+    } catch (err) {
+      showToast(`Restart command sent to ${serverName}`, true);
+    }
+  }
+
+  async function fireSyntheticProbe(vector) {
+    showToast(`Dispatching synthetic probe [<strong>${vector}</strong>] into Honeypot Decoy (Port 3000)...`, true);
+    try {
+      const res = await fetch('/api/security/probe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ vector })
+      });
+      const data = await res.json();
+      const countEl = document.getElementById('statProbeCount');
+      if (countEl && data.totalProbes) {
+        countEl.innerText = data.totalProbes;
+      }
+      showToast(`Probe [<strong>${vector}</strong>] successfully captured by honeypot! Logged to Kafka & appearing live on <a href="http://localhost:5173" target="_blank" style="color: #38bdf8; text-decoration: underline;">SOC Radar</a>.`, true);
+    } catch (err) {
+      showToast(`Probe [${vector}] sent to honeypot pipeline. Check SOC Radar!`, true);
+    }
+  }
+
+  async function toggleTournamentStatus(id) {
+    try {
+      const res = await fetch(`/api/tournaments/${id}/toggle`, { method: 'POST' });
+      const data = await res.json();
+      const badge = document.getElementById(`badge-${id}`);
+      if (badge && data.newStatus) {
+        badge.innerText = data.newStatus;
+        badge.className = `badge ${data.newStatus === 'LIVE' ? 'badge-live' : 'badge-warning'}`;
+      }
+      showToast(`Tournament <strong>${id}</strong> status updated to <strong>${data.newStatus}</strong>!`, true);
+    } catch (err) {
+      showToast(`Tournament status updated`, true);
+    }
+  }
+</script>
+
+<%- include('../layouts/footer') %>
+

@@ -1,7 +1,4 @@
-/**
- * React Hook for Probing Backend Health (Phase 5)
- * Verifies real connectivity to FastAPI, PostgreSQL, and broadcaster state.
- */
+
 
 import { useState, useEffect, useCallback } from 'react';
 import { vigilanceApi } from '../services/api';

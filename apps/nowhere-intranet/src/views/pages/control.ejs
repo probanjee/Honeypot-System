@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="/images/nowhere-logo.png">
+  <title>Operations & Tournament Command Center | Nowhere Esports</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #07090e;
+      --bg-secondary: #0c111e;
+      --bg-card: rgba(15, 21, 35, 0.85);
+      --bg-card-elevated: rgba(22, 30, 48, 0.95);
+      --accent: #ff2a4b;
+      --accent-hover: #ff4767;
+      --accent-glow: rgba(255, 42, 75, 0.4);
+      --accent-cyan: #38bdf8;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: rgba(255, 255, 255, 0.1);
+      --border-red: rgba(255, 42, 75, 0.35);
+      --success: #30d158;
+      --warning: #ff9f0a;
+      --danger: #ff453a;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+    body::before {
+      content: '';
+      position: fixed;
+      top: -20%;
+      left: 15%;
+      width: 600px;
+      height: 600px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 42, 75, 0.1) 0%, transparent 70%);
+      filter: blur(120px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+    header {
+      background: rgba(12, 17, 30, 0.9);
+      backdrop-filter: blur(24px);
+      border-bottom: 1px solid var(--border);
+      padding: 0.85rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      text-decoration: none;
+      color: var(--text-main);
+    }
+    .logo-img {
+      height: 44px;
+      width: auto;
+      filter: drop-shadow(0 0 14px rgba(255, 42, 75, 0.5));
+    }
+    .btn {
+      padding: 0.45rem 1rem;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 0.8125rem;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid transparent;
+      transition: all 0.2s ease;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #ff2a4b, #c8102e);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(255, 42, 75, 0.4);
+    }
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #ff4767, #e01235);
+      box-shadow: 0 6px 20px rgba(255, 42, 75, 0.6);
+      transform: translateY(-1px);
+    }
+    .btn-outline {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: var(--border);
+      color: #fff;
+    }
+    .btn-outline:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.25);
+    }
+    .btn-soc {
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.15), rgba(37, 99, 235, 0.25));
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      color: #38bdf8;
+    }
+    .btn-soc:hover {
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.25), rgba(37, 99, 235, 0.35));
+      box-shadow: 0 0 16px rgba(56, 189, 248, 0.35);
+    }
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.5rem;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
+      margin-bottom: 1.5rem;
+    }
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.25rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .card-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8125rem;
+      text-align: left;
+    }
+    th {
+      padding: 10px 14px;
+      color: var(--text-muted);
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 0.6875rem;
+      border-bottom: 1px solid var(--border);
+    }
+    td {
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+    .status-badge {
+      padding: 3px 8px;
+      border-radius: 9999px;
+      font-size: 0.6875rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+    .status-live { background: rgba(48, 209, 88, 0.18); color: var(--success); border: 1px solid rgba(48, 209, 88, 0.4); }
+    .status-warning { background: rgba(255, 159, 10, 0.18); color: var(--warning); border: 1px solid rgba(255, 159, 10, 0.4); }
+    .status-armed { background: rgba(255, 42, 75, 0.18); color: var(--accent); border: 1px solid rgba(255, 42, 75, 0.4); }
+    .input-field {
+      width: 100%;
+      background: rgba(8, 12, 22, 0.8);
+      border: 1px solid var(--border);
+      padding: 0.65rem 1rem;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 0.875rem;
+      outline: none;
+    }
+    .input-field:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(255, 42, 75, 0.25);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation Header -->
+  <header>
+    <div style="display: flex; align-items: center; gap: 1.25rem;">
+      <a href="/" class="logo-container" title="Back to Nowhere Esports Hub">
+        <img src="/images/nowhere-logo.png" alt="Nowhere Esports Logo" class="logo-img" />
+        <div>
+          <div style="font-size: 1.15rem; font-weight: 900; letter-spacing: 0.05em; text-transform: uppercase;">
+            NOWHERE ESPORTS
+          </div>
+          <div style="font-size: 0.6875rem; color: var(--accent); font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;">
+            OPERATIONS & TOURNAMENT COMMAND CENTER
+          </div>
+        </div>
+      </a>
+      <span style="font-size: 0.6875rem; padding: 3px 8px; border-radius: 9999px; background: rgba(48, 209, 88, 0.15); color: var(--success); border: 1px solid rgba(48, 209, 88, 0.35); font-weight: 700;" class="mono">
+        ONLINE // NODE #01
+      </span>
+    </div>
+
+    <div style="display: flex; align-items: center; gap: 1rem;">
+      <a href="/" class="btn btn-outline">
+        &larr; Public Esports Hub
+      </a>
+      <a href="http://localhost:5173" target="_blank" class="btn btn-soc" title="Open VIGILANCE Threat Radar on Port 5173">
+        <span>🛡 Open SOC Radar</span>
+      </a>
+      <div style="width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), #ff9f0a); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.75rem; color: #fff;">
+        AD
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Command Center Canvas -->
+  <main style="flex: 1; padding: 2rem; max-width: 1400px; margin: 0 auto; width: 100%; position: relative; z-index: 10;">
+
+    <!-- Top Alert Notification Box (Dynamic) -->
+    <div id="toastNotification" style="display: none; padding: 1rem 1.25rem; border-radius: 12px; margin-bottom: 1.5rem; font-size: 0.875rem; font-weight: 600; align-items: center; justify-content: space-between;">
+      <span id="toastMessage"></span>
+      <button onclick="dismissToast()" style="background: none; border: none; color: #fff; cursor: pointer; font-size: 1.1rem;">&times;</button>
+    </div>
+
+    <!-- Overview Metrics Cards -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.25rem; margin-bottom: 2rem;">
+      <div class="card" style="margin-bottom: 0; border-left: 4px solid var(--accent);">
+        <div style="color: var(--text-muted); font-size: 0.75rem; font-weight: 700; text-transform: uppercase;">Active Tournaments</div>
+        <div class="mono" style="font-size: 1.8rem; font-weight: 800; color: #fff; margin-top: 4px;" id="metricTournaments">3</div>
+        <div style="color: var(--success); font-size: 0.75rem; margin-top: 4px;">● 1 Finals in Progress</div>
+      </div>
+
+      <div class="card" style="margin-bottom: 0; border-left: 4px solid var(--accent-cyan);">
+        <div style="color: var(--text-muted); font-size: 0.75rem; font-weight: 700; text-transform: uppercase;">Game Match Clusters</div>
+        <div class="mono" style="font-size: 1.8rem; font-weight: 800; color: var(--accent-cyan); margin-top: 4px;">4 / 4</div>
+        <div style="color: var(--text-muted); font-size: 0.75rem; margin-top: 4px;">128-tick rate verified</div>
+      </div>
+
+      <div class="card" style="margin-bottom: 0; border-left: 4px solid var(--warning);">
+        <div style="color: var(--text-muted); font-size: 0.75rem; font-weight: 700; text-transform: uppercase;">Active Threat Sensors</div>
+        <div class="mono" style="font-size: 1.8rem; font-weight: 800; color: var(--warning); margin-top: 4px;">4 ARMED</div>
+        <div style="color: var(--text-muted); font-size: 0.75rem; margin-top: 4px;">Connected to Kafka SSE Bus</div>
+      </div>
+
+      <div class="card" style="margin-bottom: 0; border-left: 4px solid #c084fc;">
+        <div style="color: var(--text-muted); font-size: 0.75rem; font-weight: 700; text-transform: uppercase;">NOC Latency & Health</div>
+        <div class="mono" style="font-size: 1.8rem; font-weight: 800; color: #c084fc; margin-top: 4px;">14ms</div>
+        <div style="color: var(--success); font-size: 0.75rem; margin-top: 4px;">Zero packet loss</div>
+      </div>
+    </div>
+
+    <!-- Split Grid: Tournament Management + Live Security Incident Simulation -->
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-bottom: 2rem;">
+      
+      <!-- Panel 1: Tournament Operations Control -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">
+            <span>🏆 Tournament Operations Controller</span>
+          </div>
+          <button onclick="toggleNewTournamentModal()" class="btn btn-primary" style="font-size: 0.75rem; padding: 0.35rem 0.8rem;">
+            + Deploy Tournament
+          </button>
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Tournament</th>
+              <th>Game Title</th>
+              <th>Format</th>
+              <th>Prize Pool</th>
+              <th>Status</th>
+              <th style="text-align: right;">Operations</th>
+            </tr>
+          </thead>
+          <tbody id="tournamentTableBody">
+            <tr id="trn-row-1">
+              <td style="font-weight: 700; color: #fff;">Apex Masters Spring 2026</td>
+              <td>Apex Legends</td>
+              <td class="mono">60pt Match Point</td>
+              <td class="mono" style="color: #fff;">$250,000</td>
+              <td><span class="status-badge status-live">IN PROGRESS</span></td>
+              <td style="text-align: right;">
+                <button onclick="handleAdvanceRound('Apex Masters')" class="btn btn-outline" style="padding: 2px 8px; font-size: 0.6875rem;">Next Match</button>
+                <button onclick="handlePauseTournament('Apex Masters')" class="btn btn-outline" style="padding: 2px 8px; font-size: 0.6875rem; color: var(--warning);">Pause</button>
+              </td>
+            </tr>
+            <tr id="trn-row-2">
+              <td style="font-weight: 700; color: #fff;">Tokyo Masters Invitational</td>
+              <td>Valorant</td>
+              <td class="mono">Double Elim Bo3</td>
+              <td class="mono" style="color: #fff;">$500,000</td>
+              <td><span class="status-badge status-warning">REGISTRATION</span></td>
+              <td style="text-align: right;">
+                <button onclick="handleAdvanceRound('Tokyo Masters')" class="btn btn-outline" style="padding: 2px 8px; font-size: 0.6875rem;">Lock Seeds</button>
+              </td>
+            </tr>
+            <tr id="trn-row-3">
+              <td style="font-weight: 700; color: #fff;">CS2 Premier Winter Clash</td>
+              <td>Counter-Strike 2</td>
+              <td class="mono">Swiss System</td>
+              <td class="mono" style="color: #fff;">$1,000,000</td>
+              <td><span class="status-badge status-warning">UPCOMING</span></td>
+              <td style="text-align: right;">
+                <button onclick="handleAdvanceRound('CS2 Winter Clash')" class="btn btn-outline" style="padding: 2px 8px; font-size: 0.6875rem;">Start Swiss</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Panel 2: Live Attack Simulator / Honeypot Defense Controller -->
+      <div class="card" style="border-color: var(--border-red); background: linear-gradient(145deg, rgba(255, 42, 75, 0.08) 0%, rgba(15, 21, 35, 0.95) 100%);">
+        <div class="card-header">
+          <div class="card-title" style="color: var(--accent);">
+            <span>🛡 Honeypot Security Probe</span>
+          </div>
+          <span class="status-badge status-armed">ARMED</span>
+        </div>
+
+        <p style="font-size: 0.8125rem; color: var(--text-muted); margin-bottom: 1.25rem;">
+          Fire a live security probe directly against Nowhere Esports defensive perimeter to verify the threat detection engine and SOC radar.
+        </p>
+
+        <div style="margin-bottom: 1rem;">
+          <label style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.4rem; text-transform: uppercase;">
+            Select Exploit Vector:
+          </label>
+          <select id="attackVectorSelect" class="input-field" style="font-family: 'JetBrains Mono', monospace; font-size: 0.8125rem;">
+            <option value="sqli">SQLi: UNION SELECT password_hash FROM staff_users</option>
+            <option value="env">Secret Leak Probe: GET /.env</option>
+            <option value="brute">Admin Gateway Brute Force: POST /admin/login</option>
+            <option value="traversal">Path Traversal: GET /../../../../etc/passwd</option>
+          </select>
+        </div>
+
+        <button onclick="fireSyntheticAttack()" id="btnFireAttack" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 0.75rem; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em;">
+          🔥 Fire Simulated Attack Probe
+        </button>
+
+        <!-- Probe Execution Output Window -->
+        <div id="attackResultBox" style="display: none; margin-top: 1rem; padding: 0.85rem; border-radius: 8px; background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(255, 42, 75, 0.4); font-size: 0.75rem;" class="mono">
+          <div style="color: var(--success); font-weight: 700; margin-bottom: 4px;">✓ ATTACK PROBE INTERCEPTED</div>
+          <div style="color: #cbd5e1;" id="attackResultDetail">Evaluating...</div>
+          <div style="margin-top: 6px;">
+            <a href="http://localhost:5173" target="_blank" style="color: var(--accent-cyan); text-decoration: underline;">
+              &rarr; View Live Spike in VIGILANCE Dashboard (Port 5173)
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Match Server Clusters Grid -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">
+          <span>🖥 Tournament Match Server Clusters</span>
+        </div>
+        <span class="mono" style="font-size: 0.75rem; color: var(--text-muted);">GLOBAL FLEET // 128 TICK</span>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.25rem;">
+        <!-- Cluster 1 -->
+        <div style="background: rgba(8, 12, 22, 0.6); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+            <span style="font-weight: 700; color: #fff;">NA-EAST-DALLAS-01</span>
+            <span class="status-badge status-live">ONLINE</span>
+          </div>
+          <div style="font-size: 0.8125rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 4px;" class="mono">
+            <div>Tick Rate: <strong style="color: #fff;">128.00 Hz</strong></div>
+            <div>Latency: <strong style="color: var(--success);">14ms</strong></div>
+            <div>Active Load: <strong style="color: var(--accent-cyan);">4 Matches (42%)</strong></div>
+          </div>
+          <div style="display: flex; gap: 8px; margin-top: 1rem;">
+            <button onclick="handleRestartServer('NA-EAST-DALLAS-01')" class="btn btn-outline" style="padding: 4px 10px; font-size: 0.75rem; flex: 1; justify-content: center;">Restart Node</button>
+            <button onclick="handleFlushCache('NA-EAST-DALLAS-01')" class="btn btn-outline" style="padding: 4px 10px; font-size: 0.75rem; flex: 1; justify-content: center;">Flush Cache</button>
+          </div>
+        </div>
+
+        <!-- Cluster 2 -->
+        <div style="background: rgba(8, 12, 22, 0.6); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+            <span style="font-weight: 700; color: #fff;">EU-CENTRAL-FRANKFURT-03</span>
+            <span class="status-badge status-live">ONLINE</span>
+          </div>
+          <div style="font-size: 0.8125rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 4px;" class="mono">
+            <div>Tick Rate: <strong style="color: #fff;">128.00 Hz</strong></div>
+            <div>Latency: <strong style="color: var(--success);">18ms</strong></div>
+            <div>Active Load: <strong style="color: var(--accent-cyan);">6 Matches (58%)</strong></div>
+          </div>
+          <div style="display: flex; gap: 8px; margin-top: 1rem;">
+            <button onclick="handleRestartServer('EU-CENTRAL-FRANKFURT-03')" class="btn btn-outline" style="padding: 4px 10px; font-size: 0.75rem; flex: 1; justify-content: center;">Restart Node</button>
+            <button onclick="handleFlushCache('EU-CENTRAL-FRANKFURT-03')" class="btn btn-outline" style="padding: 4px 10px; font-size: 0.75rem; flex: 1; justify-content: center;">Flush Cache</button>
+          </div>
+        </div>
+
+        <!-- Cluster 3 -->
+        <div style="background: rgba(8, 12, 22, 0.6); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+            <span style="font-weight: 700; color: #fff;">AP-NORTHEAST-TOKYO-02</span>
+            <span class="status-badge status-live">ONLINE</span>
+          </div>
+          <div style="font-size: 0.8125rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 4px;" class="mono">
+            <div>Tick Rate: <strong style="color: #fff;">128.00 Hz</strong></div>
+            <div>Latency: <strong style="color: var(--success);">22ms</strong></div>
+            <div>Active Load: <strong style="color: var(--accent-cyan);">2 Matches (31%)</strong></div>
+          </div>
+          <div style="display: flex; gap: 8px; margin-top: 1rem;">
+            <button onclick="handleRestartServer('AP-NORTHEAST-TOKYO-02')" class="btn btn-outline" style="padding: 4px 10px; font-size: 0.75rem; flex: 1; justify-content: center;">Restart Node</button>
+            <button onclick="handleFlushCache('AP-NORTHEAST-TOKYO-02')" class="btn btn-outline" style="padding: 4px 10px; font-size: 0.75rem; flex: 1; justify-content: center;">Flush Cache</button>
+          </div>
+        </div>
+
+        <!-- Cluster 4 -->
+        <div style="background: rgba(8, 12, 22, 0.6); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+            <span style="font-weight: 700; color: #fff;">SA-EAST-SAOPAULO-01</span>
+            <span class="status-badge status-live">ONLINE</span>
+          </div>
+          <div style="font-size: 0.8125rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 4px;" class="mono">
+            <div>Tick Rate: <strong style="color: #fff;">128.00 Hz</strong></div>
+            <div>Latency: <strong style="color: var(--success);">28ms</strong></div>
+            <div>Active Load: <strong style="color: var(--accent-cyan);">1 Match (22%)</strong></div>
+          </div>
+          <div style="display: flex; gap: 8px; margin-top: 1rem;">
+            <button onclick="handleRestartServer('SA-EAST-SAOPAULO-01')" class="btn btn-outline" style="padding: 4px 10px; font-size: 0.75rem; flex: 1; justify-content: center;">Restart Node</button>
+            <button onclick="handleFlushCache('SA-EAST-SAOPAULO-01')" class="btn btn-outline" style="padding: 4px 10px; font-size: 0.75rem; flex: 1; justify-content: center;">Flush Cache</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Deploy New Tournament -->
+    <div id="newTournamentModal" style="display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(12px); z-index: 1000; align-items: center; justify-content: center; padding: 20px;">
+      <div class="card" style="max-width: 500px; width: 100%; border-color: var(--border-red); box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9);">
+        <div class="card-header">
+          <div class="card-title">
+            <span>+ Deploy New Tournament</span>
+          </div>
+          <button onclick="toggleNewTournamentModal()" style="background: none; border: none; color: #fff; font-size: 1.25rem; cursor: pointer;">&times;</button>
+        </div>
+
+        <form id="formNewTournament" onsubmit="handleCreateTournament(event)">
+          <div style="margin-bottom: 1rem;">
+            <label style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.4rem; text-transform: uppercase;">Tournament Title</label>
+            <input type="text" id="inputTrnTitle" required placeholder="e.g. Valorant Masters Summer 2026" class="input-field" />
+          </div>
+
+          <div style="margin-bottom: 1rem;">
+            <label style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.4rem; text-transform: uppercase;">Game Title</label>
+            <select id="inputTrnGame" class="input-field">
+              <option value="Valorant">Valorant</option>
+              <option value="Counter-Strike 2">Counter-Strike 2</option>
+              <option value="Apex Legends">Apex Legends</option>
+              <option value="League of Legends">League of Legends</option>
+              <option value="Rocket League">Rocket League</option>
+            </select>
+          </div>
+
+          <div style="margin-bottom: 1rem;">
+            <label style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.4rem; text-transform: uppercase;">Tournament Format</label>
+            <input type="text" id="inputTrnFormat" required placeholder="e.g. Double Elimination Bo3" class="input-field" />
+          </div>
+
+          <div style="margin-bottom: 1.5rem;">
+            <label style="display: block; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.4rem; text-transform: uppercase;">Prize Pool ($ USD)</label>
+            <input type="text" id="inputTrnPrize" required placeholder="e.g. $250,000 USD" class="input-field" />
+          </div>
+
+          <div style="display: flex; gap: 10px; justify-content: flex-end;">
+            <button type="button" onclick="toggleNewTournamentModal()" class="btn btn-outline">Cancel</button>
+            <button type="submit" class="btn btn-primary">Deploy Tournament</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  </main>
+
+  <footer style="background: rgba(12, 17, 30, 0.95); border-top: 1px solid var(--border); padding: 1.5rem 2rem; color: var(--text-muted); font-size: 0.8125rem; margin-top: auto;">
+    <div style="max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <div style="display: flex; align-items: center; gap: 8px;">
+        <img src="/images/nowhere-logo.png" alt="Nowhere Esports Logo" style="height: 24px; width: auto;" />
+        <span>Nowhere Esports Internal Command System &bull; Restricted Operations</span>
+      </div>
+      <div>
+        <a href="/" style="color: var(--accent); text-decoration: none; margin-right: 1.5rem; font-weight: 600;">Nowhere Esports Public Hub</a>
+        <a href="http://localhost:5173" target="_blank" style="color: var(--accent-cyan); text-decoration: none; font-weight: 600;">SOC Threat Radar</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Toast notification helper
+    function showToast(msg, isSuccess = true) {
+      const toast = document.getElementById('toastNotification');
+      const text = document.getElementById('toastMessage');
+      text.innerText = msg;
+      toast.style.background = isSuccess ? 'rgba(48, 209, 88, 0.2)' : 'rgba(255, 42, 75, 0.2)';
+      toast.style.border = isSuccess ? '1px solid rgba(48, 209, 88, 0.4)' : '1px solid rgba(255, 42, 75, 0.4)';
+      toast.style.color = isSuccess ? '#4ade80' : '#ff8090';
+      toast.style.display = 'flex';
+      setTimeout(() => { toast.style.display = 'none'; }, 5000);
+    }
+
+    function dismissToast() {
+      document.getElementById('toastNotification').style.display = 'none';
+    }
+
+    function handleAdvanceRound(name) {
+      showToast(`Advancing match round for '${name}'. Scoreboards and stream overlays synchronized.`);
+    }
+
+    function handlePauseTournament(name) {
+      showToast(`Emergency timeout triggered for '${name}'. Observer feed paused.`, false);
+    }
+
+    function handleRestartServer(node) {
+      showToast(`Server node '${node}' reboot sequence initiated. Failover standby online.`);
+    }
+
+    function handleFlushCache(node) {
+      showToast(`Memory cache flushed on node '${node}'. Tick rate verified at 128.00 Hz.`);
+    }
+
+    function toggleNewTournamentModal() {
+      const modal = document.getElementById('newTournamentModal');
+      modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
+    }
+
+    function handleCreateTournament(e) {
+      e.preventDefault();
+      const title = document.getElementById('inputTrnTitle').value;
+      const game = document.getElementById('inputTrnGame').value;
+      const format = document.getElementById('inputTrnFormat').value;
+      const prize = document.getElementById('inputTrnPrize').value;
+
+      const tbody = document.getElementById('tournamentTableBody');
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td style="font-weight: 700; color: #fff;">${title}</td>
+        <td>${game}</td>
+        <td class="mono">${format}</td>
+        <td class="mono" style="color: #fff;">${prize}</td>
+        <td><span class="status-badge status-live">ACTIVE</span></td>
+        <td style="text-align: right;">
+          <button onclick="handleAdvanceRound('${title}')" class="btn btn-outline" style="padding: 2px 8px; font-size: 0.6875rem;">Next Match</button>
+        </td>
+      `;
+      tbody.prepend(tr);
+
+      const metric = document.getElementById('metricTournaments');
+      metric.innerText = String(parseInt(metric.innerText || '3') + 1);
+
+      toggleNewTournamentModal();
+      showToast(`Tournament '${title}' deployed to Nowhere Esports network!`);
+    }
+
+    // Fire Synthetic Attack Probe against local Honeypot Sensor
+    async function fireSyntheticAttack() {
+      const select = document.getElementById('attackVectorSelect');
+      const vector = select.value;
+      const btn = document.getElementById('btnFireAttack');
+      const resultBox = document.getElementById('attackResultBox');
+      const resultDetail = document.getElementById('attackResultDetail');
+
+      btn.disabled = true;
+      btn.innerText = 'Transmitting Attack Probe...';
+
+      let endpoint = '/api/v1/tournaments?search=UNION%20SELECT%20username,password_hash%20FROM%20staff_users--';
+      let method = 'GET';
+      let body = undefined;
+
+      if (vector === 'env') {
+        endpoint = '/.env';
+      } else if (vector === 'brute') {
+        endpoint = '/admin/login';
+        method = 'POST';
+      } else if (vector === 'traversal') {
+        endpoint = '/api/v1/tournaments?search=../../../../etc/passwd';
+      }
+
+      try {
+        const resp = await fetch(endpoint, {
+          method,
+          headers: {
+            'X-Attack-Simulation': 'Vigilance-Control-Center',
+            'User-Agent': 'Mozilla/5.0 (VIGILANCE-Synthetic-Tester/1.0)',
+            ...(method === 'POST' ? { 'Content-Type': 'application/x-www-form-urlencoded' } : {})
+          },
+          body: method === 'POST' ? 'username=admin%27%20OR%201=1--&password=supersecretpassword' : undefined
+        });
+
+        resultBox.style.display = 'block';
+        resultDetail.innerHTML = `
+          <strong>HTTP ${resp.status}</strong> from <code>${endpoint}</code><br/>
+          &bull; Attack intercepted by Honeypot Signature Engine<br/>
+          &bull; Staged in MongoDB Outbox &rarr; Dispatched to Kafka topic <code>raw-attacks</code><br/>
+          &bull; Canonical Ingestion enriched GeoIP and pushed to PostgreSQL<br/>
+          &bull; Streamed via SSE to VIGILANCE SOC Dashboard!
+        `;
+        showToast('Synthetic attack probe fired! Check VIGILANCE SOC Dashboard (port 5173) for live threat event.');
+      } catch (err) {
+        resultBox.style.display = 'block';
+        resultDetail.innerText = 'Probe transmitted to honeypot listener.';
+      } finally {
+        btn.disabled = false;
+        btn.innerText = '🔥 Fire Simulated Attack Probe';
+      }
+    }
+  </script>
+</body>
+</html>
+

@@ -1,0 +1,68 @@
+<%- include('../layouts/header', { title: 'Pro Rosters & Squads' }) %>
+
+<div style="margin-bottom: 2.5rem; text-align: center;">
+  <div style="display: inline-block; padding: 4px 14px; border-radius: 9999px; background: rgba(255, 42, 75, 0.15); border: 1px solid rgba(255, 42, 75, 0.35); color: var(--accent); font-weight: 700; font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.75rem;">
+    OFFICIAL COMPETITIVE DIVISIONS
+  </div>
+  <h1 style="font-size: 2.4rem; font-weight: 900; text-transform: uppercase; letter-spacing: -0.02em;">
+    Nowhere Esports Pro Squads
+  </h1>
+  <p style="color: var(--text-muted); font-size: 1.05rem; max-width: 680px; margin: 0 auto;">
+    World-class competitive rosters competing across Tier 1 international leagues and Major championships.
+  </p>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 2.5rem; margin-bottom: 3rem;">
+  <% rosters.forEach(function(squad) { %>
+    <div class="card" style="border-left: 4px solid var(--accent); padding: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid var(--border);">
+        <div>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <h2 style="font-size: 1.5rem; font-weight: 800; text-transform: uppercase; color: #fff;"><%= squad.team %></h2>
+            <span style="background: rgba(255, 42, 75, 0.18); color: var(--accent); border: 1px solid rgba(255, 42, 75, 0.35); padding: 2px 8px; border-radius: 9999px; font-size: 0.6875rem; font-weight: 700;">
+              <%= squad.badge %>
+            </span>
+          </div>
+          <p style="color: var(--text-muted); font-size: 0.875rem; margin-top: 4px;">
+            <%= squad.division %> &bull; Head Coach: <strong style="color: #cbd5e1;"><%= squad.coach %></strong>
+          </p>
+        </div>
+
+        <div class="mono" style="text-align: right;">
+          <div style="font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase;">Win / Performance</div>
+          <div style="font-size: 1.35rem; font-weight: 800; color: var(--success);"><%= squad.winRate %></div>
+        </div>
+      </div>
+
+      <!-- Player Cards Grid -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.25rem;">
+        <% squad.players.forEach(function(player) { %>
+          <div style="background: rgba(10, 14, 25, 0.7); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; transition: all 0.2s ease;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.75rem;">
+              <span class="mono" style="font-size: 1.15rem; font-weight: 800; color: #fff; letter-spacing: 0.05em;">
+                <%= player.tag %>
+              </span>
+              <% if (player.captain) { %>
+                <span style="font-size: 0.625rem; padding: 1px 6px; border-radius: 4px; background: rgba(255, 159, 10, 0.2); color: var(--warning); border: 1px solid rgba(255, 159, 10, 0.4); font-weight: 700;">
+                  CAPTAIN
+                </span>
+              <% } %>
+            </div>
+
+            <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.5rem;">
+              <%= player.role %>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; font-size: 0.75rem; padding-top: 0.5rem; border-top: 1px solid rgba(255, 255, 255, 0.05);" class="mono">
+              <span style="color: var(--text-muted);">K/D: <strong style="color: var(--accent);"><%= player.kd %></strong></span>
+              <span style="color: var(--text-muted);"><%= player.nationality %></span>
+            </div>
+          </div>
+        <% }); %>
+      </div>
+    </div>
+  <% }); %>
+</div>
+
+<%- include('../layouts/footer') %>
+

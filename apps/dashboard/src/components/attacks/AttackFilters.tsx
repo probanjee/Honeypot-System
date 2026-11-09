@@ -1,8 +1,4 @@
-/**
- * Attack Filter & Search Controls (Phase 5)
- * Synchronized with backend query parameters: severity, score range, source IP,
- * country code, and page size.
- */
+
 
 import React, { useState } from 'react';
 import { Filter, Search, RotateCcw } from 'lucide-react';

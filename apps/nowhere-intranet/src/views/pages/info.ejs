@@ -1,0 +1,33 @@
+<%- include('../layouts/header', { title: pageTitle }) %>
+
+<div style="max-width: 860px; margin: 2.5rem auto 4rem;">
+  <div class="card" style="padding: 3rem 2.5rem; border-color: rgba(255, 42, 75, 0.25);">
+    <div style="margin-bottom: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 1.5rem;">
+      <div style="display: inline-block; padding: 4px 12px; border-radius: 9999px; background: rgba(255, 42, 75, 0.15); border: 1px solid rgba(255, 42, 75, 0.35); color: var(--accent); font-weight: 700; font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.75rem;" class="mono">
+        OFFICIAL DOCUMENTATION &bull; NOWHERE ESPORTS
+      </div>
+      <h1 style="font-size: 2.2rem; font-weight: 900; text-transform: uppercase; letter-spacing: -0.02em; color: #fff;">
+        <%= pageTitle %>
+      </h1>
+      <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 0.5rem;">
+        <%= pageSubtitle %>
+      </p>
+    </div>
+
+    <div style="color: #cbd5e1; line-height: 1.8; font-size: 0.95rem; display: flex; flex-direction: column; gap: 1.5rem;">
+      <%- contentHtml %>
+    </div>
+
+    <div style="margin-top: 3rem; padding-top: 1.5rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <span class="mono" style="font-size: 0.75rem; color: var(--text-muted);">
+        LAST REVISED: MARCH 2026 &bull; LEGAL ID: NW-LEG-<%= Math.floor(100 + Math.random() * 900) %>
+      </span>
+      <a href="/" style="color: var(--accent); text-decoration: none; font-weight: 700; font-size: 0.85rem;">
+        &larr; Back to Public Hub
+      </a>
+    </div>
+  </div>
+</div>
+
+<%- include('../layouts/footer') %>
+

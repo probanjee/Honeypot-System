@@ -1,7 +1,4 @@
-/**
- * Centralized REST API Client for VIGILANCE Backend (Phase 5)
- * Handles typed requests, query parameter encoding, error formatting, and timeout management.
- */
+
 
 import type { AttackDetail, AttackFilters, AttackSignature, PaginatedAttacks } from '../types/attacks';
 import type { SummaryAnalytics, TimeWindowOption } from '../types/analytics';

@@ -1,13 +1,17 @@
 <%- include('../layouts/header', { title: '401 Unauthorized' }) %>
 
-<div style="max-width: 600px; margin: 4rem auto; text-align: center;">
-  <div class="card" style="padding: 3rem 2rem;">
-    <div style="font-size: 3.5rem; font-weight: 900; color: var(--danger); margin-bottom: 0.5rem;">401</div>
-    <h1 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem;"><%= title || 'Authentication Required' %></h1>
-    <p style="color: var(--text-muted); margin-bottom: 2rem;">
+<div style="max-width: 540px; margin: 4rem auto; text-align: center;">
+  <div class="card" style="padding: 3rem 2rem; border-color: rgba(255, 69, 58, 0.4); box-shadow: 0 0 35px rgba(255, 69, 58, 0.15);">
+    <img src="/images/nowhere-logo.png" alt="Nowhere Esports Logo" style="height: 60px; width: auto; margin-bottom: 1.5rem; filter: drop-shadow(0 0 14px rgba(255, 69, 58, 0.4));" />
+    <div style="font-size: 3.5rem; font-weight: 900; color: var(--danger); line-height: 1; margin-bottom: 0.5rem;" class="mono">401</div>
+    <h1 style="font-size: 1.5rem; font-weight: 800; text-transform: uppercase; margin-bottom: 1rem;"><%= title || 'Authentication Required' %></h1>
+    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 2rem;">
       <%= message || 'The requested Nowhere Esports resource requires a valid session token or administrative credentials.' %>
     </p>
-    <a href="/login" class="btn-login" style="display: inline-block;">Return to Login Portal</a>
+    <div style="display: flex; gap: 1rem; justify-content: center;">
+      <a href="/login" class="btn-login" style="display: inline-block;">Return to Login</a>
+      <a href="/" style="background: rgba(255, 255, 255, 0.08); border: 1px solid var(--border); color: #fff; padding: 0.45rem 1.1rem; border-radius: 8px; font-weight: 700; font-size: 0.8125rem; text-decoration: none;">Public Home</a>
+    </div>
   </div>
 </div>
 

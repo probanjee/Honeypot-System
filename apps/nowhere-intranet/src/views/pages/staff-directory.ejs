@@ -1,26 +1,29 @@
 <%- include('../layouts/header', { title: 'Staff Roster & Directory' }) %>
 
 <div style="margin-bottom: 2rem;">
-  <h1 style="font-size: 2rem; font-weight: 800;">Staff & Production Directory</h1>
-  <p style="color: var(--text-muted);">Confidential internal roster. Contact admins via secure company Discord.</p>
+  <div style="display: inline-block; padding: 3px 10px; border-radius: 9999px; background: rgba(255, 42, 75, 0.15); border: 1px solid rgba(255, 42, 75, 0.35); color: var(--accent); font-weight: 700; font-size: 0.6875rem; text-transform: uppercase; margin-bottom: 0.5rem;" class="mono">
+    ORGANIZATION DIRECTORY
+  </div>
+  <h1 style="font-size: 2.2rem; font-weight: 900; text-transform: uppercase;">Staff & Production Directory</h1>
+  <p style="color: var(--text-muted); font-size: 0.95rem;">Confidential internal operations roster and broadcast engineers.</p>
 </div>
 
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem;">
   <% staff.forEach(function(s) { %>
-    <div class="card">
+    <div class="card" style="border-left: 4px solid var(--accent); padding: 1.5rem;">
       <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
-        <div style="width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, var(--border), var(--accent)); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.2rem;">
+        <div style="width: 48px; height: 48px; border-radius: 12px; background: linear-gradient(135deg, rgba(255, 42, 75, 0.3), rgba(14, 19, 32, 0.8)); border: 1px solid var(--border-red); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.25rem; color: #fff;">
           <%= s.name.charAt(0) %>
         </div>
         <div>
-          <h2 style="font-size: 1.1rem; font-weight: 700;"><%= s.name %></h2>
-          <div style="color: var(--accent-cyan); font-size: 0.85rem;"><%= s.role %></div>
+          <h2 style="font-size: 1.15rem; font-weight: 800; color: #fff;"><%= s.name %></h2>
+          <div style="color: var(--accent); font-size: 0.8125rem; font-weight: 600;"><%= s.role %></div>
         </div>
       </div>
-      <div style="font-size: 0.85rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 0.3rem;">
+      <div style="font-size: 0.8125rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 0.4rem;" class="mono">
         <div><strong>Department:</strong> <%= s.department %></div>
         <div><strong>Email:</strong> <%= s.email %></div>
-        <div><strong>Clearance:</strong> <span style="color: #ffb300;"><%= s.clearance %></span></div>
+        <div><strong>Clearance:</strong> <span style="color: #ff9f0a; font-weight: 700;"><%= s.clearance %></span></div>
       </div>
     </div>
   <% }); %>

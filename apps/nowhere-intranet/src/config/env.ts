@@ -2,6 +2,22 @@
  * VIGILANCE Nowhere Esports Intranet - Environment Configuration
  */
 
+import fs from 'node:fs';
+import path from 'node:path';
+
+// Automatically load local .env file if available
+try {
+  if (typeof (process as any).loadEnvFile === 'function') {
+    if (fs.existsSync('.env')) {
+      (process as any).loadEnvFile('.env');
+    } else if (fs.existsSync('../../.env')) {
+      (process as any).loadEnvFile('../../.env');
+    }
+  }
+} catch {
+  // Graceful fallback when .env is absent
+}
+
 export interface EnvConfig {
   nodeEnv: string;
   port: number;

@@ -1,12 +1,7 @@
-/**
- * SOC Dashboard Header (Phase 5)
- * Displays VIGILANCE branding, backend health, real-time SSE stream status,
- * last refresh timestamp, and global manual refresh / stream pause controls.
- */
+
 
 import React from 'react';
 import {
-  ShieldAlert,
   Activity,
   Radio,
   RefreshCw,
@@ -16,6 +11,7 @@ import {
 } from 'lucide-react';
 import type { SSEConnectionStatus } from '../../types/stream';
 import { ThemeToggle } from './ThemeToggle';
+import { VigilanceLogo } from './VigilanceLogo';
 
 interface HeaderProps {
   backendReachable: boolean;
@@ -71,16 +67,17 @@ export const Header: React.FC<HeaderProps> = ({
               alignItems: 'center',
               justifyContent: 'center',
               boxShadow: 'var(--shadow-glow), inset 0 1px 2px rgba(255, 255, 255, 0.3)',
+              flexShrink: 0,
             }}
           >
-            <ShieldAlert size={26} color="#38bdf8" />
+            <VigilanceLogo size={28} theme={theme} />
           </div>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <h1
                 style={{
-                  fontSize: '1.35rem',
-                  fontWeight: 800,
+                  fontSize: '1.4rem',
+                  fontWeight: 900,
                   letterSpacing: '0.06em',
                   textTransform: 'uppercase',
                   background: 'var(--brand-title-gradient)',
@@ -90,96 +87,89 @@ export const Header: React.FC<HeaderProps> = ({
               >
                 VIGILANCE
               </h1>
-              <span
-                className="mono"
-                style={{
-                  fontSize: '0.6875rem',
-                  padding: '3px 8px',
-                  borderRadius: 'var(--radius-pill)',
-                  background: 'rgba(56, 189, 248, 0.12)',
-                  color: 'var(--card-val-cyan)',
-                  border: '1px solid rgba(56, 189, 248, 0.35)',
-                  boxShadow: '0 0 12px rgba(56, 189, 248, 0.2)',
-                  fontWeight: 600,
-                }}
-              >
-                SOC OS 27
-              </span>
             </div>
             <p style={{ fontSize: '0.8125rem', color: 'var(--text-secondary)' }}>
-              Decoy Intranet Telemetry & Real-Time Threat Intelligence
+              Nowhere Esports Network Telemetry & Real-Time Threat Intelligence
             </p>
           </div>
         </div>
 
-        {/* Center: System Connection Monitors */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
+        {/* Center: Unified Real-Time Telemetry Bar */}
+        <div
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            height: '36px',
+            padding: '0 14px',
+            borderRadius: 'var(--radius-pill)',
+            background: 'var(--pill-bg)',
+            border: '1px solid var(--border-subtle)',
+            borderTop: '1px solid var(--border-strong)',
+            boxShadow: 'inset 0 1px 1px rgba(255, 255, 255, 0.08), 0 2px 8px rgba(0, 0, 0, 0.25)',
+            gap: '12px',
+          }}
+        >
           {/* Backend Status */}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              padding: '6px 14px',
-              borderRadius: 'var(--radius-pill)',
-              background: 'var(--pill-bg)',
-              border: '1px solid var(--border-subtle)',
-              borderTop: '1px solid var(--border-strong)',
-              boxShadow: 'inset 0 1px 1px rgba(255, 255, 255, 0.1)',
-            }}
-          >
-            <Server size={15} color="var(--text-muted)" />
-            <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>REST API:</span>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+            <Server size={14} color="var(--text-muted)" />
+            <span style={{ fontSize: '0.72rem', color: 'var(--text-secondary)' }}>REST API:</span>
             <span className={`pulse-dot ${backendReachable ? 'CONNECTED' : 'DISCONNECTED'}`} />
-            <span className="mono" style={{ fontSize: '0.75rem', fontWeight: 600 }}>
+            <span className="mono" style={{ fontSize: '0.72rem', fontWeight: 700 }}>
               {backendReachable ? 'CONNECTED' : 'UNREACHABLE'}
             </span>
           </div>
 
+          <span style={{ width: '1px', height: '14px', background: 'var(--border-subtle)' }} />
+
           {/* SSE Stream Status */}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              padding: '6px 14px',
-              borderRadius: 'var(--radius-pill)',
-              background: 'var(--pill-bg)',
-              border: '1px solid var(--border-subtle)',
-              borderTop: '1px solid var(--border-strong)',
-              boxShadow: 'inset 0 1px 1px rgba(255, 255, 255, 0.1)',
-            }}
-          >
-            <Radio size={15} color={streamStatus === 'CONNECTED' ? '#30d158' : 'var(--text-muted)'} />
-            <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Kafka → SSE:</span>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+            <Radio size={14} color={streamStatus === 'CONNECTED' ? '#30d158' : 'var(--text-muted)'} />
+            <span style={{ fontSize: '0.72rem', color: 'var(--text-secondary)' }}>Kafka → SSE:</span>
             <span className={`pulse-dot ${streamStatus}`} />
-            <span className="mono" style={{ fontSize: '0.75rem', fontWeight: 600 }}>
+            <span className="mono" style={{ fontSize: '0.72rem', fontWeight: 700 }}>
               {streamStatus}
             </span>
           </div>
 
+          <span style={{ width: '1px', height: '14px', background: 'var(--border-subtle)' }} />
+
           {/* Last Refresh */}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              padding: '6px 12px',
-              borderRadius: 'var(--radius-pill)',
-              background: 'var(--pill-bg)',
-              border: '1px solid var(--border-subtle)',
-            }}
-          >
-            <Activity size={14} color="var(--text-muted)" />
-            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Updated:</span>
-            <span className="mono" style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+            <Activity size={13} color="var(--text-muted)" />
+            <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Updated:</span>
+            <span className="mono" style={{ fontSize: '0.72rem', color: 'var(--text-secondary)' }}>
               {formatTime(lastUpdated)}
             </span>
           </div>
         </div>
 
         {/* Right: Actions */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          {/* Nowhere Esports Intranet & Control Center Shortcut */}
+          <a
+            href="http://localhost:3000"
+            target="_blank"
+            rel="noreferrer"
+            className="soc-btn"
+            style={{
+              height: '36px',
+              textDecoration: 'none',
+              background: 'linear-gradient(135deg, rgba(255, 42, 75, 0.12), rgba(200, 16, 46, 0.18))',
+              border: '1px solid rgba(255, 42, 75, 0.35)',
+              color: '#ff4767',
+              fontWeight: 700,
+              gap: '6px',
+            }}
+            title="Open Nowhere Esports Portal & Match Operations (Port 3000)"
+          >
+            <img
+              src="/images/nowhere-logo.png"
+              alt="Nowhere"
+              style={{ width: '15px', height: '15px', objectFit: 'contain' }}
+            />
+            <span>Nowhere Esports</span>
+          </a>
+
           {/* Apple Liquid Glass Theme Toggle */}
           {onToggleTheme && (
             <ThemeToggle theme={theme} onToggle={onToggleTheme} />
@@ -193,12 +183,12 @@ export const Header: React.FC<HeaderProps> = ({
           >
             {isStreamPaused ? (
               <>
-                <Play size={14} />
+                <Play size={13} />
                 <span>Resume Feed</span>
               </>
             ) : (
               <>
-                <Pause size={14} />
+                <Pause size={13} />
                 <span>Pause Feed</span>
               </>
             )}
@@ -211,7 +201,7 @@ export const Header: React.FC<HeaderProps> = ({
             className="soc-btn"
             title="Refresh analytics and attack history"
           >
-            <RefreshCw size={14} className={isRefreshing ? 'animate-spin' : ''} />
+            <RefreshCw size={13} className={isRefreshing ? 'animate-spin' : ''} />
             <span>Refresh</span>
           </button>
         </div>
