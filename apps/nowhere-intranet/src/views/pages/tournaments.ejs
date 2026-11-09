@@ -77,6 +77,39 @@
     </form>
   </div>
 
+  <!-- Skeleton Loading State for Low Bandwidth & Initial Render -->
+  <div id="tournaments-skeleton" class="nw-skeleton-placeholder" style="display: none; flex-direction: column; gap: 1.5rem; margin-bottom: 2rem;">
+    <% for (let i = 0; i < 3; i++) { %>
+      <div class="nw-skeleton-card" style="border-left: 5px solid rgba(255, 42, 75, 0.4); padding: 1.75rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+          <div style="display: flex; gap: 10px;">
+            <div class="nw-skeleton nw-skeleton-badge"></div>
+            <div class="nw-skeleton" style="height: 22px; width: 70px; border-radius: 6px;"></div>
+          </div>
+          <div class="nw-skeleton nw-skeleton-badge"></div>
+        </div>
+        <div class="nw-skeleton nw-skeleton-title" style="margin-bottom: 1rem;"></div>
+        <div class="nw-skeleton nw-skeleton-text" style="width: 80%;"></div>
+        <div class="nw-skeleton nw-skeleton-text" style="width: 45%; margin-bottom: 1.25rem;"></div>
+        <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 1rem; border-top: 1px solid rgba(255, 255, 255, 0.05);">
+          <div style="display: flex; gap: 1rem;">
+            <div class="nw-skeleton" style="height: 16px; width: 90px; border-radius: 4px;"></div>
+            <div class="nw-skeleton" style="height: 16px; width: 110px; border-radius: 4px;"></div>
+          </div>
+          <div class="nw-skeleton nw-skeleton-btn"></div>
+        </div>
+      </div>
+    <% } %>
+  </div>
+  <script>
+    (function() {
+      if (document.documentElement.classList.contains('nw-low-bandwidth')) {
+        var skel = document.getElementById('tournaments-skeleton');
+        if (skel) skel.style.display = 'flex';
+      }
+    })();
+  </script>
+
   <!-- Tournaments List -->
   <div style="display: flex; flex-direction: column; gap: 1.5rem; margin-bottom: 3rem;">
     <% if (tournaments && tournaments.length > 0) { %>

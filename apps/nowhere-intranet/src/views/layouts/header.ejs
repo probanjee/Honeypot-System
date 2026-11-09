@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <script src="/js/lottie-player.js"></script>
   <style>
     :root {
       --bg-primary: #07090e;
@@ -205,6 +206,15 @@
   </style>
 </head>
 <body>
+  <!-- ── LOW BANDWIDTH & NETWORK STATUS TOAST ── -->
+  <div id="nw-network-toast" style="display: none; position: fixed; bottom: 24px; right: 24px; z-index: 999999; background: rgba(14, 19, 32, 0.95); border: 1px solid #38bdf8; padding: 0.85rem 1.25rem; border-radius: 14px; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), 0 0 20px rgba(56, 189, 248, 0.25); backdrop-filter: blur(16px); font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: #f8fafc; align-items: center; gap: 12px;">
+    <span style="width: 10px; height: 10px; border-radius: 50%; background: #38bdf8; box-shadow: 0 0 10px #38bdf8; display: inline-block; animation: nwBlink 1s infinite;"></span>
+    <div>
+      <div style="font-weight: 800; color: #38bdf8; text-transform: uppercase; letter-spacing: 0.05em;">LOW BANDWIDTH DETECTED</div>
+      <div style="color: #94a3b8; font-size: 0.6875rem; margin-top: 2px;">Optimized skeleton streaming active</div>
+    </div>
+  </div>
+
   <!-- ── NOWHERE ESPORTS PREMIUM ATMOSPHERIC LOADER ── -->
   <div id="nw-global-loader">
     <div class="nw-loader-bg-ambient"></div>
@@ -219,7 +229,7 @@
         <div class="nw-loader-orbit-spinner"></div>
         <div class="nw-loader-orbit-spinner-reverse"></div>
         <div class="nw-loader-logo-box">
-          <img src="/images/nowhere-logo.png" alt="Nowhere Esports Crest" class="nw-loader-logo" />
+          <lottie-player src="/animations/loading.json" background="transparent" speed="1.2" style="width: 120px; height: 120px;" loop autoplay></lottie-player>
         </div>
       </div>
 
@@ -309,8 +319,8 @@
     /* Emblem Wrap & Holographic Rings */
     .nw-loader-emblem-wrap {
       position: relative;
-      width: 140px;
-      height: 140px;
+      width: 160px;
+      height: 160px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -369,19 +379,69 @@
     .nw-loader-logo-box {
       position: relative;
       z-index: 5;
-      width: 90px;
-      height: 90px;
+      width: 120px;
+      height: 120px;
       border-radius: 50%;
       background: radial-gradient(circle, rgba(255, 42, 75, 0.25) 0%, rgba(14, 19, 32, 0.9) 80%);
-      border: 1px solid rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.18);
       display: flex;
       align-items: center;
       justify-content: center;
+      overflow: hidden;
       box-shadow: 0 0 35px rgba(255, 42, 75, 0.4), inset 0 0 20px rgba(0, 0, 0, 0.8);
       animation: nwLogoFloat 3s ease-in-out infinite;
     }
     @keyframes nwLogoFloat {
       0%, 100% { transform: translateY(0); filter: drop-shadow(0 0 15px rgba(255, 42, 75, 0.5)); }
+      50% { transform: translateY(-4px); filter: drop-shadow(0 0 25px rgba(255, 42, 75, 0.85)); }
+    }
+
+    /* ── SKELETON WIREFRAME & LOW BANDWIDTH FRAMEWORK ── */
+    @keyframes nwShimmer {
+      0% { background-position: -200% 0; }
+      100% { background-position: 200% 0; }
+    }
+    .nw-skeleton {
+      background: linear-gradient(90deg, rgba(255, 255, 255, 0.03) 25%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.03) 75%);
+      background-size: 200% 100%;
+      animation: nwShimmer 1.8s infinite;
+      border-radius: 8px;
+      display: inline-block;
+      pointer-events: none;
+    }
+    .nw-skeleton-text {
+      height: 0.875rem;
+      margin-bottom: 0.5rem;
+      width: 100%;
+    }
+    .nw-skeleton-title {
+      height: 1.5rem;
+      margin-bottom: 0.75rem;
+      width: 60%;
+    }
+    .nw-skeleton-card {
+      background: rgba(14, 19, 32, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 1.25rem;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+    }
+    .nw-skeleton-badge {
+      height: 22px;
+      width: 90px;
+      border-radius: 9999px;
+    }
+    .nw-skeleton-circle {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+    }
+    .nw-skeleton-btn {
+      height: 38px;
+      border-radius: 10px;
+      width: 130px;
+    }
       50% { transform: translateY(-4px); filter: drop-shadow(0 0 25px rgba(255, 42, 75, 0.85)); }
     }
     .nw-loader-logo {
@@ -565,6 +625,43 @@
       }
 
       requestAnimationFrame(update);
+    })();
+
+    // Network Speed & Low Bandwidth Detection
+    (function() {
+      var isSlow = false;
+      if ('connection' in navigator) {
+        var conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+        if (conn && (conn.effectiveType === 'slow-2g' || conn.effectiveType === '2g' || conn.effectiveType === '3g' || conn.saveData || (conn.rtt && conn.rtt > 500))) {
+          isSlow = true;
+        }
+      }
+      if (isSlow) {
+        document.documentElement.classList.add('nw-low-bandwidth');
+        window.addEventListener('DOMContentLoaded', function() {
+          var toast = document.getElementById('nw-network-toast');
+          if (toast) {
+            toast.style.display = 'flex';
+            setTimeout(function() {
+              toast.style.transition = 'opacity 0.6s ease';
+              toast.style.opacity = '0';
+              setTimeout(function() { toast.remove(); }, 600);
+            }, 5000);
+          }
+        });
+      }
+
+      // Smooth skeleton transition on full window load
+      window.addEventListener('load', function() {
+        var skeletons = document.querySelectorAll('.nw-skeleton-placeholder');
+        for (var i = 0; i < skeletons.length; i++) {
+          skeletons[i].style.transition = 'opacity 0.35s ease';
+          skeletons[i].style.opacity = '0';
+          (function(el) {
+            setTimeout(function() { el.style.display = 'none'; }, 350);
+          })(skeletons[i]);
+        }
+      });
     })();
   </script>
   <header>

@@ -15,6 +15,27 @@ export function safeErrorHandler(err: any, req: Request, res: Response, _next: N
 
   // If request expects HTML / browser view
   if (req.accepts('html')) {
+    if (status === 500) {
+      res.status(500).render('errors/500', {
+        title: 'Internal Server Error',
+        message: 'The requested operation encountered an unexpected node processing error.',
+      });
+      return;
+    }
+    if (status === 403) {
+      res.status(403).render('errors/403', {
+        title: 'Staff Portal Access Denied',
+        message: 'Active staff session not found. Please log in via the authorized SSO gateway.',
+      });
+      return;
+    }
+    if (status === 401) {
+      res.status(401).render('errors/401', {
+        title: 'Authentication Required',
+        message: 'The requested resource requires valid authentication credentials.',
+      });
+      return;
+    }
     res.status(status).render('errors/404', {
       title: 'Page Not Found',
       message: 'The requested resource could not be found or access is restricted.',

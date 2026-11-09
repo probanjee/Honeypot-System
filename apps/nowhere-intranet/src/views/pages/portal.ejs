@@ -1,6 +1,27 @@
 <%- include('../layouts/header', { title: 'Fan & Player Portal' }) %>
 
 <div style="margin-bottom: 4rem;">
+
+  <!-- Skeleton Loading State for Low Bandwidth & Initial Render -->
+  <div id="portal-skeleton" class="nw-skeleton-placeholder" style="display: none; flex-direction: column; gap: 1.5rem; margin-bottom: 2rem;">
+    <div class="nw-skeleton-card" style="padding: 2.25rem;">
+      <div style="display: flex; gap: 1.5rem; align-items: center;">
+        <div class="nw-skeleton nw-skeleton-circle" style="width: 80px; height: 80px; border-radius: 22px;"></div>
+        <div style="flex: 1;">
+          <div class="nw-skeleton nw-skeleton-title" style="width: 250px; margin-bottom: 0.75rem;"></div>
+          <div class="nw-skeleton nw-skeleton-text" style="width: 180px;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function() {
+      if (document.documentElement.classList.contains('nw-low-bandwidth')) {
+        var skel = document.getElementById('portal-skeleton');
+        if (skel) skel.style.display = 'flex';
+      }
+    })();
+  </script>
   
   <!-- Welcome Banner for New Users -->
   <% if (typeof welcome !== 'undefined' && welcome) { %>
@@ -29,8 +50,8 @@
       <div style="display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;">
         <!-- Glowing Avatar Orb -->
         <div style="position: relative;">
-          <div id="passport-avatar-display" style="width: 80px; height: 80px; border-radius: 22px; background: linear-gradient(135deg, rgba(255, 42, 75, 0.35), rgba(56, 189, 248, 0.2)); border: 2px solid var(--accent); display: flex; align-items: center; justify-content: center; font-size: 2.5rem; box-shadow: 0 0 25px rgba(255, 42, 75, 0.45); cursor: pointer;" onclick="openProfileModal()" title="Click to customize avatar">
-            <%= user.avatar || '🎮' %>
+          <div id="passport-avatar-display" style="width: 80px; height: 80px; border-radius: 22px; background: linear-gradient(135deg, rgba(255, 42, 75, 0.35), rgba(56, 189, 248, 0.2)); border: 2px solid var(--accent); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: 900; color: #fff; box-shadow: 0 0 25px rgba(255, 42, 75, 0.45); cursor: pointer;" onclick="openProfileModal()" title="Click to customize avatar">
+            <%= user.avatar || 'NW' %>
           </div>
           <span style="position: absolute; bottom: -4px; right: -4px; width: 18px; height: 18px; border-radius: 50%; background: #30d158; border: 3px solid #0e1320; box-shadow: 0 0 10px #30d158;"></span>
         </div>
@@ -186,11 +207,11 @@
         <!-- Quick Hype Reaction Buttons -->
         <div style="display: flex; gap: 6px; align-items: center;">
           <span style="font-size: 0.75rem; color: #94a3b8; font-weight: 700;">Hype:</span>
-          <button type="button" onclick="sendReaction('🔥')" class="reaction-btn">🔥</button>
-          <button type="button" onclick="sendReaction('🏆')" class="reaction-btn">🏆</button>
-          <button type="button" onclick="sendReaction('🎯')" class="reaction-btn">🎯</button>
-          <button type="button" onclick="sendReaction('👏')" class="reaction-btn">👏</button>
-          <button type="button" onclick="sendReaction('💥')" class="reaction-btn">💥</button>
+          <button type="button" onclick="sendReaction('HYPED')" class="reaction-btn">HYPED</button>
+          <button type="button" onclick="sendReaction('CHAMP')" class="reaction-btn">CHAMP</button>
+          <button type="button" onclick="sendReaction('CLUTCH')" class="reaction-btn">CLUTCH</button>
+          <button type="button" onclick="sendReaction('GG')" class="reaction-btn">GG</button>
+          <button type="button" onclick="sendReaction('ACE')" class="reaction-btn">ACE</button>
         </div>
       </div>
     </div>
@@ -524,10 +545,10 @@
 
     <!-- Choose Avatar -->
     <div style="margin-bottom: 1.25rem;">
-      <label style="display: block; font-size: 0.8125rem; color: #cbd5e1; font-weight: 700; margin-bottom: 0.6rem;">Select Avatar Icon</label>
+      <label style="display: block; font-size: 0.8125rem; color: #cbd5e1; font-weight: 700; margin-bottom: 0.6rem;">Select Avatar Badge</label>
       <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px;">
-        <% ['🐍', '👑', '🦅', '⚡', '🎯', '🔥', '🐺', '🤖', '🦁', '⚔️'].forEach(av => { %>
-          <div onclick="selectModalAvatar('<%= av %>')" id="av-opt-<%= av %>" style="background: rgba(18, 24, 38, 0.85); border: 1px solid <%= user.avatar === av ? 'var(--accent)' : 'rgba(255, 255, 255, 0.1)' %>; border-radius: 12px; padding: 0.6rem; text-align: center; font-size: 1.8rem; cursor: pointer; transition: all 0.2s ease;">
+        <% ['NW', 'VIP', 'PRO', 'ACE', 'TOP', 'MAX', 'MVP', 'GOD', 'ONE', 'ELT'].forEach(av => { %>
+          <div onclick="selectModalAvatar('<%= av %>')" id="av-opt-<%= av %>" style="background: rgba(18, 24, 38, 0.85); border: 1px solid <%= user.avatar === av ? 'var(--accent)' : 'rgba(255, 255, 255, 0.1)' %>; border-radius: 12px; padding: 0.6rem; text-align: center; font-size: 1rem; font-weight: 900; color: #fff; cursor: pointer; transition: all 0.2s ease;">
             <%= av %>
           </div>
         <% }); %>
@@ -646,7 +667,7 @@
 </style>
 
 <script>
-  let selectedAvatar = '<%= user.avatar || "🎮" %>';
+  let selectedAvatar = '<%= user.avatar || "NW" %>';
 
   async function claimDailyDrop() {
     const btn = document.getElementById('claim-drop-btn');
@@ -745,7 +766,7 @@
 
   function selectModalAvatar(av) {
     selectedAvatar = av;
-    ['🐍', '👑', '🦅', '⚡', '🎯', '🔥', '🐺', '🤖', '🦁', '⚔️'].forEach(a => {
+    ['NW', 'VIP', 'PRO', 'ACE', 'TOP', 'MAX', 'MVP', 'GOD', 'ONE', 'ELT'].forEach(a => {
       const el = document.getElementById('av-opt-' + a);
       if (el) el.style.borderColor = a === av ? 'var(--accent)' : 'rgba(255, 255, 255, 0.1)';
     });
