@@ -205,6 +205,368 @@
   </style>
 </head>
 <body>
+  <!-- ── NOWHERE ESPORTS PREMIUM ATMOSPHERIC LOADER ── -->
+  <div id="nw-global-loader">
+    <div class="nw-loader-bg-ambient"></div>
+    <div class="nw-loader-scanlines"></div>
+    <div class="nw-loader-content">
+      
+      <!-- Central Hologram & Ring -->
+      <div class="nw-loader-emblem-wrap">
+        <div class="nw-loader-pulse-ring ring-1"></div>
+        <div class="nw-loader-pulse-ring ring-2"></div>
+        <div class="nw-loader-orbit-dashed"></div>
+        <div class="nw-loader-orbit-spinner"></div>
+        <div class="nw-loader-orbit-spinner-reverse"></div>
+        <div class="nw-loader-logo-box">
+          <img src="/images/nowhere-logo.png" alt="Nowhere Esports Crest" class="nw-loader-logo" />
+        </div>
+      </div>
+
+      <!-- Typography -->
+      <div class="nw-loader-header">
+        <div class="nw-loader-brand">NOWHERE ESPORTS</div>
+        <div class="nw-loader-subbrand">TOURNAMENT NETWORK PROTOCOL // ACTIVE NODE</div>
+      </div>
+
+      <!-- Progress Track -->
+      <div class="nw-loader-progress-card">
+        <div class="nw-loader-progress-track">
+          <div class="nw-loader-progress-fill" id="nwLoaderProgressFill">
+            <div class="nw-loader-progress-glare"></div>
+          </div>
+        </div>
+        <div class="nw-loader-stats">
+          <div class="nw-loader-status-text" id="nwLoaderStatusText">INITIALIZING SECURE CLIENT...</div>
+          <div class="nw-loader-percent" id="nwLoaderPercent">0%</div>
+        </div>
+      </div>
+
+      <!-- Security / Protocol Watermark -->
+      <div class="nw-loader-footer-meta">
+        <div class="nw-meta-pill">
+          <span class="nw-meta-dot"></span>
+          <span>256-BIT TLS ENCRYPTED</span>
+        </div>
+        <div class="nw-meta-pill">
+          <span>REGION: GLOBAL-APAC-01</span>
+        </div>
+        <div class="nw-meta-pill">
+          <span>LATENCY: 4ms</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <style>
+    #nw-global-loader {
+      position: fixed;
+      inset: 0;
+      z-index: 9999999;
+      background: #05070b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      transition: opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1), transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+    }
+    #nw-global-loader.hidden {
+      opacity: 0;
+      transform: scale(1.02);
+      pointer-events: none;
+    }
+    .nw-loader-bg-ambient {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 45%, rgba(255, 42, 75, 0.18) 0%, rgba(14, 19, 32, 0.6) 40%, #05070b 85%);
+      pointer-events: none;
+    }
+    .nw-loader-scanlines {
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        to bottom,
+        transparent 0px,
+        transparent 2px,
+        rgba(0, 0, 0, 0.25) 2px,
+        rgba(0, 0, 0, 0.25) 4px
+      );
+      pointer-events: none;
+      opacity: 0.6;
+    }
+    .nw-loader-content {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      max-width: 480px;
+      width: 90%;
+    }
+    /* Emblem Wrap & Holographic Rings */
+    .nw-loader-emblem-wrap {
+      position: relative;
+      width: 140px;
+      height: 140px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 24px;
+    }
+    .nw-loader-pulse-ring {
+      position: absolute;
+      inset: -15px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 42, 75, 0.35);
+      animation: nwRingPulse 2.4s ease-out infinite;
+      pointer-events: none;
+    }
+    .nw-loader-pulse-ring.ring-2 {
+      animation-delay: 1.2s;
+    }
+    @keyframes nwRingPulse {
+      0% { transform: scale(0.7); opacity: 0.8; }
+      100% { transform: scale(1.4); opacity: 0; }
+    }
+    .nw-loader-orbit-dashed {
+      position: absolute;
+      inset: -6px;
+      border-radius: 50%;
+      border: 2px dashed rgba(255, 42, 75, 0.3);
+      animation: nwSpinClockwise 14s linear infinite;
+    }
+    .nw-loader-orbit-spinner {
+      position: absolute;
+      inset: -10px;
+      border-radius: 50%;
+      border: 3px solid transparent;
+      border-top-color: #ff2a4b;
+      border-right-color: rgba(255, 42, 75, 0.4);
+      animation: nwSpinClockwise 1.6s cubic-bezier(0.5, 0.1, 0.5, 0.9) infinite;
+      filter: drop-shadow(0 0 8px rgba(255, 42, 75, 0.8));
+    }
+    .nw-loader-orbit-spinner-reverse {
+      position: absolute;
+      inset: -18px;
+      border-radius: 50%;
+      border: 2px solid transparent;
+      border-bottom-color: #38bdf8;
+      border-left-color: rgba(56, 189, 248, 0.3);
+      animation: nwSpinCounter 2.4s linear infinite;
+      filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.6));
+    }
+    @keyframes nwSpinClockwise {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    @keyframes nwSpinCounter {
+      from { transform: rotate(360deg); }
+      to { transform: rotate(0deg); }
+    }
+    .nw-loader-logo-box {
+      position: relative;
+      z-index: 5;
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 42, 75, 0.25) 0%, rgba(14, 19, 32, 0.9) 80%);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 35px rgba(255, 42, 75, 0.4), inset 0 0 20px rgba(0, 0, 0, 0.8);
+      animation: nwLogoFloat 3s ease-in-out infinite;
+    }
+    @keyframes nwLogoFloat {
+      0%, 100% { transform: translateY(0); filter: drop-shadow(0 0 15px rgba(255, 42, 75, 0.5)); }
+      50% { transform: translateY(-4px); filter: drop-shadow(0 0 25px rgba(255, 42, 75, 0.85)); }
+    }
+    .nw-loader-logo {
+      width: 58px;
+      height: auto;
+      object-fit: contain;
+    }
+    /* Typography */
+    .nw-loader-header {
+      margin-bottom: 22px;
+    }
+    .nw-loader-brand {
+      font-size: 1.35rem;
+      font-weight: 900;
+      letter-spacing: 0.22em;
+      color: #ffffff;
+      text-transform: uppercase;
+      text-shadow: 0 0 20px rgba(255, 42, 75, 0.6), 0 2px 4px rgba(0,0,0,0.8);
+    }
+    .nw-loader-subbrand {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.6875rem;
+      letter-spacing: 0.18em;
+      color: #94a3b8;
+      margin-top: 4px;
+      text-transform: uppercase;
+    }
+    /* Progress Track */
+    .nw-loader-progress-card {
+      width: 100%;
+      background: rgba(18, 24, 38, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 14px 18px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      margin-bottom: 20px;
+      backdrop-filter: blur(12px);
+    }
+    .nw-loader-progress-track {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 9999px;
+      overflow: hidden;
+      position: relative;
+      margin-bottom: 10px;
+    }
+    .nw-loader-progress-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #ff2a4b 0%, #ff4767 70%, #38bdf8 100%);
+      border-radius: 9999px;
+      position: relative;
+      box-shadow: 0 0 14px rgba(255, 42, 75, 0.9);
+      transition: width 0.15s ease-out;
+    }
+    .nw-loader-progress-glare {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+      animation: nwProgressGlare 1.5s infinite;
+    }
+    @keyframes nwProgressGlare {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+    .nw-loader-stats {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+    }
+    .nw-loader-status-text {
+      color: #cbd5e1;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      max-width: 80%;
+      text-align: left;
+    }
+    .nw-loader-percent {
+      color: #ff4767;
+      font-weight: 800;
+    }
+    /* Footer Meta */
+    .nw-loader-footer-meta {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      justify-content: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.625rem;
+      color: #64748b;
+    }
+    .nw-meta-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 3px 10px;
+      border-radius: 6px;
+      letter-spacing: 0.05em;
+    }
+    .nw-meta-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #30d158;
+      box-shadow: 0 0 6px #30d158;
+      animation: nwBlink 1.5s infinite;
+    }
+    @keyframes nwBlink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+  </style>
+
+  <script>
+    (function() {
+      var loader = document.getElementById('nw-global-loader');
+      if (!loader) return;
+
+      var progressFill = document.getElementById('nwLoaderProgressFill');
+      var percentText = document.getElementById('nwLoaderPercent');
+      var statusText = document.getElementById('nwLoaderStatusText');
+
+      var stages = [
+        { at: 20, msg: 'ESTABLISHING SECURE PROTOCOLS...' },
+        { at: 45, msg: 'SYNCING CHAMPIONSHIP BRACKETS...' },
+        { at: 70, msg: 'AUTHENTICATING NETWORK CLIENT...' },
+        { at: 90, msg: 'INITIALIZING STREAM NODES...' },
+        { at: 100, msg: 'NODE SYNCHRONIZED // READY' }
+      ];
+
+      var currentProgress = 0;
+      var duration = 950; // Smooth 950ms intro duration
+      var startTime = performance.now();
+
+      function update(now) {
+        var elapsed = now - startTime;
+        var rawRatio = Math.min(1, elapsed / duration);
+        // Cubic ease out
+        var progress = Math.floor((1 - Math.pow(1 - rawRatio, 3)) * 100);
+
+        if (progress > currentProgress) {
+          currentProgress = progress;
+          if (progressFill) progressFill.style.width = currentProgress + '%';
+          if (percentText) percentText.innerText = currentProgress + '%';
+
+          for (var i = 0; i < stages.length; i++) {
+            if (currentProgress <= stages[i].at) {
+              if (statusText && statusText.innerText !== stages[i].msg) {
+                statusText.innerText = stages[i].msg;
+              }
+              break;
+            }
+          }
+        }
+
+        if (rawRatio < 1) {
+          requestAnimationFrame(update);
+        } else {
+          if (progressFill) progressFill.style.width = '100%';
+          if (percentText) percentText.innerText = '100%';
+          if (statusText) statusText.innerText = 'NODE SYNCHRONIZED // READY';
+
+          setTimeout(function() {
+            loader.classList.add('hidden');
+            setTimeout(function() {
+              if (loader.parentNode) loader.parentNode.removeChild(loader);
+            }, 450);
+          }, 150);
+        }
+      }
+
+      requestAnimationFrame(update);
+    })();
+  </script>
   <header>
     <a href="/" class="logo-container">
       <img src="/images/nowhere-logo.png" alt="Nowhere Esports Logo" class="logo-img" />
