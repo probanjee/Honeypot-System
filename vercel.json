@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "rewrites": [
+    {
+      "source": "/radar/(.*)",
+      "destination": "/apps/dashboard/$1"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/apps/nowhere-intranet/$1"
+    }
+  ]
+}

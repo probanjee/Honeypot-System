@@ -33,21 +33,35 @@ export function createApp(optionsOrRepo: AppOptions | IEvidenceRepository): expr
     : optionsOrRepo;
   const app = express();
 
-  // 1. Configure EJS view engine
-  const viewsPath = fs.existsSync(path.join(__dirname, 'views'))
-    ? path.join(__dirname, 'views')
-    : path.join(__dirname, '..', 'src', 'views');
+  // 1. Configure EJS view engine with multi-environment path discovery
+  let viewsPath = path.join(__dirname, 'views');
+  if (!fs.existsSync(viewsPath)) {
+    if (fs.existsSync(path.join(__dirname, '..', 'src', 'views'))) {
+      viewsPath = path.join(__dirname, '..', 'src', 'views');
+    } else if (fs.existsSync(path.join(process.cwd(), 'src', 'views'))) {
+      viewsPath = path.join(process.cwd(), 'src', 'views');
+    } else if (fs.existsSync(path.join(process.cwd(), 'apps', 'nowhere-intranet', 'src', 'views'))) {
+      viewsPath = path.join(process.cwd(), 'apps', 'nowhere-intranet', 'src', 'views');
+    }
+  }
   app.set('view engine', 'ejs');
   app.set('views', viewsPath);
 
   // 1b. Static asset serving for Nowhere Esports logo, styles, and media
-  if (fs.existsSync(path.join(__dirname, 'public'))) {
-    app.use(express.static(path.join(__dirname, 'public')));
+  const staticCandidates = [
+    path.join(__dirname, 'public'),
+    path.join(__dirname, '..', 'src', 'public'),
+    path.join(__dirname, '..', 'public'),
+    path.join(process.cwd(), 'public'),
+    path.join(process.cwd(), 'src', 'public'),
+    path.join(process.cwd(), 'apps', 'nowhere-intranet', 'public'),
+    path.join(process.cwd(), 'apps', 'nowhere-intranet', 'src', 'public'),
+  ];
+  for (const staticDir of staticCandidates) {
+    if (fs.existsSync(staticDir)) {
+      app.use(express.static(staticDir));
+    }
   }
-  if (fs.existsSync(path.join(__dirname, '..', 'src', 'public'))) {
-    app.use(express.static(path.join(__dirname, '..', 'src', 'public')));
-  }
-  app.use(express.static(path.join(__dirname, '..', 'public')));
 
   // 2. Configure bounded body parsers (4KB hard limit)
   configureBodyParsers(app, options.maxBodySizeBytes || 4096);
