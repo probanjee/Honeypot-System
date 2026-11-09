@@ -20,3 +20,4 @@ COPY alembic/ ./alembic/
 COPY alembic.ini ./
 
 CMD ["python", "-m", "src.main"]
+
