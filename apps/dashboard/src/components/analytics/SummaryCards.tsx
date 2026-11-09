@@ -1,8 +1,3 @@
-/**
- * Summary Analytics Cards (Phase 5)
- * Displays total attacks, critical incidents, distinct threat actors,
- * and top attack vector from GET /api/v1/analytics/summary.
- */
 
 import React from 'react';
 import {
@@ -132,9 +127,9 @@ export const SummaryCards: React.FC<SummaryCardsProps> = ({
               <p style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--text-muted)' }}>
                 Total Attacks Detected
               </p>
-                <h2 className="mono" style={{ fontSize: '2rem', fontWeight: 700, marginTop: '4px', color: 'var(--card-val-cyan)' }}>
-                  {loading && !summary ? '—' : summary?.total_attacks.toLocaleString() ?? '0'}
-                </h2>
+              <h2 className="mono" style={{ fontSize: '2rem', fontWeight: 700, marginTop: '4px', color: 'var(--card-val-cyan)' }}>
+                {loading && !summary ? '—' : summary?.total_attacks.toLocaleString() ?? '0'}
+              </h2>
             </div>
             <div
               style={{
@@ -194,95 +189,95 @@ export const SummaryCards: React.FC<SummaryCardsProps> = ({
             </div>
           </div>
           <div style={{ display: 'flex', gap: '12px', marginTop: '8px', fontSize: '0.75rem' }}>
-              <span style={{ color: 'var(--severity-critical)', fontWeight: 600 }}>
-                Critical: <strong>{criticalCount}</strong>
-              </span>
-                <span style={{ color: 'var(--severity-high)', fontWeight: 600 }}>
-                  High: <strong>{highCount}</strong>
-                </span>
-              </div>
-          </div>
-
-          {/* Card 3: Distinct Attacker IPs */}
-          <div
-            className="soc-panel soc-panel-body"
-            style={{
-              position: 'relative',
-              overflow: 'hidden',
-              background: 'var(--card-bg-purple)',
-            }}
-          >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-              <div>
-                <p style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--text-muted)' }}>
-                  Distinct Source IPs
-                </p>
-                  <h2 className="mono" style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--card-val-purple)', marginTop: '4px' }}>
-                    {loading && !summary ? '—' : summary?.distinct_sources_count.toLocaleString() ?? '0'}
-                  </h2>
-              </div>
-              <div
-                style={{
-                  width: '42px',
-                  height: '42px',
-                  borderRadius: 'var(--radius-md)',
-                  background: 'var(--card-icon-bg-purple)',
-                  border: '1px solid var(--card-icon-border-purple)',
-                  borderTop: '1px solid rgba(255, 255, 255, 0.5)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  boxShadow: 'var(--card-icon-shadow-purple)',
-                }}
-              >
-                <Users size={20} color="var(--card-val-purple)" />
-              </div>
-            </div>
-            <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '8px' }}>
-              Unique origin network endpoints
-            </p>
-          </div>
-
-          {/* Card 4: Dominant Attack Vector */}
-          <div
-            className="soc-panel soc-panel-body"
-            style={{
-              position: 'relative',
-              overflow: 'hidden',
-              background: 'var(--card-bg-amber)',
-            }}
-          >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-              <div>
-                <p style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--text-muted)' }}>
-                  Top Vector
-                </p>
-                  <h2 className="mono" style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--card-val-amber)', marginTop: '8px', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', maxWidth: '170px' }}>
-                    {loading && !summary ? '—' : topCategory}
-                  </h2>
-              </div>
-              <div
-                style={{
-                  width: '42px',
-                  height: '42px',
-                  borderRadius: 'var(--radius-md)',
-                  background: 'var(--card-icon-bg-amber)',
-                  border: '1px solid var(--card-icon-border-amber)',
-                  borderTop: '1px solid rgba(255, 255, 255, 0.5)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  boxShadow: 'var(--card-icon-shadow-amber)',
-                }}
-              >
-                <Crosshair size={20} color="var(--card-val-amber)" />
-              </div>
-            </div>
-            <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '8px' }}>
-              {topCategoryCount > 0 ? `${topCategoryCount} detections` : 'No category logged'}
-            </p>
+            <span style={{ color: 'var(--severity-critical)', fontWeight: 600 }}>
+              Critical: <strong>{criticalCount}</strong>
+            </span>
+            <span style={{ color: 'var(--severity-high)', fontWeight: 600 }}>
+              High: <strong>{highCount}</strong>
+            </span>
           </div>
         </div>
+
+        {/* Card 3: Distinct Attacker IPs */}
+        <div
+          className="soc-panel soc-panel-body"
+          style={{
+            position: 'relative',
+            overflow: 'hidden',
+            background: 'var(--card-bg-purple)',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <div>
+              <p style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--text-muted)' }}>
+                Distinct Source IPs
+              </p>
+              <h2 className="mono" style={{ fontSize: '2rem', fontWeight: 700, color: 'var(--card-val-purple)', marginTop: '4px' }}>
+                {loading && !summary ? '—' : summary?.distinct_sources_count.toLocaleString() ?? '0'}
+              </h2>
+            </div>
+            <div
+              style={{
+                width: '42px',
+                height: '42px',
+                borderRadius: 'var(--radius-md)',
+                background: 'var(--card-icon-bg-purple)',
+                border: '1px solid var(--card-icon-border-purple)',
+                borderTop: '1px solid rgba(255, 255, 255, 0.5)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: 'var(--card-icon-shadow-purple)',
+              }}
+            >
+              <Users size={20} color="var(--card-val-purple)" />
+            </div>
+          </div>
+          <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '8px' }}>
+            Unique origin network endpoints
+          </p>
+        </div>
+
+        {/* Card 4: Dominant Attack Vector */}
+        <div
+          className="soc-panel soc-panel-body"
+          style={{
+            position: 'relative',
+            overflow: 'hidden',
+            background: 'var(--card-bg-amber)',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <div>
+              <p style={{ fontSize: '0.75rem', fontWeight: 600, textTransform: 'uppercase', color: 'var(--text-muted)' }}>
+                Top Vector
+              </p>
+              <h2 className="mono" style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--card-val-amber)', marginTop: '8px', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', maxWidth: '170px' }}>
+                {loading && !summary ? '—' : topCategory}
+              </h2>
+            </div>
+            <div
+              style={{
+                width: '42px',
+                height: '42px',
+                borderRadius: 'var(--radius-md)',
+                background: 'var(--card-icon-bg-amber)',
+                border: '1px solid var(--card-icon-border-amber)',
+                borderTop: '1px solid rgba(255, 255, 255, 0.5)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: 'var(--card-icon-shadow-amber)',
+              }}
+            >
+              <Crosshair size={20} color="var(--card-val-amber)" />
+            </div>
+          </div>
+          <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '8px' }}>
+            {topCategoryCount > 0 ? `${topCategoryCount} detections` : 'No category logged'}
+          </p>
+        </div>
       </div>
-      );
+    </div>
+  );
 };

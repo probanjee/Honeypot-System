@@ -1,19 +1,4 @@
-"""
-GeoIP Enrichment Service (Phase 3)
 
-Responsibilities:
-1. Validates and inspects IP addresses using the standard library `ipaddress`.
-2. Strictly screens out private, loopback, link-local, multicast, and reserved IPs.
-3. Performs local lookup against MaxMind GeoLite2 databases (or test mock providers).
-4. Treats missing/unreadable databases as degraded state (UNAVAILABLE), never as a fatal error.
-5. Emits normalized GeoMetadata and status.
-
-ATTRIBUTION DISCLAIMER:
-IP Geolocation identifies network routing points and BGP allocation records.
-It does NOT identify a confirmed human attacker or their physical residence.
-Attackers routinely route malicious traffic through compromised proxies, Tor exit nodes,
-VPNs, and cloud hosting infrastructure. Geolocation must never be treated as attribution.
-"""
 
 import ipaddress
 import os

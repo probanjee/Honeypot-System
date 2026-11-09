@@ -1,0 +1,49 @@
+<%- include('../layouts/header', { title: 'System Audit Logs & Operational Trail', currentTab: 'logs' }) %>
+
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1.5rem;">
+  <div>
+    <div class="mono" style="font-size: 0.72rem; color: #c084fc; font-weight: 700; text-transform: uppercase; margin-bottom: 0.4rem;">
+      IMMUTABLE AUDIT TRAIL & SYSTEM LOGS
+    </div>
+    <h1 style="font-size: 2.2rem; font-weight: 900; text-transform: uppercase;">
+      Administrative Audit Trail
+    </h1>
+    <p style="color: var(--text-muted); font-size: 0.95rem;">
+      Cryptographically signed audit records of administrative logins, match operations, and server configuration changes.
+    </p>
+  </div>
+</div>
+
+<div class="card" style="font-family: 'JetBrains Mono', monospace; font-size: 0.8125rem;">
+  <table>
+    <thead>
+      <tr>
+        <th>Timestamp (UTC)</th>
+        <th>Operator</th>
+        <th>Action / Event</th>
+        <th>Target Component</th>
+        <th>IP Origin</th>
+        <th>Result</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% logs.forEach(function(log) { %>
+        <tr>
+          <td style="color: var(--text-muted);"><%= log.time %></td>
+          <td><strong style="color: #fff;"><%= log.user %></strong></td>
+          <td style="color: <%= log.result === 'SUCCESS' ? 'var(--accent-cyan)' : 'var(--accent)' %>;"><%= log.action %></td>
+          <td><%= log.target %></td>
+          <td style="color: #94a3b8;"><%= log.ip %></td>
+          <td>
+            <span class="badge <%= log.result === 'SUCCESS' ? 'badge-live' : 'badge-danger' %>">
+              <%= log.result %>
+            </span>
+          </td>
+        </tr>
+      <% }); %>
+    </tbody>
+  </table>
+</div>
+
+<%- include('../layouts/footer') %>
+

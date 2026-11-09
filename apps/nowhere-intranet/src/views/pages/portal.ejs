@@ -1,0 +1,854 @@
+<%- include('../layouts/header', { title: 'Fan & Player Portal' }) %>
+
+<div style="margin-bottom: 4rem;">
+  
+  <!-- Welcome Banner for New Users -->
+  <% if (typeof welcome !== 'undefined' && welcome) { %>
+    <div style="background: linear-gradient(135deg, rgba(48, 209, 88, 0.18) 0%, rgba(14, 19, 32, 0.95) 100%); border: 1px solid rgba(48, 209, 88, 0.4); border-radius: 18px; padding: 1.25rem 1.75rem; margin-bottom: 2rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#30d158" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+          <polyline points="22 4 12 14.01 9 11.01"/>
+        </svg>
+        <div>
+          <h3 style="color: #30d158; font-size: 1.15rem; font-weight: 800; margin-bottom: 2px;">Welcome to the Arena, <%= user.gamertag %>!</h3>
+          <p style="color: #cbd5e1; font-size: 0.875rem; margin: 0;">Your Nowhere Esports Fan Passport has been activated with 500 Nowhere Coins bonus.</p>
+        </div>
+      </div>
+      <span class="mono" style="background: rgba(48, 209, 88, 0.15); color: #30d158; padding: 4px 12px; border-radius: 8px; font-weight: 800; font-size: 0.8125rem;">+500 NC CREDITED</span>
+    </div>
+  <% } %>
+
+  <!-- ========================================================================= -->
+  <!-- 1. HOLOGRAPHIC FAN PASSPORT HEADER                                        -->
+  <!-- ========================================================================= -->
+  <div class="card" style="padding: 2.25rem; border-radius: 24px; border: 1px solid rgba(255, 42, 75, 0.35); background: radial-gradient(ellipse at 80% 20%, rgba(255, 42, 75, 0.18) 0%, rgba(18, 24, 38, 0.95) 60%, rgba(10, 14, 25, 0.98) 100%); margin-bottom: 2.5rem; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.65);">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 2rem;">
+      
+      <!-- Left: Avatar, Gamertag, Clan & Tier -->
+      <div style="display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;">
+        <!-- Glowing Avatar Orb -->
+        <div style="position: relative;">
+          <div id="passport-avatar-display" style="width: 80px; height: 80px; border-radius: 22px; background: linear-gradient(135deg, rgba(255, 42, 75, 0.35), rgba(56, 189, 248, 0.2)); border: 2px solid var(--accent); display: flex; align-items: center; justify-content: center; font-size: 2.5rem; box-shadow: 0 0 25px rgba(255, 42, 75, 0.45); cursor: pointer;" onclick="openProfileModal()" title="Click to customize avatar">
+            <%= user.avatar || '🎮' %>
+          </div>
+          <span style="position: absolute; bottom: -4px; right: -4px; width: 18px; height: 18px; border-radius: 50%; background: #30d158; border: 3px solid #0e1320; box-shadow: 0 0 10px #30d158;"></span>
+        </div>
+
+        <div>
+          <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 0.35rem; flex-wrap: wrap;">
+            <h1 id="passport-gamertag-display" style="font-size: 1.95rem; font-weight: 900; letter-spacing: -0.01em; color: #fff; margin: 0;">
+              <%= user.gamertag %>
+            </h1>
+            <span id="passport-clan-display" style="background: rgba(255, 42, 75, 0.18); border: 1px solid rgba(255, 42, 75, 0.4); color: var(--accent); padding: 2px 8px; border-radius: 6px; font-weight: 800; font-size: 0.7rem;" class="mono">
+              <%= user.clan || 'NOWHERE ARMY' %>
+            </span>
+            <span style="background: rgba(48, 209, 88, 0.15); color: #30d158; padding: 2px 8px; border-radius: 6px; font-weight: 700; font-size: 0.7rem;">
+              ✓ VERIFIED FAN
+            </span>
+            <button type="button" onclick="openProfileModal()" style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); color: #cbd5e1; padding: 2px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; cursor: pointer;">
+              Edit
+            </button>
+          </div>
+
+          <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; color: var(--text-muted); font-size: 0.84rem;">
+            <span>Favorite: <strong id="passport-game-display" style="color: #38bdf8;"><%= user.favoriteGame || 'VALORANT' %></strong></span>
+            <span>&bull;</span>
+            <span>Region: <strong style="color: #cbd5e1;"><%= user.region || 'India / South Asia' %></strong></span>
+            <span>&bull;</span>
+            <span class="mono" style="color: #64748b;">UID: <strong style="color: #fff;"><%= user.id %></strong></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Level, XP Progress Bar & Nowhere Coins -->
+      <div style="min-width: 280px; flex: 1; max-width: 400px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+          <div style="font-size: 0.8125rem; font-weight: 800; color: #f59e0b; text-transform: uppercase;" class="mono">
+            LEVEL <%= user.level %> &bull; <%= user.tier %>
+          </div>
+          <div class="mono" style="font-size: 0.8125rem; color: #cbd5e1;">
+            <span id="user-xp-display"><%= user.xp %></span> / <span id="user-maxxp-display"><%= user.maxXp %></span> XP
+          </div>
+        </div>
+
+        <!-- Animated XP Progress Bar -->
+        <div style="width: 100%; height: 10px; background: rgba(0, 0, 0, 0.6); border-radius: 9999px; overflow: hidden; border: 1px solid rgba(255, 255, 255, 0.1); margin-bottom: 1rem;">
+          <% const pct = Math.min(100, Math.round((user.xp / user.maxXp) * 100)); %>
+          <div id="user-xp-bar" style="width: <%= pct %>%; height: 100%; background: linear-gradient(90deg, #ff2a4b, #f59e0b); border-radius: 9999px; transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);"></div>
+        </div>
+
+        <!-- Coin Balance & Actions -->
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(245, 158, 11, 0.3); padding: 6px 14px; border-radius: 12px;" class="mono">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+              <polyline points="2 17 12 22 22 17"></polyline>
+              <polyline points="2 12 12 17 22 12"></polyline>
+            </svg>
+            <span style="font-size: 1.1rem; font-weight: 900; color: #f59e0b;" id="user-coins-display"><%= user.coins %></span>
+            <span style="font-size: 0.7rem; color: #94a3b8;">NOWHERE COINS</span>
+          </div>
+
+          <a href="#rewards-shop-section" style="background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.35); color: #f59e0b; padding: 0.5rem 1rem; border-radius: 10px; font-weight: 800; font-size: 0.8125rem; text-decoration: none;">
+            Fan Shop
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- 2. DAILY FAN DROPS & LOGIN STREAK                                         -->
+  <!-- ========================================================================= -->
+  <div class="card" style="padding: 1.75rem 2rem; border-radius: 20px; border-color: rgba(245, 158, 11, 0.35); background: rgba(18, 24, 38, 0.9); margin-bottom: 2.5rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem;">
+      <div>
+        <div style="display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 9999px; background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.35); color: #f59e0b; font-size: 0.7rem; font-weight: 800; text-transform: uppercase;" class="mono">
+          DAILY FAN REWARDS &bull; STREAK: <%= user.streak %> DAYS
+        </div>
+        <h2 style="font-size: 1.45rem; font-weight: 900; color: #fff; margin-top: 4px; text-transform: uppercase;">
+          Claim Today's Fan Loot Drop
+        </h2>
+      </div>
+
+      <button id="claim-drop-btn" onclick="claimDailyDrop()" <%= user.claimedToday ? 'disabled' : '' %> style="<%= user.claimedToday ? 'background: rgba(255, 255, 255, 0.08); color: #94a3b8; border: 1px solid rgba(255, 255, 255, 0.1); cursor: not-allowed;' : 'background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: #000; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.45); cursor: pointer;' %> border: none; padding: 0.65rem 1.75rem; border-radius: 12px; font-weight: 900; font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em; transition: all 0.2s ease;">
+        <%= user.claimedToday ? '✓ Claimed for Today' : 'Claim +250 XP & 100 Coins' %>
+      </button>
+    </div>
+
+    <!-- 7-Day Streak Calendar Track -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 10px;">
+      <% for (let i = 1; i <= 7; i++) { %>
+        <% 
+          const isDone = i < user.streak || (i === user.streak && user.claimedToday);
+          const isToday = i === user.streak && !user.claimedToday;
+        %>
+        <div style="background: <%= isDone ? 'rgba(48, 209, 88, 0.12)' : (isToday ? 'rgba(245, 158, 11, 0.15)' : 'rgba(8, 12, 22, 0.6)') %>; border: 1px solid <%= isDone ? 'rgba(48, 209, 88, 0.4)' : (isToday ? 'rgba(245, 158, 11, 0.5)' : 'rgba(255, 255, 255, 0.06)') %>; border-radius: 12px; padding: 0.85rem 0.6rem; text-align: center;">
+          <div style="font-size: 0.7rem; color: <%= isDone ? '#30d158' : (isToday ? '#f59e0b' : '#64748b') %>; font-weight: 800;" class="mono">
+            DAY <%= i %>
+          </div>
+          <div style="font-size: 1.1rem; font-weight: 800; color: <%= isDone ? '#30d158' : (isToday ? '#f59e0b' : '#cbd5e1') %>; margin: 6px 0;">
+            <%= isDone ? '✓' : (isToday ? '●' : '○') %>
+          </div>
+          <div style="font-size: 0.75rem; color: #cbd5e1; font-weight: 700;">
+            <%= i === 7 ? '+500 NC' : `+${i * 50} NC` %>
+          </div>
+        </div>
+      <% } %>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- 3. LIVE MATCH STREAM LOUNGE & FAN MVP VOTE                                -->
+  <!-- ========================================================================= -->
+  <div style="display: grid; grid-template-columns: 2fr 1.2fr; gap: 2rem; margin-bottom: 2.5rem;" class="portal-grid">
+    
+    <!-- Left: Watch Stream Theater Feed -->
+    <div class="card" style="padding: 1.75rem; border-radius: 20px; border-color: rgba(255, 42, 75, 0.35); position: relative;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem;">
+        <div>
+          <div style="display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 9999px; background: rgba(255, 42, 75, 0.15); color: #ff2a4b; font-size: 0.7rem; font-weight: 800;" class="mono">
+            <span style="width: 8px; height: 8px; border-radius: 50%; background: #ff2a4b; display: inline-block;"></span>
+            LIVE BROADCAST FEED
+          </div>
+          <h2 style="font-size: 1.4rem; font-weight: 900; color: #fff; margin-top: 4px;">
+            Match Theater: <%= user.favoriteGame || 'VALORANT' %>
+          </h2>
+        </div>
+
+        <button onclick="openStreamModal('5W8f7m4X6lI', 'Nowhere Esports Live Clean Feed', '<%= user.favoriteGame || 'VALORANT' %>', 'Grand Finals • 1080p60')" style="background: var(--accent); color: #fff; border: none; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 800; font-size: 0.8125rem; cursor: pointer; display: flex; align-items: center; gap: 6px;">
+          <span>▶</span> Full Theater Mode
+        </button>
+      </div>
+
+      <!-- Embedded Clean Feed Preview -->
+      <div id="stream-preview-box" style="position: relative; width: 100%; padding-bottom: 56.25%; border-radius: 14px; overflow: hidden; background: #000; border: 1px solid rgba(255, 255, 255, 0.1); margin-bottom: 1rem;">
+        <iframe 
+          id="portal-inline-stream"
+          style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;"
+          src="https://www.youtube-nocookie.com/embed/5W8f7m4X6lI?autoplay=0&rel=0"
+          title="Live Match Player"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen>
+        </iframe>
+        <!-- Floating Reactions Container -->
+        <div id="floating-reactions-area" style="position: absolute; inset: 0; pointer-events: none; overflow: hidden; z-index: 5;"></div>
+      </div>
+
+      <!-- Match Info & Floating Reaction Emojis -->
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+        <div style="font-size: 0.8125rem; color: #94a3b8;" class="mono">
+          NOWHERE (13) vs SENTINELS (9) &bull; MAP 2: BIND &bull; <span style="color: #ff2a4b; font-weight: 700;">382,400 WATCHING</span>
+        </div>
+
+        <!-- Quick Hype Reaction Buttons -->
+        <div style="display: flex; gap: 6px; align-items: center;">
+          <span style="font-size: 0.75rem; color: #94a3b8; font-weight: 700;">Hype:</span>
+          <button type="button" onclick="sendReaction('🔥')" class="reaction-btn">🔥</button>
+          <button type="button" onclick="sendReaction('🏆')" class="reaction-btn">🏆</button>
+          <button type="button" onclick="sendReaction('🎯')" class="reaction-btn">🎯</button>
+          <button type="button" onclick="sendReaction('👏')" class="reaction-btn">👏</button>
+          <button type="button" onclick="sendReaction('💥')" class="reaction-btn">💥</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right: Interactive Match Pick'em & MVP Vote -->
+    <div class="card" style="padding: 1.75rem; border-radius: 20px; border-color: rgba(56, 189, 248, 0.35); background: rgba(14, 19, 32, 0.95); display: flex; flex-direction: column; justify-content: space-between;">
+      <div>
+        <div style="display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 9999px; background: rgba(56, 189, 248, 0.15); color: #38bdf8; font-size: 0.7rem; font-weight: 800;" class="mono">
+          FAN MVP POLL & PREDICTION
+        </div>
+        <h3 style="font-size: 1.25rem; font-weight: 900; color: #fff; margin: 0.5rem 0 0.25rem;">
+          Vote Match MVP (+75 XP)
+        </h3>
+        <p style="color: var(--text-muted); font-size: 0.8125rem; margin-bottom: 1.25rem;">
+          Vote for the top performer in today's Grand Finals.
+        </p>
+
+        <!-- MVP Candidates -->
+        <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 1.25rem;">
+          <% const candidates = [
+            { id: 'mvp_tenz', name: 'Nowhere "TenZ"', role: 'Duelist / Jett', stat: '28 Kills (1.75 K/D)' },
+            { id: 'mvp_joker', name: 'Nowhere "Joker"', role: 'Initiator / Sova', stat: '14 Assists • 3 Clutches' },
+            { id: 'mvp_sentinels', name: 'Sentinels "zekken"', role: 'Entry / Raze', stat: '21 Kills (1.30 K/D)' },
+          ]; %>
+
+          <% candidates.forEach(c => { %>
+            <div onclick="voteMvp('<%= c.name %>')" style="background: rgba(18, 24, 38, 0.85); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 0.75rem 1rem; cursor: pointer; transition: all 0.2s ease; display: flex; justify-content: space-between; align-items: center;" class="mvp-card">
+              <div>
+                <div style="font-size: 0.9rem; font-weight: 800; color: #fff;"><%= c.name %></div>
+                <div style="font-size: 0.75rem; color: #94a3b8;"><%= c.role %> &bull; <strong style="color: #38bdf8;"><%= c.stat %></strong></div>
+              </div>
+              <button type="button" style="background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.4); color: #38bdf8; padding: 4px 10px; border-radius: 6px; font-weight: 800; font-size: 0.75rem;">
+                Vote
+              </button>
+            </div>
+          <% }); %>
+        </div>
+
+        <div id="mvp-voted-msg" style="display: <%= user.votedMvp ? 'block' : 'none' %>; background: rgba(48, 209, 88, 0.15); border: 1px solid rgba(48, 209, 88, 0.4); color: #30d158; padding: 0.65rem 1rem; border-radius: 8px; font-size: 0.8125rem; text-align: center;">
+          ✓ Voted for <strong id="voted-player-name"><%= user.votedMvp || '' %></strong> (+75 XP awarded)
+        </div>
+      </div>
+
+      <!-- Live Fan Chat Link -->
+      <div style="margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid rgba(255, 255, 255, 0.08); text-align: center;">
+        <a href="https://discord.com" target="_blank" rel="noreferrer" style="color: #38bdf8; text-decoration: none; font-size: 0.8125rem; font-weight: 700; display: inline-flex; align-items: center; gap: 6px;">
+          <span>Join 45,000+ Fans on Discord Voice & Chat &rarr;</span>
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- 4. NOWHERE FAN REWARDS SHOP (REDEEM NOWHERE COINS)                        -->
+  <!-- ========================================================================= -->
+  <section id="rewards-shop-section" style="margin-bottom: 2.5rem;">
+    <div class="card" style="padding: 2.25rem; border-radius: 24px; border: 1px solid rgba(245, 158, 11, 0.35); background: radial-gradient(ellipse at 50% 0%, rgba(245, 158, 11, 0.12) 0%, rgba(14, 19, 32, 0.95) 70%);">
+      
+      <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.75rem;">
+        <div>
+          <div style="display: inline-flex; align-items: center; gap: 6px; padding: 3px 12px; border-radius: 9999px; background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.35); color: #f59e0b; font-size: 0.72rem; font-weight: 800; text-transform: uppercase;" class="mono">
+            LOOT VAULT &bull; NOWHERE COINS REWARDS
+          </div>
+          <h2 style="font-size: 1.6rem; font-weight: 900; text-transform: uppercase; color: #fff; margin-top: 6px;">
+            Nowhere Fan Store & Digital Loot
+          </h2>
+          <p style="color: var(--text-muted); font-size: 0.875rem;">
+            Spend your earned Nowhere Coins on exclusive tournament passes, physical merchandise vouchers, and digital keys.
+          </p>
+        </div>
+
+        <div style="display: inline-flex; align-items: center; gap: 8px; background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(245, 158, 11, 0.35); padding: 8px 16px; border-radius: 12px;" class="mono">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+            <polyline points="2 17 12 22 22 17"></polyline>
+            <polyline points="2 12 12 17 22 12"></polyline>
+          </svg>
+          <div>
+            <div style="font-size: 0.65rem; color: #94a3b8; text-transform: uppercase;">Your Balance</div>
+            <div style="font-size: 1.2rem; font-weight: 900; color: #f59e0b;" id="shop-coins-display"><%= user.coins %> NC</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Shop Items Grid -->
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.25rem; margin-bottom: 2rem;">
+        
+        <!-- Item 1: VIP Pass -->
+        <div style="background: rgba(18, 24, 38, 0.85); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="margin-bottom: 0.75rem;">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect width="20" height="12" x="2" y="6" rx="2"/>
+                <path d="M12 12h.01"/>
+                <path d="M17 12h.01"/>
+                <path d="M7 12h.01"/>
+              </svg>
+            </div>
+            <h3 style="font-size: 1.1rem; font-weight: 800; color: #fff; margin-bottom: 4px;">VIP Tournament Pass</h3>
+            <p style="color: var(--text-muted); font-size: 0.8125rem; margin-bottom: 1rem;">
+              Unlock 4K Clean Feed broadcast, ad-free viewing, and VIP Discord role.
+            </p>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 0.75rem; border-top: 1px solid rgba(255, 255, 255, 0.08);">
+            <span class="mono" style="font-weight: 800; color: #f59e0b; font-size: 0.95rem;">1,200 NC</span>
+            <button type="button" onclick="redeemReward('vip_pass', 1200, 'VIP Tournament Pass')" class="redeem-btn">
+              Redeem
+            </button>
+          </div>
+        </div>
+
+        <!-- Item 2: Pro Jersey -->
+        <div style="background: rgba(18, 24, 38, 0.85); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="margin-bottom: 0.75rem;">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ff2a4b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/>
+              </svg>
+            </div>
+            <h3 style="font-size: 1.1rem; font-weight: 800; color: #fff; margin-bottom: 4px;">Nowhere Pro Jersey 2026</h3>
+            <p style="color: var(--text-muted); font-size: 0.8125rem; margin-bottom: 1rem;">
+              100% off physical merchandise coupon for official competitive team jersey.
+            </p>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 0.75rem; border-top: 1px solid rgba(255, 255, 255, 0.08);">
+            <span class="mono" style="font-weight: 800; color: #f59e0b; font-size: 0.95rem;">2,500 NC</span>
+            <button type="button" onclick="redeemReward('pro_jersey', 2500, 'Nowhere Pro Jersey 2026')" class="redeem-btn">
+              Redeem
+            </button>
+          </div>
+        </div>
+
+        <!-- Item 3: In-Game Loot -->
+        <div style="background: rgba(18, 24, 38, 0.85); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="margin-bottom: 0.75rem;">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                <polyline points="2 17 12 22 22 17"></polyline>
+                <polyline points="2 12 12 17 22 12"></polyline>
+              </svg>
+            </div>
+            <h3 style="font-size: 1.1rem; font-weight: 800; color: #fff; margin-bottom: 4px;">In-Game Currency Key</h3>
+            <p style="color: var(--text-muted); font-size: 0.8125rem; margin-bottom: 1rem;">
+              600 VP / 300 UC / 310 Free Fire Diamonds voucher for your primary game.
+            </p>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 0.75rem; border-top: 1px solid rgba(255, 255, 255, 0.08);">
+            <span class="mono" style="font-weight: 800; color: #f59e0b; font-size: 0.95rem;">1,800 NC</span>
+            <button type="button" onclick="redeemReward('ingame_key', 1800, 'In-Game Currency Key')" class="redeem-btn">
+              Redeem
+            </button>
+          </div>
+        </div>
+
+        <!-- Item 4: App Gold Badge -->
+        <div style="background: rgba(18, 24, 38, 0.85); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 16px; padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div style="margin-bottom: 0.75rem;">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#30d158" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              </svg>
+            </div>
+            <h3 style="font-size: 1.1rem; font-weight: 800; color: #fff; margin-bottom: 4px;">Mobile App Gold Badge</h3>
+            <p style="color: var(--text-muted); font-size: 0.8125rem; margin-bottom: 1rem;">
+              Exclusive gold halo border and pioneer supporter title on Android & iOS.
+            </p>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 0.75rem; border-top: 1px solid rgba(255, 255, 255, 0.08);">
+            <span class="mono" style="font-weight: 800; color: #f59e0b; font-size: 0.95rem;">800 NC</span>
+            <button type="button" onclick="redeemReward('app_gold_badge', 800, 'Mobile App Gold Badge')" class="redeem-btn">
+              Redeem
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Redeemed Inventory Section -->
+      <div id="user-inventory-box" style="display: <%= (user.inventory && user.inventory.length > 0) ? 'block' : 'none' %>; padding: 1.25rem; background: rgba(8, 12, 22, 0.7); border-radius: 14px; border: 1px solid rgba(255, 255, 255, 0.08);">
+        <h4 style="font-size: 0.95rem; font-weight: 800; color: #fff; text-transform: uppercase; margin-bottom: 0.75rem;" class="mono">
+          My Claimed Loot Vault & Codes
+        </h4>
+        <div id="inventory-items-list" style="display: flex; flex-direction: column; gap: 8px;">
+          <% if (user.inventory && user.inventory.length > 0) { %>
+            <% user.inventory.forEach(item => { %>
+              <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(18, 24, 38, 0.9); padding: 8px 14px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.05); font-size: 0.8125rem;">
+                <span style="color: #fff; font-weight: 700;"><%= item.itemName %></span>
+                <span class="mono" style="color: #38bdf8; background: rgba(56, 189, 248, 0.15); padding: 2px 8px; border-radius: 4px; font-weight: 800;">CODE: <%= item.voucherCode %></span>
+              </div>
+            <% }); %>
+          <% } %>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ========================================================================= -->
+  <!-- 5. NOWHERE MOBILE APP COMPANION (ANDROID & iOS) UPCOMING ROADMAP          -->
+  <!-- ========================================================================= -->
+  <div class="card" style="padding: 2.5rem; border-radius: 24px; border: 1px solid rgba(56, 189, 248, 0.35); background: radial-gradient(ellipse at 50% 0%, rgba(56, 189, 248, 0.15) 0%, rgba(14, 19, 32, 0.95) 70%); margin-bottom: 2.5rem;">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 2rem;">
+      
+      <div style="max-width: 600px;">
+        <div style="display: inline-flex; align-items: center; gap: 6px; padding: 3px 12px; border-radius: 9999px; background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.35); color: #38bdf8; font-size: 0.72rem; font-weight: 800; text-transform: uppercase; margin-bottom: 0.75rem;" class="mono">
+          UPCOMING FEATURES &bull; MOBILE APP
+        </div>
+        <h2 style="font-size: 1.85rem; font-weight: 900; text-transform: uppercase; letter-spacing: -0.01em; margin-bottom: 0.75rem;">
+          Upcoming Features: Nowhere Esports Android & iOS
+        </h2>
+        <p style="color: var(--text-muted); font-size: 0.95rem; line-height: 1.6; margin-bottom: 1.5rem;">
+          Watch live tournaments on the go with zero-buffer streaming, receive instant match push notifications, join team scrim lobbies, and track your player stats in real time.
+        </p>
+
+        <!-- Feature Pills -->
+        <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 2rem;">
+          <span style="background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12); padding: 5px 12px; border-radius: 8px; font-size: 0.8125rem; color: #cbd5e1;">
+            1080p60 Live Streams
+          </span>
+          <span style="background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12); padding: 5px 12px; border-radius: 8px; font-size: 0.8125rem; color: #cbd5e1;">
+            Instant Match Alerts
+          </span>
+          <span style="background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12); padding: 5px 12px; border-radius: 8px; font-size: 0.8125rem; color: #cbd5e1;">
+            Squad Voice Comms
+          </span>
+          <span style="background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12); padding: 5px 12px; border-radius: 8px; font-size: 0.8125rem; color: #cbd5e1;">
+            Live In-Game HUD Stats
+          </span>
+        </div>
+
+        <!-- Download & TestFlight Buttons -->
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+          <button type="button" onclick="downloadAndroidApk()" id="apk-download-btn" style="background: linear-gradient(135deg, #0284c7 0%, #2563eb 100%); color: #fff; border: none; padding: 0.8rem 1.6rem; border-radius: 12px; font-weight: 800; font-size: 0.9rem; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 18px rgba(2, 132, 199, 0.45); transition: transform 0.2s ease;">
+            <span>Download Android APK (v2.4 Beta)</span>
+          </button>
+          
+          <button type="button" onclick="reserveTestFlight()" id="testflight-btn" style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.2); color: #fff; padding: 0.8rem 1.6rem; border-radius: 12px; font-weight: 800; font-size: 0.9rem; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s ease;">
+            <span>Reserve iOS TestFlight Slot</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- App Mockup Graphic Card -->
+      <div style="background: #080c16; border: 2px solid rgba(56, 189, 248, 0.3); border-radius: 22px; padding: 1.5rem; width: 260px; text-align: center; box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8);">
+        <div style="width: 50px; height: 5px; background: rgba(255, 255, 255, 0.2); border-radius: 9999px; margin: 0 auto 1.25rem;"></div>
+        <img src="/images/nowhere-logo.png" alt="Nowhere App" style="height: 60px; margin-bottom: 1rem; filter: drop-shadow(0 0 15px rgba(255, 42, 75, 0.5));" />
+        <div style="font-weight: 900; font-size: 1.1rem; color: #fff;">Nowhere Mobile</div>
+        <div style="font-size: 0.75rem; color: #38bdf8; margin: 4px 0 1rem;" class="mono">BUILD 2026.4.11-RELEASE</div>
+        <div style="background: rgba(48, 209, 88, 0.15); border: 1px solid rgba(48, 209, 88, 0.4); color: #30d158; padding: 6px; border-radius: 8px; font-size: 0.75rem; font-weight: 800;">
+          READY FOR INSTALLATION
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- 6. MY TOURNAMENTS & SQUAD STATUS                                          -->
+  <!-- ========================================================================= -->
+  <div class="card" style="padding: 2rem; border-radius: 20px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+      <div>
+        <h2 style="font-size: 1.45rem; font-weight: 900; text-transform: uppercase;">
+          My Registered Tournaments & Scrims
+        </h2>
+        <p style="color: var(--text-muted); font-size: 0.875rem;">
+          Track your bracket seed, roster verification, and check-in lobby PINs.
+        </p>
+      </div>
+
+      <a href="/register" style="background: var(--accent); color: #fff; padding: 0.55rem 1.25rem; border-radius: 10px; font-weight: 800; font-size: 0.8125rem; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+        <span>Join New Tournament</span>
+      </a>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.25rem;">
+      
+      <!-- Tournament Entry 1 -->
+      <div style="background: rgba(14, 19, 32, 0.8); border: 1px solid rgba(255, 255, 255, 0.08); border-left: 4px solid #ff4655; border-radius: 12px; padding: 1.25rem;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+          <span style="font-size: 0.7rem; font-weight: 800; color: #ff4655;" class="mono">VALORANT</span>
+          <span style="font-size: 0.7rem; color: #30d158; font-weight: 800;" class="mono">● CHECKED IN</span>
+        </div>
+        <h3 style="font-size: 1.05rem; font-weight: 800; color: #fff; margin-bottom: 0.4rem;">
+          VALORANT Masters Tokyo Qualifier
+        </h3>
+        <div style="font-size: 0.8125rem; color: var(--text-muted); margin-bottom: 0.85rem;" class="mono">
+          Squad: <strong style="color: #fff;"><%= user.clan || 'Nowhere Army' %></strong> &bull; Slot: #07
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; padding-top: 0.6rem; border-top: 1px solid rgba(255, 255, 255, 0.06);" class="mono">
+          <span style="color: #94a3b8;">Lobby PIN: <strong style="color: #38bdf8;">NW-7749</strong></span>
+          <span style="color: #94a3b8;">Starts in 2h 45m</span>
+        </div>
+      </div>
+
+      <!-- Tournament Entry 2 -->
+      <div style="background: rgba(14, 19, 32, 0.8); border: 1px solid rgba(255, 255, 255, 0.08); border-left: 4px solid #f59e0b; border-radius: 12px; padding: 1.25rem;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+          <span style="font-size: 0.7rem; font-weight: 800; color: #f59e0b;" class="mono">BGMI</span>
+          <span style="font-size: 0.7rem; color: #38bdf8; font-weight: 800;" class="mono">ROSTER LOCKED</span>
+        </div>
+        <h3 style="font-size: 1.05rem; font-weight: 800; color: #fff; margin-bottom: 0.4rem;">
+          BGMI Pro Series 2026: Open Ladder
+        </h3>
+        <div style="font-size: 0.8125rem; color: var(--text-muted); margin-bottom: 0.85rem;" class="mono">
+          Squad: <strong style="color: #fff;"><%= user.gamertag %> Squad</strong> &bull; Group B
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; padding-top: 0.6rem; border-top: 1px solid rgba(255, 255, 255, 0.06);" class="mono">
+          <span style="color: #94a3b8;">Lobby PIN: <strong style="color: #38bdf8;">BMS-9012</strong></span>
+          <span style="color: #94a3b8;">Tomorrow 18:00 IST</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- ========================================================================= -->
+<!-- PROFILE & PASSPORT CUSTOMIZER MODAL                                       -->
+<!-- ========================================================================= -->
+<div id="profile-modal" style="display: none; position: fixed; inset: 0; z-index: 9999; background: rgba(4, 6, 11, 0.92); backdrop-filter: blur(12px); align-items: center; justify-content: center; padding: 1.5rem;" onclick="handleProfileBackdropClick(event)">
+  <div style="background: #0e1320; border: 1px solid rgba(255, 42, 75, 0.4); border-radius: 20px; width: 100%; max-width: 500px; padding: 2rem; box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);">
+    
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 1rem;">
+      <h3 style="font-size: 1.25rem; font-weight: 900; color: #fff; margin: 0;">Customize Fan Passport</h3>
+      <button type="button" onclick="closeProfileModal()" style="background: none; border: none; color: #94a3b8; font-size: 1.2rem; cursor: pointer;">✕</button>
+    </div>
+
+    <!-- Choose Avatar -->
+    <div style="margin-bottom: 1.25rem;">
+      <label style="display: block; font-size: 0.8125rem; color: #cbd5e1; font-weight: 700; margin-bottom: 0.6rem;">Select Avatar Icon</label>
+      <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px;">
+        <% ['🐍', '👑', '🦅', '⚡', '🎯', '🔥', '🐺', '🤖', '🦁', '⚔️'].forEach(av => { %>
+          <div onclick="selectModalAvatar('<%= av %>')" id="av-opt-<%= av %>" style="background: rgba(18, 24, 38, 0.85); border: 1px solid <%= user.avatar === av ? 'var(--accent)' : 'rgba(255, 255, 255, 0.1)' %>; border-radius: 12px; padding: 0.6rem; text-align: center; font-size: 1.8rem; cursor: pointer; transition: all 0.2s ease;">
+            <%= av %>
+          </div>
+        <% }); %>
+      </div>
+    </div>
+
+    <!-- Edit Gamertag & Clan -->
+    <div style="margin-bottom: 1rem;">
+      <label style="display: block; font-size: 0.8125rem; color: #cbd5e1; font-weight: 700; margin-bottom: 0.4rem;">Gamertag</label>
+      <input type="text" id="modal-gamertag-input" value="<%= user.gamertag %>" class="modal-input">
+    </div>
+
+    <div style="margin-bottom: 1rem;">
+      <label style="display: block; font-size: 0.8125rem; color: #cbd5e1; font-weight: 700; margin-bottom: 0.4rem;">Clan Tag / Club</label>
+      <input type="text" id="modal-clan-input" value="<%= user.clan || 'Nowhere Army' %>" class="modal-input">
+    </div>
+
+    <div style="margin-bottom: 1.5rem;">
+      <label style="display: block; font-size: 0.8125rem; color: #cbd5e1; font-weight: 700; margin-bottom: 0.4rem;">Primary Game</label>
+      <select id="modal-game-input" class="modal-input">
+        <option value="VALORANT" <%= user.favoriteGame === 'VALORANT' ? 'selected' : '' %>>VALORANT</option>
+        <option value="BGMI" <%= user.favoriteGame === 'BGMI' ? 'selected' : '' %>>BGMI</option>
+        <option value="Free Fire" <%= user.favoriteGame === 'Free Fire' ? 'selected' : '' %>>Free Fire MAX</option>
+        <option value="eFootball" <%= user.favoriteGame === 'eFootball' ? 'selected' : '' %>>eFootball 2026</option>
+        <option value="Counter-Strike 2" <%= user.favoriteGame === 'Counter-Strike 2' ? 'selected' : '' %>>Counter-Strike 2</option>
+      </select>
+    </div>
+
+    <div style="display: flex; gap: 10px; justify-content: flex-end;">
+      <button type="button" onclick="closeProfileModal()" style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); color: #fff; padding: 0.6rem 1.25rem; border-radius: 8px; font-weight: 700; cursor: pointer;">
+        Cancel
+      </button>
+      <button type="button" onclick="saveProfileChanges()" style="background: var(--accent); color: #fff; border: none; padding: 0.6rem 1.5rem; border-radius: 8px; font-weight: 800; cursor: pointer;">
+        Save Changes
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- YouTube Modal -->
+<div id="stream-modal" style="display: none; position: fixed; inset: 0; z-index: 9999; background: rgba(4, 6, 11, 0.92); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); align-items: center; justify-content: center; padding: 1.5rem;" onclick="handleModalBackdropClick(event)">
+  <div style="background: #0e1320; border: 1px solid rgba(255, 42, 75, 0.35); border-radius: 20px; width: 100%; max-width: 960px; overflow: hidden; box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8);">
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 1.5rem; border-bottom: 1px solid rgba(255, 255, 255, 0.08); background: rgba(18, 24, 38, 0.8);">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span style="width: 10px; height: 10px; border-radius: 50%; background-color: #ff2a4b; box-shadow: 0 0 10px #ff2a4b; display: inline-block;"></span>
+        <div>
+          <div id="modal-stream-game" style="font-size: 0.75rem; font-weight: 800; color: #ff2a4b; text-transform: uppercase;" class="mono">LIVE BROADCAST</div>
+          <h3 id="modal-stream-title" style="font-size: 1.05rem; font-weight: 800; color: #fff; margin: 0;">Official YouTube Tournament Stream</h3>
+        </div>
+      </div>
+      <button type="button" onclick="closeStreamModal()" style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); color: #fff; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer;">✕</button>
+    </div>
+    <div style="position: relative; width: 100%; padding-bottom: 56.25%; background: #000;">
+      <iframe id="modal-youtube-iframe" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;" src="" title="Live Player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </div>
+    <div style="padding: 1rem 1.5rem; background: rgba(10, 14, 24, 0.95); display: flex; justify-content: space-between; align-items: center;">
+      <div id="modal-stream-match-info" style="font-size: 0.85rem; color: #94a3b8;" class="mono">Clean Broadcast Feed</div>
+      <button type="button" onclick="closeStreamModal()" style="background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); color: #fff; padding: 0.45rem 1rem; border-radius: 8px; font-size: 0.8125rem; font-weight: 700; cursor: pointer;">Close</button>
+    </div>
+  </div>
+</div>
+
+<style>
+  @media (max-width: 900px) {
+    .portal-grid {
+      grid-template-columns: 1fr !important;
+    }
+  }
+  .mvp-card:hover {
+    border-color: rgba(56, 189, 248, 0.4) !important;
+    transform: translateX(3px);
+  }
+  .redeem-btn {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    border: none;
+    color: #000;
+    padding: 0.45rem 1rem;
+    border-radius: 8px;
+    font-weight: 800;
+    font-size: 0.8125rem;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+  .redeem-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+  }
+  .reaction-btn {
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .reaction-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: scale(1.15);
+  }
+  .modal-input {
+    width: 100%;
+    background: rgba(18, 24, 38, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #fff;
+    padding: 0.65rem 0.9rem;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    outline: none;
+  }
+  @keyframes floatUp {
+    0% { opacity: 1; transform: translateY(0) scale(1); }
+    100% { opacity: 0; transform: translateY(-140px) scale(1.5); }
+  }
+</style>
+
+<script>
+  let selectedAvatar = '<%= user.avatar || "🎮" %>';
+
+  async function claimDailyDrop() {
+    const btn = document.getElementById('claim-drop-btn');
+    if (!btn || btn.disabled) return;
+
+    btn.textContent = 'Claiming Loot...';
+    btn.disabled = true;
+
+    try {
+      const res = await fetch('/portal/claim-drop', { method: 'POST' });
+      const data = await res.json();
+      if (data.status === 'success' && data.user) {
+        document.getElementById('user-coins-display').textContent = data.user.coins;
+        const shopCoins = document.getElementById('shop-coins-display');
+        if (shopCoins) shopCoins.textContent = data.user.coins + ' NC';
+        document.getElementById('user-xp-display').textContent = data.user.xp;
+        document.getElementById('user-maxxp-display').textContent = data.user.maxXp;
+
+        const pct = Math.min(100, Math.round((data.user.xp / data.user.maxXp) * 100));
+        document.getElementById('user-xp-bar').style.width = pct + '%';
+
+        btn.textContent = '✓ Claimed for Today (+250 XP, +100 NC)';
+        btn.style.background = 'rgba(255, 255, 255, 0.08)';
+        btn.style.color = '#94a3b8';
+
+        alert('Daily Drop Claimed!\n\n+250 XP Added to Passport\n+100 Nowhere Coins Credited');
+      }
+    } catch (err) {
+      console.error(err);
+      btn.textContent = 'Error Claiming Drop';
+      btn.disabled = false;
+    }
+  }
+
+  async function redeemReward(itemId, cost, itemName) {
+    if (!confirm(`Redeem "${itemName}" for ${cost} Nowhere Coins?`)) return;
+
+    try {
+      const res = await fetch('/portal/redeem-reward', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ item_id: itemId, cost: cost, item_name: itemName })
+      });
+      const data = await res.json();
+      if (data.status === 'success') {
+        document.getElementById('user-coins-display').textContent = data.coins;
+        const shopCoins = document.getElementById('shop-coins-display');
+        if (shopCoins) shopCoins.textContent = data.coins + ' NC';
+
+        const invBox = document.getElementById('user-inventory-box');
+        const invList = document.getElementById('inventory-items-list');
+        if (invBox && invList) {
+          invBox.style.display = 'block';
+          const itemEl = document.createElement('div');
+          itemEl.style.cssText = 'display: flex; justify-content: space-between; align-items: center; background: rgba(18, 24, 38, 0.9); padding: 8px 14px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.05); font-size: 0.8125rem;';
+          itemEl.innerHTML = `<span style="color: #fff; font-weight: 700;">${itemName}</span><span class="mono" style="color: #38bdf8; background: rgba(56, 189, 248, 0.15); padding: 2px 8px; border-radius: 4px; font-weight: 800;">CODE: ${data.voucherCode}</span>`;
+          invList.prepend(itemEl);
+        }
+
+        alert(`Redemption Successful!\n\nYou claimed: ${itemName}\nYour Voucher Code: ${data.voucherCode}\nCheck "My Claimed Loot Vault" below.`);
+      } else {
+        alert(data.message || 'Redemption failed. Check your Nowhere Coins balance.');
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  function sendReaction(emoji) {
+    const area = document.getElementById('floating-reactions-area');
+    if (!area) return;
+
+    const span = document.createElement('span');
+    span.textContent = emoji;
+    span.style.cssText = `position: absolute; bottom: 20px; left: ${Math.random() * 80 + 10}%; font-size: 2rem; animation: floatUp 1.8s ease-out forwards;`;
+    area.appendChild(span);
+
+    setTimeout(() => {
+      span.remove();
+    }, 1800);
+  }
+
+  function openProfileModal() {
+    const modal = document.getElementById('profile-modal');
+    if (modal) modal.style.display = 'flex';
+  }
+
+  function closeProfileModal() {
+    const modal = document.getElementById('profile-modal');
+    if (modal) modal.style.display = 'none';
+  }
+
+  function handleProfileBackdropClick(e) {
+    if (e.target && e.target.id === 'profile-modal') closeProfileModal();
+  }
+
+  function selectModalAvatar(av) {
+    selectedAvatar = av;
+    ['🐍', '👑', '🦅', '⚡', '🎯', '🔥', '🐺', '🤖', '🦁', '⚔️'].forEach(a => {
+      const el = document.getElementById('av-opt-' + a);
+      if (el) el.style.borderColor = a === av ? 'var(--accent)' : 'rgba(255, 255, 255, 0.1)';
+    });
+  }
+
+  async function saveProfileChanges() {
+    const gamertag = document.getElementById('modal-gamertag-input').value;
+    const clan = document.getElementById('modal-clan-input').value;
+    const favoriteGame = document.getElementById('modal-game-input').value;
+
+    try {
+      const res = await fetch('/portal/update-profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ avatar: selectedAvatar, gamertag, clan, favorite_game: favoriteGame })
+      });
+      const data = await res.json();
+      if (data.status === 'success' && data.user) {
+        document.getElementById('passport-avatar-display').textContent = data.user.avatar;
+        document.getElementById('passport-gamertag-display').textContent = data.user.gamertag;
+        document.getElementById('passport-clan-display').textContent = data.user.clan;
+        document.getElementById('passport-game-display').textContent = data.user.favoriteGame;
+        closeProfileModal();
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  async function voteMvp(playerName) {
+    try {
+      const res = await fetch('/portal/vote-mvp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ candidate: playerName })
+      });
+      const data = await res.json();
+      if (data.status === 'success') {
+        const votedMsg = document.getElementById('mvp-voted-msg');
+        const votedName = document.getElementById('voted-player-name');
+        if (votedMsg && votedName) {
+          votedName.textContent = playerName;
+          votedMsg.style.display = 'block';
+        }
+        alert(`Vote Counted!\n\nYou voted for ${playerName} as Match MVP.\n+75 XP awarded to your Fan Passport!`);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  function downloadAndroidApk() {
+    const btn = document.getElementById('apk-download-btn');
+    if (btn) {
+      btn.innerHTML = '<span>Preparing Nowhere_v2.4_Beta.apk...</span>';
+      setTimeout(() => {
+        btn.innerHTML = '<span>APK Download Triggered!</span>';
+        alert('Nowhere Esports Android App (v2.4 Beta)\n\nPackage: com.nowhereesports.mobile\nSize: 48.2 MB\n\nDownload queued for installation on your device!');
+      }, 800);
+    }
+  }
+
+  function reserveTestFlight() {
+    const btn = document.getElementById('testflight-btn');
+    if (btn) {
+      btn.innerHTML = '<span>TestFlight Slot Reserved!</span>';
+      btn.style.borderColor = '#30d158';
+      btn.style.color = '#30d158';
+      alert('Nowhere Esports iOS TestFlight\n\nYour slot has been reserved under your registered email.\nYou will receive an official TestFlight invite link shortly!');
+    }
+  }
+
+  function openStreamModal(videoId, title, game, matchInfo) {
+    const modal = document.getElementById('stream-modal');
+    const iframe = document.getElementById('modal-youtube-iframe');
+    const titleEl = document.getElementById('modal-stream-title');
+    const gameEl = document.getElementById('modal-stream-game');
+    const matchEl = document.getElementById('modal-stream-match-info');
+
+    if (!modal || !iframe) return;
+
+    if (titleEl) titleEl.textContent = title || 'Live Match Stream';
+    if (gameEl) gameEl.textContent = (game ? game.toUpperCase() + ' • ' : '') + 'NOWHERE LIVE THEATER';
+    if (matchEl && matchInfo) matchEl.textContent = matchInfo;
+
+    iframe.src = 'https://www.youtube-nocookie.com/embed/' + videoId + '?autoplay=1&rel=0';
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeStreamModal() {
+    const modal = document.getElementById('stream-modal');
+    const iframe = document.getElementById('modal-youtube-iframe');
+    if (iframe) iframe.src = '';
+    if (modal) modal.style.display = 'none';
+    document.body.style.overflow = 'auto';
+  }
+
+  function handleModalBackdropClick(event) {
+    if (event.target && event.target.id === 'stream-modal') {
+      closeStreamModal();
+    }
+  }
+</script>
+
+<%- include('../layouts/footer') %>

@@ -1,50 +1,826 @@
-<%- include('../layouts/header', { title: 'Internal Hub' }) %>
+<%- include('../layouts/header', { title: 'Official Competitive Hub' }) %>
 
-<div style="margin-bottom: 2rem;">
-  <h1 style="font-size: 2.2rem; font-weight: 800; margin-bottom: 0.5rem; background: linear-gradient(90deg, #fff, var(--text-muted)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
-    Welcome to Nowhere Esports Intranet
-  </h1>
-  <p style="color: var(--text-muted); font-size: 1.1rem;">
-    Internal operations, tournament bracket management, and official caster schedules.
-  </p>
+<!-- Hero Section with Glowing Nowhere Esports Logo -->
+<div style="position: relative; border-radius: 24px; padding: 3.5rem 2.5rem; margin-bottom: 2.5rem; background: radial-gradient(ellipse at 50% 20%, rgba(255, 42, 75, 0.18) 0%, rgba(14, 19, 32, 0.85) 60%, rgba(7, 9, 14, 0.95) 100%); border: 1px solid var(--border-red); box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.2); overflow: hidden; text-align: center;">
+  
+  <!-- Ambient Specular Line -->
+  <div style="position: absolute; top: 0; left: 20%; right: 20%; height: 1px; background: linear-gradient(90deg, transparent, rgba(255, 42, 75, 0.8), transparent);"></div>
+
+  <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; z-index: 2;">
+    <!-- Large Glowing Nowhere Logo -->
+    <div style="position: relative; margin-bottom: 1.5rem;">
+      <div style="position: absolute; inset: -20px; border-radius: 50%; background: radial-gradient(circle, rgba(255, 42, 75, 0.4) 0%, transparent 70%); filter: blur(25px); pointer-events: none;"></div>
+      <img src="/images/nowhere-logo.png" alt="Nowhere Esports Logo" style="height: 160px; width: auto; object-fit: contain; position: relative; filter: drop-shadow(0 0 25px rgba(255, 42, 75, 0.65));" />
+    </div>
+
+    <div style="display: inline-block; padding: 4px 14px; border-radius: 9999px; background: rgba(255, 42, 75, 0.15); border: 1px solid rgba(255, 42, 75, 0.4); color: var(--accent); font-weight: 700; font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 1rem;">
+      OFFICIAL ESPORTS TOURNAMENT OPERATIONS & STREAMING HUB
+    </div>
+
+    <h1 style="font-size: 2.8rem; font-weight: 900; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 1rem; text-transform: uppercase;">
+      Welcome to Nowhere Esports
+    </h1>
+
+    <p style="color: var(--text-muted); font-size: 1.15rem; max-width: 720px; margin-bottom: 2rem;">
+      Watch global championships live on YouTube, register your squad to compete, follow pro team brackets, and battle for legacy prize pools.
+    </p>
+
+    <!-- Quick CTA Buttons -->
+    <div style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
+      <a href="/register" style="background: linear-gradient(135deg, #ff2a4b 0%, #c8102e 100%); color: #fff; font-size: 0.95rem; font-weight: 800; padding: 0.8rem 2rem; border-radius: 12px; text-decoration: none; box-shadow: 0 4px 18px rgba(255, 42, 75, 0.45); transition: transform 0.2s ease; display: inline-flex; align-items: center; gap: 6px;">
+        <span>Register Squad to Play</span>
+      </a>
+      <a href="#live-tournaments-section" style="background: rgba(255, 255, 255, 0.08); border: 1px solid var(--border); color: #fff; padding: 0.8rem 1.75rem; border-radius: 12px; font-weight: 700; font-size: 0.95rem; text-decoration: none; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 6px;">
+        <span>▶ Watch Live Streams</span>
+      </a>
+    </div>
+  </div>
 </div>
 
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
-  <div class="card">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-      <h2 style="font-size: 1.3rem;">Apex Masters Spring 2026</h2>
-      <span style="background: rgba(0, 230, 118, 0.2); color: var(--success); padding: 0.2rem 0.6rem; border-radius: 4px; font-size: 0.8rem; font-weight: 600;">ACTIVE</span>
+<!-- Live Match Status Ticker -->
+<div class="card" style="padding: 1rem 1.5rem; margin-bottom: 2.5rem; border-color: rgba(255, 42, 75, 0.25); background: rgba(18, 24, 38, 0.9);">
+  <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+    <div style="display: flex; align-items: center; gap: 8px;">
+      <span style="width: 10px; height: 10px; border-radius: 50%; background-color: var(--danger); box-shadow: 0 0 10px var(--danger); display: inline-block;"></span>
+      <span class="mono" style="font-weight: 800; font-size: 0.8125rem; color: #fff; text-transform: uppercase; letter-spacing: 0.05em;">LIVE MATCH WIRE:</span>
     </div>
-    <p style="color: var(--text-muted); margin-bottom: 1rem;">64 teams competing across NA & EMEA. Semifinals stream begins 18:00 UTC.</p>
-    <div style="display: flex; justify-content: space-between; font-size: 0.9rem; color: var(--accent-cyan);">
-      <span>Prize Pool: $250,000 USD</span>
-      <a href="/tournaments" style="color: var(--accent-cyan); text-decoration: none; font-weight: 600;">View Bracket &rarr;</a>
+
+    <div style="display: flex; gap: 2rem; overflow-x: auto; font-size: 0.8125rem; scrollbar-width: none;" class="mono">
+      <div style="white-space: nowrap;">
+        <span style="color: #ff4655; font-weight: 800;">VALORANT:</span>
+        <span style="color: #fff; font-weight: 600;"> NOWHERE (13) vs SENTINELS (9)</span>
+        <span style="color: var(--success); font-weight: 700; margin-left: 4px;">[MAP 2: BIND]</span>
+      </div>
+      <div style="white-space: nowrap;">
+        <span style="color: #f59e0b; font-weight: 800;">BGMI:</span>
+        <span style="color: #fff; font-weight: 600;"> FINALS MATCH 4 [ERANGEL]</span>
+        <span style="color: #38bdf8; font-weight: 700; margin-left: 4px;">[NOWHERE: 54 PTS]</span>
+      </div>
+      <div style="white-space: nowrap;">
+        <span style="color: #f97316; font-weight: 800;">FREE FIRE:</span>
+        <span style="color: #fff; font-weight: 600;"> FFWS FINALS [BERMUDA]</span>
+        <span style="color: var(--warning); font-weight: 700; margin-left: 4px;">[MATCH 6/8]</span>
+      </div>
+      <div style="white-space: nowrap;">
+        <span style="color: #0284c7; font-weight: 800;">eFOOTBALL:</span>
+        <span style="color: #fff; font-weight: 600;"> NOWHERE FC (3) vs FC BAYERN (2)</span>
+        <span style="color: var(--success); font-weight: 700; margin-left: 4px;">[88' ET]</span>
+      </div>
+      <div style="white-space: nowrap;">
+        <span style="color: #f97316; font-weight: 800;">CS2:</span>
+        <span style="color: #fff; font-weight: 600;"> NOWHERE (16) vs FAZE CLAN (12)</span>
+        <span style="color: var(--warning); font-weight: 700; margin-left: 4px;">[MIRAGE]</span>
+      </div>
+      <div style="white-space: nowrap;">
+        <span style="color: #ef4444; font-weight: 800;">APEX:</span>
+        <span style="color: #fff; font-weight: 600;"> MATCH POINT 64pts</span>
+        <span style="color: var(--accent-cyan); font-weight: 700; margin-left: 4px;">[1st PLACE]</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========================================================================= -->
+<!-- FEATURED GAME POSTER BANNERS SECTION                                      -->
+<!-- ========================================================================= -->
+<section id="game-banners-section" style="margin-bottom: 3.5rem;">
+  <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+    <div>
+      <div style="display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 9999px; background: rgba(56, 189, 248, 0.12); border: 1px solid rgba(56, 189, 248, 0.3); color: #38bdf8; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.5rem;" class="mono">
+        SANCTIONED ARENAS
+      </div>
+      <h2 style="font-size: 1.85rem; font-weight: 900; text-transform: uppercase; letter-spacing: -0.01em;">
+        Featured Esports Game Arenas
+      </h2>
+      <p style="color: var(--text-muted); font-size: 0.95rem;">
+        Choose your competitive discipline, watch YouTube live broadcasts, and register your team to compete.
+      </p>
+    </div>
+    <span class="mono" style="font-size: 0.8125rem; color: var(--text-muted);">
+      8 OFFICIAL TITLES
+    </span>
+  </div>
+
+  <!-- Game Banners Grid (With User Uploaded Real Game Posters) -->
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 1.5rem;">
+    
+    <!-- Banner 1: VALORANT (Real Poster Artwork) -->
+    <div class="card game-poster-card" style="padding: 0; overflow: hidden; border-radius: 20px; border: 1px solid rgba(255, 70, 85, 0.4); background: #0b0f19;">
+      <div style="height: 240px; position: relative; overflow: hidden;">
+        <img src="/images/banners/banner-valorant.jpg" alt="VALORANT Esports Poster" style="width: 100%; height: 100%; object-fit: cover; object-position: center 25%; transition: transform 0.4s ease;" class="poster-img">
+        <div style="position: absolute; inset: 0; background: linear-gradient(to top, #0b0f19 0%, rgba(11, 15, 25, 0.4) 60%, transparent 100%);"></div>
+        <div style="position: absolute; top: 14px; left: 14px;">
+          <span class="mono" style="font-size: 0.7rem; font-weight: 800; color: #fff; background: #ff4655; padding: 3px 8px; border-radius: 6px; box-shadow: 0 4px 10px rgba(255, 70, 85, 0.5);">
+            5V5 TACTICAL FPS
+          </span>
+        </div>
+        <div style="position: absolute; top: 14px; right: 14px;">
+          <span style="background: rgba(0, 0, 0, 0.65); color: #30d158; border: 1px solid rgba(48, 209, 88, 0.4); padding: 3px 8px; border-radius: 9999px; font-size: 0.7rem; font-weight: 800; display: inline-flex; align-items: center; gap: 4px;">
+            <span style="width: 6px; height: 6px; border-radius: 50%; background: #30d158;"></span> LIVE STREAM
+          </span>
+        </div>
+      </div>
+      <div style="padding: 1.5rem;">
+        <h3 style="font-size: 1.5rem; font-weight: 900; color: #fff; margin-bottom: 0.4rem;">VALORANT</h3>
+        <p style="color: var(--text-muted); font-size: 0.84rem; line-height: 1.45; margin-bottom: 1.25rem;">
+          VCT Masters Tokyo Grand Finals. Precision gunplay and tactical ability mastery.
+        </p>
+        <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 1.25rem; border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
+          <span class="mono" style="font-size: 0.75rem; color: var(--text-muted);">PRIZE POOL</span>
+          <strong class="mono" style="color: #fff; font-size: 1.1rem;">$500,000 USD</strong>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 1rem;">
+          <button onclick="openStreamModal('5W8f7m4X6lI', 'VALORANT Masters Tokyo: Grand Finals', 'VALORANT', '#ff4655')" style="background: #ff4655; color: #fff; border: none; padding: 0.55rem; border-radius: 8px; font-weight: 800; font-size: 0.78rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px;">
+            ▶ Watch Live
+          </button>
+          <a href="/register?game=VALORANT" style="background: rgba(255, 255, 255, 0.08); border: 1px solid var(--border); color: #fff; padding: 0.55rem; border-radius: 8px; font-weight: 700; font-size: 0.78rem; text-decoration: none; text-align: center;">
+            Register Team
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Banner 2: BGMI (Real Poster Artwork) -->
+    <div class="card game-poster-card" style="padding: 0; overflow: hidden; border-radius: 20px; border: 1px solid rgba(245, 158, 11, 0.4); background: #0b0f19;">
+      <div style="height: 240px; position: relative; overflow: hidden;">
+        <img src="/images/banners/banner-bgmi.jpg" alt="BGMI Esports Poster" style="width: 100%; height: 100%; object-fit: cover; object-position: center 30%; transition: transform 0.4s ease;" class="poster-img">
+        <div style="position: absolute; inset: 0; background: linear-gradient(to top, #0b0f19 0%, rgba(11, 15, 25, 0.4) 60%, transparent 100%);"></div>
+        <div style="position: absolute; top: 14px; left: 14px;">
+          <span class="mono" style="font-size: 0.7rem; font-weight: 800; color: #000; background: #f59e0b; padding: 3px 8px; border-radius: 6px; box-shadow: 0 4px 10px rgba(245, 158, 11, 0.5);">
+            BATTLE ROYALE INDIA
+          </span>
+        </div>
+        <div style="position: absolute; top: 14px; right: 14px;">
+          <span style="background: rgba(0, 0, 0, 0.65); color: #30d158; border: 1px solid rgba(48, 209, 88, 0.4); padding: 3px 8px; border-radius: 9999px; font-size: 0.7rem; font-weight: 800; display: inline-flex; align-items: center; gap: 4px;">
+            <span style="width: 6px; height: 6px; border-radius: 50%; background: #30d158;"></span> LIVE STREAM
+          </span>
+        </div>
+      </div>
+      <div style="padding: 1.5rem;">
+        <h3 style="font-size: 1.5rem; font-weight: 900; color: #fff; margin-bottom: 0.4rem;">BGMI PRO SERIES</h3>
+        <p style="color: var(--text-muted); font-size: 0.84rem; line-height: 1.45; margin-bottom: 1.25rem;">
+          Krafton official Indian circuit. 16 top squads battling on Erangel & Miramar.
+        </p>
+        <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 1.25rem; border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
+          <span class="mono" style="font-size: 0.75rem; color: var(--text-muted);">PRIZE POOL</span>
+          <strong class="mono" style="color: #f59e0b; font-size: 1.1rem;">₹1,00,00,000 INR</strong>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 1rem;">
+          <button onclick="openStreamModal('y881t8ilMyc', 'BGMI Pro Series (BMS) 2026: Finals Day 3', 'BGMI', '#f59e0b')" style="background: #f59e0b; color: #000; border: none; padding: 0.55rem; border-radius: 8px; font-weight: 800; font-size: 0.78rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px;">
+            ▶ Watch Live
+          </button>
+          <a href="/register?game=BGMI" style="background: rgba(255, 255, 255, 0.08); border: 1px solid var(--border); color: #fff; padding: 0.55rem; border-radius: 8px; font-weight: 700; font-size: 0.78rem; text-decoration: none; text-align: center;">
+            Register Team
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Banner 3: FREE FIRE (Real Poster Artwork) -->
+    <div class="card game-poster-card" style="padding: 0; overflow: hidden; border-radius: 20px; border: 1px solid rgba(249, 115, 22, 0.4); background: #0b0f19;">
+      <div style="height: 240px; position: relative; overflow: hidden;">
+        <img src="/images/banners/banner-freefire.jpg" alt="Free Fire Esports Poster" style="width: 100%; height: 100%; object-fit: cover; object-position: center 20%; transition: transform 0.4s ease;" class="poster-img">
+        <div style="position: absolute; inset: 0; background: linear-gradient(to top, #0b0f19 0%, rgba(11, 15, 25, 0.4) 60%, transparent 100%);"></div>
+        <div style="position: absolute; top: 14px; left: 14px;">
+          <span class="mono" style="font-size: 0.7rem; font-weight: 800; color: #fff; background: #f97316; padding: 3px 8px; border-radius: 6px; box-shadow: 0 4px 10px rgba(249, 115, 22, 0.5);">
+            50P SURVIVAL BR
+          </span>
+        </div>
+        <div style="position: absolute; top: 14px; right: 14px;">
+          <span style="background: rgba(0, 0, 0, 0.65); color: #30d158; border: 1px solid rgba(48, 209, 88, 0.4); padding: 3px 8px; border-radius: 9999px; font-size: 0.7rem; font-weight: 800; display: inline-flex; align-items: center; gap: 4px;">
+            <span style="width: 6px; height: 6px; border-radius: 50%; background: #30d158;"></span> LIVE STREAM
+          </span>
+        </div>
+      </div>
+      <div style="padding: 1.5rem;">
+        <h3 style="font-size: 1.5rem; font-weight: 900; color: #fff; margin-bottom: 0.4rem;">FREE FIRE MAX</h3>
+        <p style="color: var(--text-muted); font-size: 0.84rem; line-height: 1.45; margin-bottom: 1.25rem;">
+          Free Fire World Series (FFWS). Fast-paced 10-minute battle royale survival.
+        </p>
+        <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 1.25rem; border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
+          <span class="mono" style="font-size: 0.75rem; color: var(--text-muted);">PRIZE POOL</span>
+          <strong class="mono" style="color: #f97316; font-size: 1.1rem;">$500,000 USD (₹4.1 Cr)</strong>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 1rem;">
+          <button onclick="openStreamModal('g2q6N_B9G5E', 'Free Fire World Series (FFWS) 2026: Spring Finals', 'Free Fire', '#f97316')" style="background: #f97316; color: #fff; border: none; padding: 0.55rem; border-radius: 8px; font-weight: 800; font-size: 0.78rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px;">
+            ▶ Watch Live
+          </button>
+          <a href="/register?game=Free Fire" style="background: rgba(255, 255, 255, 0.08); border: 1px solid var(--border); color: #fff; padding: 0.55rem; border-radius: 8px; font-weight: 700; font-size: 0.78rem; text-decoration: none; text-align: center;">
+            Register Team
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Banner 4: eFOOTBALL (Real Poster Artwork) -->
+    <div class="card game-poster-card" style="padding: 0; overflow: hidden; border-radius: 20px; border: 1px solid rgba(2, 132, 199, 0.4); background: #0b0f19;">
+      <div style="height: 240px; position: relative; overflow: hidden;">
+        <img src="/images/banners/banner-efootball.jpg" alt="eFootball 2026 Esports Poster" style="width: 100%; height: 100%; object-fit: cover; object-position: center 30%; transition: transform 0.4s ease;" class="poster-img">
+        <div style="position: absolute; inset: 0; background: linear-gradient(to top, #0b0f19 0%, rgba(11, 15, 25, 0.4) 60%, transparent 100%);"></div>
+        <div style="position: absolute; top: 14px; left: 14px;">
+          <span class="mono" style="font-size: 0.7rem; font-weight: 800; color: #fff; background: #0284c7; padding: 3px 8px; border-radius: 6px; box-shadow: 0 4px 10px rgba(2, 132, 199, 0.5);">
+            FOOTBALL SIMULATION
+          </span>
+        </div>
+        <div style="position: absolute; top: 14px; right: 14px;">
+          <span style="background: rgba(0, 0, 0, 0.65); color: #30d158; border: 1px solid rgba(48, 209, 88, 0.4); padding: 3px 8px; border-radius: 9999px; font-size: 0.7rem; font-weight: 800; display: inline-flex; align-items: center; gap: 4px;">
+            <span style="width: 6px; height: 6px; border-radius: 50%; background: #30d158;"></span> LIVE STREAM
+          </span>
+        </div>
+      </div>
+      <div style="padding: 1.5rem;">
+        <h3 style="font-size: 1.5rem; font-weight: 900; color: #fff; margin-bottom: 0.4rem;">eFOOTBALL 2026</h3>
+        <p style="color: var(--text-muted); font-size: 0.84rem; line-height: 1.45; margin-bottom: 1.25rem;">
+          Championship Pro European & Asia divisions. Precision 11v11 dream team matches.
+        </p>
+        <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 1.25rem; border-bottom: 1px solid rgba(255, 255, 255, 0.08);">
+          <span class="mono" style="font-size: 0.75rem; color: var(--text-muted);">PRIZE POOL</span>
+          <strong class="mono" style="color: #38bdf8; font-size: 1.1rem;">$200,000 USD</strong>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 1rem;">
+          <button onclick="openStreamModal('Vb1n1c3q_B0', 'eFootball Championship Pro 2026: Matchday 4', 'eFootball', '#0284c7')" style="background: #0284c7; color: #fff; border: none; padding: 0.55rem; border-radius: 8px; font-weight: 800; font-size: 0.78rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 4px;">
+            ▶ Watch Live
+          </button>
+          <a href="/register?game=eFootball" style="background: rgba(255, 255, 255, 0.08); border: 1px solid var(--border); color: #fff; padding: 0.55rem; border-radius: 8px; font-weight: 700; font-size: 0.78rem; text-decoration: none; text-align: center;">
+            Register Player
+          </a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ========================================================================= -->
+<!-- REAL-TIME LIVE TOURNAMENTS SECTION (NO DEMO APIS - PURE ESPORTS EXPERIENCE) -->
+<!-- ========================================================================= -->
+<section id="live-tournaments-section" style="margin-bottom: 4rem;">
+  <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+    <div>
+      <div style="display: inline-flex; align-items: center; gap: 8px; padding: 3px 10px; border-radius: 9999px; background: rgba(48, 209, 88, 0.15); border: 1px solid rgba(48, 209, 88, 0.35); color: var(--success); font-size: 0.7rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.5rem;" class="mono">
+        <span style="width: 8px; height: 8px; border-radius: 50%; background: var(--success); box-shadow: 0 0 8px var(--success); display: inline-block;"></span>
+        OFFICIAL CHAMPIONSHIP TOURNAMENTS &bull; LIVE STREAMS & BRACKETS
+      </div>
+      <h2 style="font-size: 1.85rem; font-weight: 900; text-transform: uppercase; letter-spacing: -0.01em;">
+        Live Tournaments & Match Stream
+      </h2>
+      <p style="color: var(--text-muted); font-size: 0.95rem;">
+        Watch official matches live on YouTube, track real-time standings, and register your team to compete.
+      </p>
+    </div>
+
+    <!-- Feed Status & Refresh -->
+    <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+      <span class="mono" style="font-size: 0.75rem; color: #30d158; background: rgba(48, 209, 88, 0.1); padding: 6px 12px; border-radius: 8px; border: 1px solid rgba(48, 209, 88, 0.25);">
+        ● 8 LIVE STREAMS BROADCASTING
+      </span>
+      <button id="refresh-tournaments-btn" onclick="fetchLiveTournaments(true)" style="background: rgba(255, 255, 255, 0.08); border: 1px solid var(--border); color: #fff; padding: 0.55rem 1rem; border-radius: 8px; font-weight: 700; font-size: 0.8125rem; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.2s ease;">
+        <span id="refresh-icon">↻</span> Refresh Scores
+      </button>
+      <a href="/tournaments" style="color: var(--accent); font-weight: 700; text-decoration: none; font-size: 0.875rem;">
+        View Full Schedule &rarr;
+      </a>
     </div>
   </div>
 
-  <div class="card">
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-      <h2 style="font-size: 1.3rem;">Valorant Invitational Major</h2>
-      <span style="background: rgba(255, 179, 0, 0.2); color: var(--warning); padding: 0.2rem 0.6rem; border-radius: 4px; font-size: 0.8rem; font-weight: 600;">REGISTRATION</span>
+  <!-- Filter Console Bar -->
+  <div class="card" style="padding: 1.25rem 1.5rem; margin-bottom: 2rem; border-color: rgba(255, 255, 255, 0.12); background: rgba(14, 19, 32, 0.9); border-radius: 16px;">
+    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+      
+      <!-- Filter Selectors & Search Controls -->
+      <div style="display: flex; align-items: center; flex-wrap: wrap; gap: 12px; flex: 1; min-width: 280px;">
+        
+        <!-- Filter Button / Label Indicator -->
+        <div style="display: inline-flex; align-items: center; gap: 6px; padding: 0.55rem 0.9rem; border-radius: 10px; background: rgba(255, 42, 75, 0.15); border: 1px solid rgba(255, 42, 75, 0.35); color: #fff; font-weight: 800; font-size: 0.8125rem; text-transform: uppercase;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+          </svg>
+          <span>Filter</span>
+        </div>
+
+        <!-- 1. Game Selection Dropdown -->
+        <div style="position: relative;">
+          <select id="game-filter-select" onchange="onFilterChange()" class="filter-select">
+            <option value="ALL">All Games (8 Titles)</option>
+            <option value="VALORANT">VALORANT</option>
+            <option value="BGMI">BGMI (India)</option>
+            <option value="Free Fire">Free Fire MAX</option>
+            <option value="eFootball">eFootball 2026</option>
+            <option value="Counter-Strike 2">Counter-Strike 2</option>
+            <option value="Apex Legends">Apex Legends</option>
+            <option value="Call of Duty">Call of Duty</option>
+            <option value="League of Legends">League of Legends</option>
+          </select>
+        </div>
+
+        <!-- 2. Status Selection Dropdown -->
+        <div style="position: relative;">
+          <select id="status-filter-select" onchange="onFilterChange()" class="filter-select">
+            <option value="ALL">All Tournaments</option>
+            <option value="LIVE_NOW">Live Now</option>
+            <option value="ACTIVE">Match Point / Finals</option>
+            <option value="UPCOMING">Starting Soon</option>
+            <option value="REGISTRATION">Open for Registration</option>
+          </select>
+        </div>
+
+        <!-- 3. Real-Time Text Search Input -->
+        <div style="flex: 1; min-width: 220px; position: relative;">
+          <input
+            type="text"
+            id="tournament-search-input"
+            oninput="onFilterChange()"
+            placeholder="Search tournament, game, or squad..."
+            class="filter-search-input"
+          />
+        </div>
+
+        <!-- 4. Reset Filters Button -->
+        <button id="reset-filters-btn" onclick="resetAllFilters()" class="filter-reset-btn" title="Clear all active filters">
+          ↺ Reset
+        </button>
+      </div>
+
+      <!-- Filter Results Active Counter -->
+      <div class="mono" style="font-size: 0.8125rem; color: var(--text-muted); display: flex; align-items: center; gap: 8px;">
+        <span id="filter-results-badge" style="color: #38bdf8; font-weight: 700;">
+          Showing 8 Active Tournaments
+        </span>
+      </div>
+
     </div>
-    <p style="color: var(--text-muted); margin-bottom: 1rem;">Regional qualifiers open for franchised rosters and verified collegiate squads.</p>
-    <div style="display: flex; justify-content: space-between; font-size: 0.9rem; color: var(--accent-cyan);">
-      <span>Slots: 16 Teams</span>
-      <a href="/tournaments" style="color: var(--accent-cyan); text-decoration: none; font-weight: 600;">Register &rarr;</a>
+  </div>
+
+  <!-- Dynamic Live Tournaments Container -->
+  <div id="live-tournaments-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)); gap: 1.5rem;">
+    <!-- Skeletons rendered initially while fetching -->
+    <div class="card tournament-skeleton" style="padding: 1.75rem; border-left: 4px solid var(--accent); opacity: 0.6;">
+      <div style="height: 18px; width: 40%; background: rgba(255, 255, 255, 0.1); border-radius: 4px; margin-bottom: 12px;"></div>
+      <div style="height: 28px; width: 75%; background: rgba(255, 255, 255, 0.15); border-radius: 6px; margin-bottom: 16px;"></div>
+      <div style="height: 60px; width: 100%; background: rgba(255, 255, 255, 0.05); border-radius: 8px; margin-bottom: 16px;"></div>
+      <div style="height: 20px; width: 50%; background: rgba(255, 255, 255, 0.08); border-radius: 4px;"></div>
     </div>
+  </div>
+</section>
+
+<!-- ========================================================================= -->
+<!-- FUTURE MOBILE APPLICATION SECTION (ANDROID & IOS)                         -->
+<!-- ========================================================================= -->
+<section id="mobile-app-section" style="margin-bottom: 4rem;">
+  <div class="card" style="padding: 3rem 2.5rem; border-radius: 24px; background: radial-gradient(ellipse at 80% 50%, rgba(56, 189, 248, 0.15) 0%, rgba(14, 19, 32, 0.95) 70%); border: 1px solid rgba(56, 189, 248, 0.3); position: relative; overflow: hidden;">
+    <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 2rem;">
+      
+      <!-- Left: App Features & Value Proposition -->
+      <div style="max-width: 640px;">
+        <div style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 9999px; background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.4); color: #38bdf8; font-size: 0.72rem; font-weight: 800; text-transform: uppercase; margin-bottom: 1rem;" class="mono">
+          UPCOMING FEATURES
+        </div>
+        <h2 style="font-size: 2.2rem; font-weight: 900; letter-spacing: -0.02em; line-height: 1.2; text-transform: uppercase; margin-bottom: 1rem; color: #fff;">
+          Upcoming Features & Mobile Experience
+        </h2>
+        <p style="color: var(--text-muted); font-size: 1rem; line-height: 1.6; margin-bottom: 1.5rem;">
+          Take the competition anywhere. Watch high-definition YouTube live streams with pro caster audio, check tournament brackets on the go, receive instant push notifications when your squad’s match point is reached, and register for scrims with a single tap.
+        </p>
+
+        <!-- App Feature Highlights -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#30d158" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+            <span style="font-size: 0.875rem; color: #cbd5e1; font-weight: 600;">Instant Match Point Push Alerts</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="15" x="2" y="7" rx="2" ry="2"></rect><polyline points="17 2 12 7 7 2"></polyline></svg>
+            <span style="font-size: 0.875rem; color: #cbd5e1; font-weight: 600;">Native YouTube HD Live Player</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path><path d="M4 22h16"></path><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path></svg>
+            <span style="font-size: 0.875rem; color: #cbd5e1; font-weight: 600;">One-Tap Squad Scrim Registration</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ff4655" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 17.5 3 6V3h3l11.5 11.5"></path><path d="m13 19 6-6"></path><path d="m16 16 4 4"></path><path d="m19 21 2-2"></path></svg>
+            <span style="font-size: 0.875rem; color: #cbd5e1; font-weight: 600;">Player Profiles & K/D Leaderboards</span>
+          </div>
+        </div>
+
+        <!-- App Store Badges (Simulated High-Quality Badges) -->
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+          <div style="display: inline-flex; align-items: center; gap: 10px; background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(255, 255, 255, 0.2); padding: 0.65rem 1.25rem; border-radius: 12px;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="#38bdf8">
+              <path d="M3.609 1.814L13.793 12 3.61 22.186a1.956 1.956 0 0 1-.22-.96V2.774c0-.363.08-.696.219-.96zm11.233 11.234l2.127 2.127-11.838 6.829 9.711-8.956zm2.127-2.128L14.842 13 5.13 4.043l11.839 6.877zm1.094 1.094l2.368-1.371a1.958 1.958 0 0 0 0-3.376l-2.368-1.371-2.482 2.482 2.482 2.636z"/>
+            </svg>
+            <div>
+              <div style="font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase;">Pre-Register On</div>
+              <div style="font-size: 0.95rem; font-weight: 800; color: #fff;">Google Play</div>
+            </div>
+          </div>
+
+          <div style="display: inline-flex; align-items: center; gap: 10px; background: rgba(0, 0, 0, 0.6); border: 1px solid rgba(255, 255, 255, 0.2); padding: 0.65rem 1.25rem; border-radius: 12px;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="#fff">
+              <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.63-.77 1.06-1.84.94-2.91-.91.04-2.02.61-2.67 1.37-.58.67-1.1 1.76-.96 2.81 1.02.08 2.06-.5 2.69-1.27z"/>
+            </svg>
+            <div>
+              <div style="font-size: 0.65rem; color: var(--text-muted); text-transform: uppercase;">Coming Soon To</div>
+              <div style="font-size: 0.95rem; font-weight: 800; color: #fff;">Apple App Store</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Mobile App Mockup Visual -->
+      <div style="flex-shrink: 0; position: relative;">
+        <div style="width: 260px; height: 380px; background: linear-gradient(145deg, #161e30, #0a0e18); border-radius: 36px; border: 4px solid #334155; box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 35px rgba(56, 189, 248, 0.3); padding: 16px; display: flex; flex-direction: column; justify-content: space-between; position: relative; overflow: hidden;">
+          <div style="width: 80px; height: 16px; background: #1e293b; border-radius: 9999px; margin: 0 auto 12px;"></div>
+          
+          <!-- Mock Phone Screen UI -->
+          <div style="flex: 1; background: rgba(7, 9, 14, 0.85); border-radius: 20px; padding: 12px; display: flex; flex-direction: column; gap: 10px;">
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+              <span class="mono" style="font-size: 0.65rem; color: var(--accent); font-weight: 800;">NOWHERE LIVE</span>
+              <span style="font-size: 0.6rem; color: #30d158; font-weight: 700;">● 1080p 60fps</span>
+            </div>
+            
+            <!-- Mock Video Box -->
+            <div style="height: 95px; background: #ff2a4b; border-radius: 10px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden;">
+              <img src="/images/banners/banner-valorant.jpg" style="width: 100%; height: 100%; object-fit: cover;" alt="App preview">
+              <div style="position: absolute; inset: 0; background: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center;">
+                <span style="font-size: 1.8rem; color: #fff;">▶</span>
+              </div>
+            </div>
+
+            <!-- Mock Match Stats -->
+            <div style="background: rgba(255,255,255,0.05); padding: 8px; border-radius: 8px;">
+              <div style="font-size: 0.65rem; font-weight: 700; color: #fff;">VALORANT MASTERS</div>
+              <div class="mono" style="font-size: 0.6rem; color: #38bdf8;">Nowhere 13 - 9 Sentinels</div>
+            </div>
+
+            <div style="background: rgba(255,42,75,0.2); border: 1px solid var(--accent); border-radius: 8px; padding: 6px; text-align: center;">
+              <span style="font-size: 0.65rem; color: #fff; font-weight: 800;">REGISTER TO PLAY</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ========================================================================= -->
+<!-- YOUTUBE LIVE STREAM THEATER MODAL                                         -->
+<!-- ========================================================================= -->
+<div id="stream-modal" style="display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(16px); z-index: 9999; align-items: center; justify-content: center; padding: 1.5rem;">
+  <div style="max-width: 960px; width: 100%; background: #0c111e; border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 20px; overflow: hidden; box-shadow: 0 30px 80px rgba(0, 0, 0, 0.9);">
+    
+    <!-- Modal Header -->
+    <div style="padding: 1.25rem 1.75rem; background: rgba(14, 19, 32, 0.95); border-bottom: 1px solid rgba(255, 255, 255, 0.1); display: flex; justify-content: space-between; align-items: center;">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span style="width: 10px; height: 10px; border-radius: 50%; background: #ff2a4b; box-shadow: 0 0 10px #ff2a4b; display: inline-block;"></span>
+        <h3 id="modal-stream-title" style="font-size: 1.15rem; font-weight: 800; color: #fff; margin: 0;">
+          Live Esports Stream
+        </h3>
+      </div>
+      <button onclick="closeStreamModal()" style="background: rgba(255, 255, 255, 0.1); border: none; color: #fff; width: 34px; height: 34px; border-radius: 50%; font-size: 1.1rem; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+        ✕
+      </button>
+    </div>
+
+    <!-- YouTube Embed Video Frame -->
+    <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; background: #000;">
+      <iframe
+        id="modal-youtube-iframe"
+        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;"
+        src=""
+        title="Nowhere Esports YouTube Live Stream"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        allowfullscreen>
+      </iframe>
+    </div>
+
+    <!-- Modal Footer Controls -->
+    <div style="padding: 1.25rem 1.75rem; background: rgba(14, 19, 32, 0.95); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+      <div class="mono" style="font-size: 0.8125rem; color: var(--text-muted);">
+        BROADCAST: <strong id="modal-game-badge" style="color: #38bdf8;">OFFICIAL ESPORTS FEED</strong> &bull; 1080P 60FPS
+      </div>
+      <div style="display: flex; gap: 10px;">
+        <a id="modal-register-btn" href="/register" style="background: var(--accent); color: #fff; text-decoration: none; padding: 0.5rem 1.25rem; border-radius: 8px; font-weight: 700; font-size: 0.84rem;">
+          Register Squad to Play &rarr;
+        </a>
+        <button onclick="closeStreamModal()" style="background: rgba(255, 255, 255, 0.1); border: 1px solid var(--border); color: #fff; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 600; font-size: 0.84rem; cursor: pointer;">
+          Close
+        </button>
+      </div>
+    </div>
+
   </div>
 </div>
 
-<div class="card">
-  <h2 style="font-size: 1.2rem; margin-bottom: 1rem;">Internal Staff Notices</h2>
-  <ul style="list-style-type: none; display: flex; flex-direction: column; gap: 0.75rem;">
-    <li style="border-left: 3px solid var(--accent-cyan); padding-left: 1rem;">
-      <strong>Broadcast Patch 2.4.1 Released:</strong> Production booths must update OBS streaming plugins prior to tournament day 2.
-    </li>
-    <li style="border-left: 3px solid var(--accent); padding-left: 1rem;">
-      <strong>Security Reminder:</strong> Two-factor authentication is required on all caster VPN endpoints. Do not share credentials.
-    </li>
-  </ul>
-</div>
+<!-- Embedded Styles for Controls & Poster Cards -->
+<style>
+  .game-poster-card {
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  }
+  .game-poster-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.6);
+    border-color: rgba(255, 255, 255, 0.35);
+  }
+  .game-poster-card:hover .poster-img {
+    transform: scale(1.04);
+  }
+  .filter-select {
+    background: rgba(18, 24, 38, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #f8fafc;
+    padding: 0.6rem 2.2rem 0.6rem 0.9rem;
+    border-radius: 10px;
+    font-size: 0.84rem;
+    font-weight: 600;
+    cursor: pointer;
+    outline: none;
+    transition: all 0.2s ease;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%2394a3b8%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 11px;
+    font-family: inherit;
+  }
+  .filter-select:hover, .filter-select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 12px rgba(255, 42, 75, 0.25);
+  }
+  .filter-search-input {
+    width: 100%;
+    background: rgba(18, 24, 38, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #f8fafc;
+    padding: 0.6rem 1rem;
+    border-radius: 10px;
+    font-size: 0.84rem;
+    outline: none;
+    transition: all 0.2s ease;
+    font-family: inherit;
+  }
+  .filter-search-input:hover, .filter-search-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 12px rgba(255, 42, 75, 0.25);
+  }
+  .filter-reset-btn {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    color: var(--text-muted);
+    padding: 0.6rem 1rem;
+    border-radius: 10px;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+  }
+  .filter-reset-btn:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.25);
+  }
+  .live-pulse-badge {
+    animation: liveBadgePulse 2s infinite ease-in-out;
+  }
+  @keyframes liveBadgePulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.8; transform: scale(1.02); }
+  }
+</style>
+
+<!-- ========================================================================= -->
+<!-- CLIENT-SIDE API FETCH, STREAM MODAL & TOURNAMENT MANAGER SCRIPT           -->
+<!-- ========================================================================= -->
+<script>
+  let allTournamentsCache = [];
+
+  async function fetchLiveTournaments(manual = false) {
+    const refreshIcon = document.getElementById('refresh-icon');
+
+    if (refreshIcon && manual) {
+      refreshIcon.style.display = 'inline-block';
+      refreshIcon.style.transform = 'rotate(180deg)';
+      refreshIcon.style.transition = 'transform 0.4s ease';
+      setTimeout(() => { refreshIcon.style.transform = 'none'; }, 400);
+    }
+
+    try {
+      const response = await fetch('/api/v1/tournaments');
+      if (!response.ok) {
+        throw new Error('API returned status ' + response.status);
+      }
+
+      const payload = await response.json();
+      if (payload && Array.isArray(payload.data)) {
+        allTournamentsCache = payload.data;
+        onFilterChange();
+      }
+    } catch (err) {
+      console.error('Failed to sync live tournaments:', err);
+    }
+  }
+
+  function onFilterChange() {
+    const gameSelect = document.getElementById('game-filter-select');
+    const statusSelect = document.getElementById('status-filter-select');
+    const searchInput = document.getElementById('tournament-search-input');
+    const resultsBadge = document.getElementById('filter-results-badge');
+
+    const selectedGame = gameSelect ? gameSelect.value : 'ALL';
+    const selectedStatus = statusSelect ? statusSelect.value : 'ALL';
+    const searchQuery = searchInput ? searchInput.value.trim().toLowerCase() : '';
+
+    let filtered = allTournamentsCache;
+
+    // 1. Filter by Game
+    if (selectedGame && selectedGame !== 'ALL') {
+      filtered = filtered.filter(t => 
+        (t.game && t.game.toLowerCase().includes(selectedGame.toLowerCase())) ||
+        (t.game_slug && t.game_slug.toLowerCase() === selectedGame.toLowerCase())
+      );
+    }
+
+    // 2. Filter by Status
+    if (selectedStatus && selectedStatus !== 'ALL') {
+      filtered = filtered.filter(t => t.status === selectedStatus);
+    }
+
+    // 3. Search Keyword Filter
+    if (searchQuery) {
+      filtered = filtered.filter(t => 
+        (t.title && t.title.toLowerCase().includes(searchQuery)) ||
+        (t.game && t.game.toLowerCase().includes(searchQuery)) ||
+        (t.region && t.region.toLowerCase().includes(searchQuery)) ||
+        (t.current_match && t.current_match.toLowerCase().includes(searchQuery))
+      );
+    }
+
+    // Update results count badge
+    if (resultsBadge) {
+      resultsBadge.textContent = `Showing ${filtered.length} Active Tournaments`;
+    }
+
+    renderTournaments(filtered);
+  }
+
+  function renderTournaments(tournaments) {
+    const grid = document.getElementById('live-tournaments-grid');
+    if (!grid) return;
+
+    if (tournaments.length === 0) {
+      grid.innerHTML = `
+        <div class="card" style="grid-column: 1 / -1; padding: 3rem; text-align: center; border-radius: 20px;">
+          <h3 style="font-size: 1.35rem; font-weight: 800; margin-bottom: 0.5rem; color: #fff;">No Live Tournaments Found</h3>
+          <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem;">
+            No ongoing tournament brackets currently match your selection.
+          </p>
+          <button onclick="resetAllFilters()" style="background: var(--accent); color: #fff; border: none; padding: 0.65rem 1.5rem; border-radius: 8px; font-weight: 700; cursor: pointer;">
+            ↺ Reset Filters
+          </button>
+        </div>
+      `;
+      return;
+    }
+
+    grid.innerHTML = tournaments.map(t => {
+      const accent = t.accent_color || '#ff2a4b';
+      const isLive = t.status === 'LIVE_NOW' || t.status === 'ACTIVE';
+      const statusBadge = isLive 
+        ? `<span class="live-pulse-badge" style="background: rgba(48, 209, 88, 0.18); color: #30d158; border: 1px solid rgba(48, 209, 88, 0.4); padding: 0.25rem 0.65rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 800; display: inline-flex; align-items: center; gap: 5px;">
+            <span style="width: 6px; height: 6px; border-radius: 50%; background: #30d158; display: inline-block;"></span>
+            ${t.status_label || 'LIVE NOW'}
+          </span>`
+        : `<span style="background: rgba(255, 159, 10, 0.18); color: #ff9f0a; border: 1px solid rgba(255, 159, 10, 0.4); padding: 0.25rem 0.65rem; border-radius: 9999px; font-size: 0.72rem; font-weight: 800;">
+            ${t.status_label || t.status || 'SCHEDULED'}
+          </span>`;
+
+      const videoId = t.stream_video_id || '5W8f7m4X6lI';
+
+      return `
+        <div class="card" style="border-left: 4px solid ${accent}; padding: 1.75rem; display: flex; flex-direction: column; justify-content: space-between; position: relative; border-radius: 18px;">
+          <div>
+            <!-- Top Metadata Row -->
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.85rem; gap: 8px;">
+              <div>
+                <span class="mono" style="font-size: 0.72rem; color: ${accent}; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase;">
+                  ${t.game} &bull; ${t.region}
+                </span>
+                <h3 style="font-size: 1.3rem; font-weight: 800; margin-top: 4px; line-height: 1.25; color: #fff;">
+                  ${t.title}
+                </h3>
+              </div>
+              <div style="flex-shrink: 0;">
+                ${statusBadge}
+              </div>
+            </div>
+
+            <!-- Match stats callout -->
+            <div style="background: rgba(0, 0, 0, 0.35); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 0.9rem 1.1rem; margin-bottom: 1.25rem;">
+              <div style="font-size: 0.84rem; font-weight: 700; color: #f8fafc; margin-bottom: 4px;">
+                ${t.current_match || 'Competitive Championship in Progress'}
+              </div>
+              <div class="mono" style="font-size: 0.75rem; color: var(--text-muted); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 6px;">
+                <span>${t.current_map || t.bracket_type}</span>
+                <span style="color: ${accent}; font-weight: 700;">${t.viewers ? t.viewers + ' Watching' : '16 Teams'}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Real Esports Action Footer (No demo JSON links) -->
+          <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 1rem; border-top: 1px solid rgba(255, 255, 255, 0.08); font-size: 0.8125rem;">
+            <div>
+              <span class="mono" style="font-size: 0.7rem; color: var(--text-muted); display: block;">PRIZE POOL</span>
+              <strong class="mono" style="color: #fff; font-size: 1.05rem;">
+                ${t.prize_formatted || ('$' + (t.prize_usd || 0).toLocaleString() + ' USD')}
+              </strong>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <button onclick="openStreamModal('${videoId}', '${t.title.replace(/'/g, "\\'")}', '${t.game}', '${accent}')" style="background: rgba(255, 42, 75, 0.18); border: 1px solid rgba(255, 42, 75, 0.45); color: #ff4767; padding: 0.45rem 0.85rem; border-radius: 8px; font-weight: 800; font-size: 0.76rem; cursor: pointer; display: flex; align-items: center; gap: 4px;">
+                ▶ Watch Stream
+              </button>
+              <a href="/register?game=${encodeURIComponent(t.game)}" style="background: ${accent}; color: #fff; text-decoration: none; font-weight: 700; font-size: 0.76rem; padding: 0.45rem 0.85rem; border-radius: 8px;">
+                Register
+              </a>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // YouTube Stream Modal Functions
+  function openStreamModal(videoId, title, game, accent) {
+    const modal = document.getElementById('stream-modal');
+    const iframe = document.getElementById('modal-youtube-iframe');
+    const titleEl = document.getElementById('modal-stream-title');
+    const badgeEl = document.getElementById('modal-game-badge');
+    const regBtn = document.getElementById('modal-register-btn');
+
+    if (titleEl) titleEl.textContent = title || 'Live Esports Broadcast';
+    if (badgeEl) {
+      badgeEl.textContent = game ? (game.toUpperCase() + ' OFFICIAL STREAM') : 'OFFICIAL ESPORTS FEED';
+      badgeEl.style.color = accent || '#38bdf8';
+    }
+    if (regBtn && game) {
+      regBtn.href = '/register?game=' + encodeURIComponent(game);
+    }
+
+    if (iframe) {
+      // Using YouTube Privacy-Enhanced Mode (youtube-nocookie.com)
+      iframe.src = 'https://www.youtube-nocookie.com/embed/' + videoId + '?autoplay=1&rel=0&modestbranding=1';
+    }
+
+    if (modal) {
+      modal.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+    }
+  }
+
+  function closeStreamModal() {
+    const modal = document.getElementById('stream-modal');
+    const iframe = document.getElementById('modal-youtube-iframe');
+
+    if (iframe) iframe.src = '';
+    if (modal) {
+      modal.style.display = 'none';
+      document.body.style.overflow = 'auto';
+    }
+  }
+
+  function applyGameFilter(gameName) {
+    const gameSelect = document.getElementById('game-filter-select');
+    if (gameSelect) {
+      gameSelect.value = gameName;
+    }
+    onFilterChange();
+
+    const targetSection = document.getElementById('live-tournaments-section');
+    if (targetSection) {
+      targetSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  }
+
+  function resetAllFilters() {
+    const gameSelect = document.getElementById('game-filter-select');
+    const statusSelect = document.getElementById('status-filter-select');
+    const searchInput = document.getElementById('tournament-search-input');
+
+    if (gameSelect) gameSelect.value = 'ALL';
+    if (statusSelect) statusSelect.value = 'ALL';
+    if (searchInput) searchInput.value = '';
+
+    onFilterChange();
+  }
+
+  // Initial fetch on page load
+  document.addEventListener('DOMContentLoaded', () => {
+    fetchLiveTournaments();
+    // Auto refresh every 15 seconds to simulate live match score stream
+    setInterval(() => {
+      fetchLiveTournaments();
+    }, 15000);
+  });
+</script>
 
 <%- include('../layouts/footer') %>

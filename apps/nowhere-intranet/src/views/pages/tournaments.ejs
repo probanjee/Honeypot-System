@@ -1,30 +1,765 @@
-<%- include('../layouts/header', { title: 'Tournament Listings' }) %>
+<%- include('../layouts/header', { title: 'Official Tournaments' }) %>
 
-<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-  <div>
-    <h1 style="font-size: 2rem; font-weight: 800;">Official Tournaments</h1>
-    <p style="color: var(--text-muted);">Current season schedules, server allocations, and bracket rosters.</p>
+<div style="margin-bottom: 3.5rem;">
+  
+  <!-- Header Title & Subtitle -->
+  <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; flex-wrap: wrap; gap: 1.5rem;">
+    <div>
+      <div style="display: inline-flex; align-items: center; gap: 6px; padding: 3px 12px; border-radius: 9999px; background: rgba(255, 42, 75, 0.15); border: 1px solid rgba(255, 42, 75, 0.35); color: var(--accent); font-weight: 800; font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.6rem;" class="mono">
+        COMPETITIVE CIRCUIT 2026 • GLOBAL OPERATIONS
+      </div>
+      <h1 style="font-size: 2.3rem; font-weight: 900; letter-spacing: -0.02em; text-transform: uppercase; margin-bottom: 0.5rem;">
+        Official Tournaments & Championship Brackets
+      </h1>
+      <p style="color: var(--text-muted); font-size: 1rem; max-width: 780px;">
+        Watch official broadcast streams live on YouTube, track match point standings, review prize pools, and register your squad to compete.
+      </p>
+    </div>
+
+    <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+      <a href="/register" style="background: linear-gradient(135deg, #ff2a4b 0%, #c8102e 100%); color: #fff; padding: 0.65rem 1.5rem; border-radius: 10px; font-weight: 800; font-size: 0.875rem; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 15px rgba(255, 42, 75, 0.35);">
+        <span>Register Squad</span>
+      </a>
+      <a href="/rosters" style="background: rgba(255, 255, 255, 0.08); border: 1px solid var(--border); color: #fff; padding: 0.65rem 1.25rem; border-radius: 10px; font-weight: 700; font-size: 0.875rem; text-decoration: none;">
+        Pro Rosters
+      </a>
+    </div>
   </div>
-  <form action="/tournaments" method="GET" style="display: flex; gap: 0.5rem;">
-    <input type="text" name="search" placeholder="Search tournament or game..." style="background: var(--bg-card); border: 1px solid var(--border); padding: 0.5rem 1rem; border-radius: 6px; color: #fff;">
-    <button type="submit" style="background: var(--accent-cyan); color: #000; border: none; padding: 0.5rem 1rem; border-radius: 6px; font-weight: 600; cursor: pointer;">Search</button>
-  </form>
+
+  <!-- Interactive Filter Console Bar -->
+  <div class="card" style="padding: 1.25rem 1.5rem; margin-bottom: 2rem; border-radius: 16px; background: rgba(14, 19, 32, 0.9); border-color: rgba(255, 255, 255, 0.1);">
+    <form action="/tournaments" method="GET" style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; justify-content: space-between;">
+      
+      <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; flex: 1; min-width: 300px;">
+        <!-- Filter by Game -->
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 0.8125rem; font-weight: 700; color: #94a3b8; text-transform: uppercase;" class="mono">Game:</span>
+          <select name="game" style="background: rgba(18, 24, 38, 0.9); border: 1px solid rgba(255, 255, 255, 0.15); color: #fff; padding: 0.55rem 0.9rem; border-radius: 8px; font-size: 0.875rem; outline: none; cursor: pointer;">
+            <option value="all" <%= (selectedGame === 'all' || !selectedGame) ? 'selected' : '' %>>All Disciplines (8)</option>
+            <option value="valorant" <%= selectedGame === 'valorant' ? 'selected' : '' %>>VALORANT</option>
+            <option value="bgmi" <%= selectedGame === 'bgmi' ? 'selected' : '' %>>BGMI (Battlegrounds)</option>
+            <option value="freefire" <%= selectedGame === 'freefire' ? 'selected' : '' %>>Free Fire</option>
+            <option value="efootball" <%= selectedGame === 'efootball' ? 'selected' : '' %>>eFootball 2026</option>
+            <option value="cs2" <%= selectedGame === 'cs2' ? 'selected' : '' %>>Counter-Strike 2</option>
+            <option value="apex" <%= selectedGame === 'apex' ? 'selected' : '' %>>Apex Legends</option>
+            <option value="cod" <%= selectedGame === 'cod' ? 'selected' : '' %>>Call of Duty</option>
+            <option value="lol" <%= selectedGame === 'lol' ? 'selected' : '' %>>League of Legends</option>
+          </select>
+        </div>
+
+        <!-- Filter by Status -->
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <span style="font-size: 0.8125rem; font-weight: 700; color: #94a3b8; text-transform: uppercase;" class="mono">Status:</span>
+          <select name="status" style="background: rgba(18, 24, 38, 0.9); border: 1px solid rgba(255, 255, 255, 0.15); color: #fff; padding: 0.55rem 0.9rem; border-radius: 8px; font-size: 0.875rem; outline: none; cursor: pointer;">
+            <option value="ALL" <%= (selectedStatus === 'ALL' || !selectedStatus) ? 'selected' : '' %>>All Statuses</option>
+            <option value="LIVE_NOW" <%= selectedStatus === 'LIVE_NOW' ? 'selected' : '' %>>Live Now</option>
+            <option value="REGISTRATION" <%= selectedStatus === 'REGISTRATION' ? 'selected' : '' %>>Registration Open</option>
+            <option value="UPCOMING" <%= selectedStatus === 'UPCOMING' ? 'selected' : '' %>>Upcoming</option>
+          </select>
+        </div>
+
+        <!-- Text Search -->
+        <div style="flex: 1; min-width: 220px;">
+          <input type="text" name="search" value="<%= searchQuery || '' %>" placeholder="Search title, region, or game..." style="width: 100%; background: rgba(18, 24, 38, 0.9); border: 1px solid rgba(255, 255, 255, 0.15); padding: 0.55rem 0.9rem; border-radius: 8px; color: #fff; font-size: 0.875rem; outline: none;">
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div style="display: flex; gap: 0.5rem; align-items: center;">
+        <button type="submit" style="background: var(--accent); color: #fff; border: none; padding: 0.55rem 1.25rem; border-radius: 8px; font-weight: 700; font-size: 0.875rem; cursor: pointer;">
+          Apply Filters
+        </button>
+        <a href="/tournaments" style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); color: #94a3b8; text-decoration: none; padding: 0.55rem 1rem; border-radius: 8px; font-size: 0.875rem; font-weight: 600;">
+          Reset
+        </a>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- Tournaments List -->
+  <div style="display: flex; flex-direction: column; gap: 1.5rem; margin-bottom: 3rem;">
+    <% if (tournaments && tournaments.length > 0) { %>
+      <% tournaments.forEach(function(t) { %>
+        <% 
+          const isLive = t.status === 'LIVE_NOW' || (t.status_label && t.status_label.includes('LIVE'));
+          const isReg = t.status === 'REGISTRATION' || (t.status_label && t.status_label.includes('REGISTRATION'));
+          const accent = t.accent_color || '#ff2a4b';
+          const banner = t.banner_image || '/images/nowhere-logo.png';
+          const videoId = t.stream_video_id || '5W8f7m4X6lI';
+          const videoTitle = (t.stream_title || (t.title + ' | Official Live Broadcast')).replace(/"/g, '&quot;');
+          const currentMatch = (t.current_match || '').replace(/"/g, '&quot;');
+          const currentMap = (t.current_map || '').replace(/"/g, '&quot;');
+        %>
+
+        <div class="card tournament-row-card" style="display: flex; flex-direction: column; gap: 1.25rem; border-left: 5px solid <%= accent %>; padding: 1.75rem; border-radius: 16px; background: rgba(14, 19, 32, 0.95); transition: transform 0.2s ease, border-color 0.2s ease;">
+          
+          <!-- Top Row: Meta Badge & Status -->
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+            <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+              <span class="mono" style="font-size: 0.75rem; font-weight: 800; color: <%= accent %>; text-transform: uppercase; letter-spacing: 0.05em; background: rgba(255, 255, 255, 0.05); padding: 3px 10px; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.08);">
+                <%= t.game %> &bull; <%= t.category || 'Championship' %>
+              </span>
+              <span style="font-size: 0.8125rem; color: #94a3b8;" class="mono">
+                <%= t.region %>
+              </span>
+              <% if (t.teams_registered) { %>
+                <span style="font-size: 0.8125rem; color: #64748b;" class="mono">
+                  • <%= t.teams_registered %> Teams Enrolled
+                </span>
+              <% } %>
+            </div>
+
+            <!-- Status Pill -->
+            <% if (isLive) { %>
+              <div style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 9999px; background: rgba(255, 42, 75, 0.15); border: 1px solid rgba(255, 42, 75, 0.4); color: #ff2a4b; font-size: 0.75rem; font-weight: 800;" class="mono">
+                <span style="width: 8px; height: 8px; border-radius: 50%; background: #ff2a4b; box-shadow: 0 0 8px #ff2a4b; display: inline-block;"></span>
+                LIVE BROADCAST
+              </div>
+            <% } else if (isReg) { %>
+              <div style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 9999px; background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.4); color: #38bdf8; font-size: 0.75rem; font-weight: 800;" class="mono">
+                REGISTRATION OPEN
+              </div>
+            <% } else { %>
+              <div style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 9999px; background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.4); color: #f59e0b; font-size: 0.75rem; font-weight: 800;" class="mono">
+                <%= t.status_label || t.status || 'UPCOMING' %>
+              </div>
+            <% } %>
+          </div>
+
+          <!-- Middle Row: Title, Match Status, and Format -->
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1.5rem;">
+            <div style="flex: 1; min-width: 280px;">
+              <h2 style="font-size: 1.5rem; font-weight: 900; margin-bottom: 0.5rem; color: #ffffff; letter-spacing: -0.01em;">
+                <%= t.title %>
+              </h2>
+              
+              <% if (t.current_match) { %>
+                <div style="margin-bottom: 0.6rem; padding: 0.6rem 0.9rem; background: rgba(0, 0, 0, 0.35); border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.05);">
+                  <div style="font-size: 0.875rem; font-weight: 700; color: #fff;">
+                    Current Match: <%= t.current_match %>
+                  </div>
+                  <% if (t.current_map) { %>
+                    <div style="font-size: 0.8125rem; color: #94a3b8; margin-top: 3px;" class="mono">
+                      <%= t.current_map %>
+                      <% if (t.viewers) { %>
+                        <span style="color: #ff2a4b; font-weight: 700; margin-left: 8px;">• <%= t.viewers %> Watching</span>
+                      <% } %>
+                    </div>
+                  <% } %>
+                </div>
+              <% } %>
+
+              <div style="color: var(--text-muted); font-size: 0.875rem; display: flex; gap: 1rem; flex-wrap: wrap;">
+                <span>Format: <strong style="color: #cbd5e1;"><%= t.format || t.bracket_type || 'Standard Tournament' %></strong></span>
+                <% if (t.server_regions && t.server_regions.length > 0) { %>
+                  <span class="mono" style="color: #64748b;">Servers: <%= t.server_regions.join(', ') %></span>
+                <% } %>
+              </div>
+            </div>
+
+            <!-- Right Column: Prize Pool & Action Buttons -->
+            <div style="text-align: right; display: flex; flex-direction: column; align-items: flex-end; justify-content: space-between; min-width: 240px;" class="mono">
+              <div>
+                <div style="font-size: 0.75rem; color: #94a3b8; text-transform: uppercase; font-weight: 700; margin-bottom: 2px;">PRIZE POOL</div>
+                <div style="font-size: 1.6rem; font-weight: 900; color: #ffffff; text-shadow: 0 0 15px rgba(255, 255, 255, 0.1);">
+                  <%= t.prize_formatted || t.prize_pool %>
+                </div>
+              </div>
+
+              <!-- Real User Action Buttons -->
+              <div style="display: flex; gap: 10px; margin-top: 1.25rem; flex-wrap: wrap; justify-content: flex-end;">
+                
+                <!-- Watch Stream Button -->
+                <button type="button" 
+                  onclick="openStreamModal('<%= videoId %>', '<%= videoTitle %>', '<%= t.game %>', '<%= currentMatch %>')"
+                  style="background: linear-gradient(135deg, rgba(255, 42, 75, 0.18) 0%, rgba(200, 16, 46, 0.28) 100%); border: 1px solid rgba(255, 42, 75, 0.5); color: #fff; padding: 0.55rem 1.15rem; border-radius: 8px; font-weight: 800; font-size: 0.8125rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s ease;">
+                  <span style="color: #ff2a4b; font-size: 0.9rem;">▶</span> Watch Live Stream
+                </button>
+
+                <!-- Interactive Bracket Button -->
+                <button type="button" 
+                  onclick="openBracketModal('<%= t.id %>', '<%= (t.title || '').replace(/'/g, '\\\'') %>', '<%= t.game %>')"
+                  style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.2); color: #cbd5e1; padding: 0.55rem 1rem; border-radius: 8px; font-weight: 700; font-size: 0.8125rem; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.2s ease;">
+                  Live Bracket
+                </button>
+
+                <!-- Register Squad Button -->
+                <a href="/register?game=<%= encodeURIComponent(t.game) %>&tournament=<%= encodeURIComponent(t.id) %>" 
+                  style="background: linear-gradient(135deg, #ff2a4b 0%, #c8102e 100%); color: #fff; padding: 0.55rem 1.15rem; border-radius: 8px; font-weight: 800; font-size: 0.8125rem; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(255, 42, 75, 0.35); transition: transform 0.2s ease;">
+                  Register Squad
+                </a>
+
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      <% }); %>
+    <% } else { %>
+      <div class="card" style="text-align: center; padding: 4rem 2rem; border-radius: 16px;">
+        <h3 style="font-size: 1.35rem; font-weight: 800; color: #fff; margin-bottom: 0.5rem;">No Tournaments Match Your Filter</h3>
+        <p style="color: #94a3b8; font-size: 0.95rem; margin-bottom: 1.5rem;">
+          Try adjusting your game or status selection to discover active tournaments and matches.
+        </p>
+        <a href="/tournaments" style="background: var(--accent); color: #fff; padding: 0.6rem 1.5rem; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 0.875rem;">
+          View All Tournaments
+        </a>
+      </div>
+    <% } %>
+  </div>
+
+  <!-- Bottom Competitive Call to Action -->
+  <div class="card" style="border-radius: 20px; padding: 2.5rem; background: radial-gradient(ellipse at 50% 0%, rgba(255, 42, 75, 0.12) 0%, rgba(14, 19, 32, 0.95) 70%); border-color: rgba(255, 42, 75, 0.3); text-align: center;">
+    <h3 style="font-size: 1.6rem; font-weight: 900; text-transform: uppercase; margin-bottom: 0.75rem;">
+      Ready to Compete on the Pro Stage?
+    </h3>
+    <p style="color: var(--text-muted); font-size: 1rem; max-width: 650px; margin: 0 auto 1.75rem;">
+      Register your roster today to qualify for Nowhere-sanctioned circuit cups, prize purses, and official broadcast features.
+    </p>
+    <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+      <a href="/register" style="background: linear-gradient(135deg, #ff2a4b 0%, #c8102e 100%); color: #fff; padding: 0.75rem 2rem; border-radius: 10px; font-weight: 800; font-size: 0.95rem; text-decoration: none; box-shadow: 0 4px 18px rgba(255, 42, 75, 0.45);">
+        Register Your Team Now
+      </a>
+      <a href="/rosters" style="background: rgba(255, 255, 255, 0.08); border: 1px solid var(--border); color: #fff; padding: 0.75rem 1.75rem; border-radius: 10px; font-weight: 700; font-size: 0.95rem; text-decoration: none;">
+        Meet Nowhere Pro Rosters
+      </a>
+    </div>
+  </div>
+
 </div>
 
-<div style="display: flex; flex-direction: column; gap: 1rem;">
-  <% tournaments.forEach(function(t) { %>
-    <div class="card" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-      <div>
-        <div style="font-size: 0.8rem; color: var(--accent-cyan); font-weight: 600; text-transform: uppercase;"><%= t.game %> &bull; <%= t.region %></div>
-        <h2 style="font-size: 1.3rem; font-weight: 700; margin: 0.25rem 0;"><%= t.title %></h2>
-        <p style="color: var(--text-muted); font-size: 0.9rem;">Format: <%= t.format %> &bull; Status: <%= t.status %></p>
+<!-- ========================================================================= -->
+<!-- YOUTUBE LIVE STREAM THEATER MODAL                                         -->
+<!-- ========================================================================= -->
+<div id="stream-modal" style="display: none; position: fixed; inset: 0; z-index: 9999; background: rgba(4, 6, 11, 0.92); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); align-items: center; justify-content: center; padding: 1.5rem;" onclick="handleModalBackdropClick(event)">
+  
+  <div style="background: #0e1320; border: 1px solid rgba(255, 42, 75, 0.35); border-radius: 20px; width: 100%; max-width: 960px; overflow: hidden; box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(255, 42, 75, 0.2); animation: modalFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);">
+    
+    <!-- Modal Header -->
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 1.5rem; border-bottom: 1px solid rgba(255, 255, 255, 0.08); background: rgba(18, 24, 38, 0.8);">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span style="width: 10px; height: 10px; border-radius: 50%; background-color: #ff2a4b; box-shadow: 0 0 10px #ff2a4b; display: inline-block;"></span>
+        <div>
+          <div id="modal-stream-game" style="font-size: 0.75rem; font-weight: 800; color: #ff2a4b; text-transform: uppercase;" class="mono">NOWHERE ESPORTS LIVE BROADCAST</div>
+          <h3 id="modal-stream-title" style="font-size: 1.05rem; font-weight: 800; color: #fff; margin: 0; max-width: 650px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+            Official YouTube Tournament Stream
+          </h3>
+        </div>
       </div>
-      <div style="text-align: right;">
-        <div style="font-size: 1.2rem; font-weight: 700; color: var(--success);"><%= t.prize_pool %></div>
-        <a href="/api/v1/tournaments/<%= t.id %>" style="color: var(--accent-cyan); text-decoration: none; font-size: 0.85rem; font-weight: 600;">API JSON Data &rarr;</a>
+
+      <button type="button" onclick="closeStreamModal()" style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); color: #fff; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.2rem; transition: all 0.2s ease;">
+        ✕
+      </button>
+    </div>
+
+    <!-- YouTube Video Iframe Container (16:9 responsive) -->
+    <div style="position: relative; width: 100%; padding-bottom: 56.25%; background: #000;">
+      <iframe 
+        id="modal-youtube-iframe"
+        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;"
+        src=""
+        title="YouTube Live Tournament Player"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        allowfullscreen>
+      </iframe>
+    </div>
+
+    <!-- Modal Footer Controls -->
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.5rem; background: rgba(10, 14, 24, 0.95); border-top: 1px solid rgba(255, 255, 255, 0.08); flex-wrap: wrap; gap: 0.75rem;">
+      <div id="modal-stream-match-info" style="font-size: 0.85rem; color: #94a3b8;" class="mono">
+        Official Tournament Clean Feed • 1080p60 Low-Latency
+      </div>
+      <div style="display: flex; gap: 0.75rem; align-items: center;">
+        <a id="modal-youtube-direct-link" href="#" target="_blank" rel="noreferrer" style="color: #ff2a4b; text-decoration: none; font-size: 0.8125rem; font-weight: 700; display: inline-flex; align-items: center; gap: 4px;">
+          <span>Watch on YouTube</span> ↗
+        </a>
+        <button type="button" onclick="closeStreamModal()" style="background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); color: #fff; padding: 0.45rem 1rem; border-radius: 8px; font-size: 0.8125rem; font-weight: 700; cursor: pointer;">
+          Close Theater
+        </button>
       </div>
     </div>
-  <% }); %>
+
+  </div>
 </div>
+
+<!-- ========================================================================= -->
+<!-- INTERACTIVE TOURNAMENT BRACKET MODAL                                      -->
+<!-- ========================================================================= -->
+<div id="bracket-modal" style="display: none; position: fixed; inset: 0; z-index: 9999; background: rgba(4, 6, 11, 0.94); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); align-items: center; justify-content: center; padding: 1.5rem;" onclick="handleBracketBackdropClick(event)">
+  
+  <div style="background: #0b0f19; border: 1px solid rgba(255, 42, 75, 0.35); border-radius: 24px; width: 100%; max-width: 1080px; max-height: 90vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 30px 80px rgba(0, 0, 0, 0.9), 0 0 40px rgba(255, 42, 75, 0.2); animation: modalFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);">
+    
+    <!-- Modal Header -->
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 1.75rem; border-bottom: 1px solid rgba(255, 255, 255, 0.08); background: rgba(14, 19, 32, 0.95);">
+      <div>
+        <div style="display: inline-flex; align-items: center; gap: 6px; padding: 2px 10px; border-radius: 9999px; background: rgba(255, 42, 75, 0.15); border: 1px solid rgba(255, 42, 75, 0.35); color: #ff2a4b; font-weight: 800; font-size: 0.7rem; text-transform: uppercase;" class="mono" id="modal-bracket-game">
+          TOURNAMENT BRACKET
+        </div>
+        <h3 id="modal-bracket-title" style="font-size: 1.25rem; font-weight: 800; color: #fff; margin: 4px 0 0;">
+          Championship Playoff Bracket
+        </h3>
+      </div>
+
+      <button type="button" onclick="closeBracketModal()" style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); color: #fff; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.2rem; transition: all 0.2s ease;">
+        ✕
+      </button>
+    </div>
+
+    <!-- Bracket Body (Scrollable horizontal container) -->
+    <div style="padding: 1.75rem; overflow-x: auto; overflow-y: auto; flex: 1;">
+      
+      <div style="display: flex; gap: 2rem; min-width: 860px; justify-content: space-between; align-items: stretch;">
+        
+        <!-- Column 1: Quarterfinals -->
+        <div style="flex: 1; display: flex; flex-direction: column; gap: 1.25rem;">
+          <div class="mono" style="font-size: 0.8125rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; padding-bottom: 0.5rem; border-bottom: 2px solid rgba(255, 255, 255, 0.1); display: flex; justify-content: space-between;">
+            <span>Quarterfinals (Bo3)</span>
+            <span style="color: #38bdf8;">Round 1</span>
+          </div>
+
+          <!-- Match 1 -->
+          <div class="bracket-match-card">
+            <div class="bracket-team winner">
+              <span class="team-name">Nowhere Esports</span>
+              <span class="team-score">2</span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-name">Sentinels</span>
+              <span class="team-score">1</span>
+            </div>
+            <div class="match-meta"><span class="status-live-dot">●</span> Final • Map 3: Haven</div>
+          </div>
+
+          <!-- Match 2 -->
+          <div class="bracket-match-card">
+            <div class="bracket-team winner">
+              <span class="team-name">Fnatic</span>
+              <span class="team-score">2</span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-name">Paper Rex</span>
+              <span class="team-score">0</span>
+            </div>
+            <div class="match-meta">Final • Map 2: Lotus</div>
+          </div>
+
+          <!-- Match 3 -->
+          <div class="bracket-match-card">
+            <div class="bracket-team">
+              <span class="team-name">Team Liquid</span>
+              <span class="team-score">1</span>
+            </div>
+            <div class="bracket-team winner">
+              <span class="team-name">DRX</span>
+              <span class="team-score">2</span>
+            </div>
+            <div class="match-meta">Final • Map 3: Split</div>
+          </div>
+
+          <!-- Match 4 -->
+          <div class="bracket-match-card">
+            <div class="bracket-team winner">
+              <span class="team-name">LOUD</span>
+              <span class="team-score">2</span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-name">EDward Gaming</span>
+              <span class="team-score">1</span>
+            </div>
+            <div class="match-meta">Final • Map 3: Bind</div>
+          </div>
+
+        </div>
+
+        <!-- Column 2: Semifinals -->
+        <div style="flex: 1; display: flex; flex-direction: column; justify-content: space-around; gap: 1.5rem;">
+          <div class="mono" style="font-size: 0.8125rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; padding-bottom: 0.5rem; border-bottom: 2px solid rgba(255, 42, 75, 0.4); display: flex; justify-content: space-between;">
+            <span>Semifinals (Bo3)</span>
+            <span style="color: #ff2a4b;">Final Four</span>
+          </div>
+
+          <!-- Semifinal 1 -->
+          <div class="bracket-match-card" style="border-color: rgba(255, 42, 75, 0.4); background: rgba(255, 42, 75, 0.04);">
+            <div class="bracket-team winner">
+              <span class="team-name">Nowhere Esports</span>
+              <span class="team-score">2</span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-name">Fnatic</span>
+              <span class="team-score">1</span>
+            </div>
+            <div class="match-meta"><span style="color: #30d158; font-weight: 700;">Completed</span> • Nowhere Advances</div>
+          </div>
+
+          <!-- Semifinal 2 -->
+          <div class="bracket-match-card" style="border-color: rgba(255, 42, 75, 0.4); background: rgba(255, 42, 75, 0.04);">
+            <div class="bracket-team">
+              <span class="team-name">DRX</span>
+              <span class="team-score">1</span>
+            </div>
+            <div class="bracket-team winner">
+              <span class="team-name">LOUD</span>
+              <span class="team-score">2</span>
+            </div>
+            <div class="match-meta"><span style="color: #30d158; font-weight: 700;">Completed</span> • LOUD Advances</div>
+          </div>
+
+        </div>
+
+        <!-- Column 3: Grand Finals -->
+        <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 1.5rem;">
+          <div class="mono" style="font-size: 0.8125rem; font-weight: 800; color: #f59e0b; text-transform: uppercase; letter-spacing: 0.05em; padding-bottom: 0.5rem; border-bottom: 2px solid rgba(245, 158, 11, 0.5); display: flex; justify-content: space-between;">
+            <span>Grand Final (Bo5)</span>
+            <span style="color: #f59e0b;">Trophy Match</span>
+          </div>
+
+          <!-- Grand Final Match -->
+          <div class="bracket-match-card" style="border: 2px solid #f59e0b; background: linear-gradient(135deg, rgba(245, 158, 11, 0.12) 0%, rgba(255, 42, 75, 0.12) 100%); box-shadow: 0 0 25px rgba(245, 158, 11, 0.2);">
+            
+            <div style="font-size: 0.7rem; font-weight: 800; color: #f59e0b; text-transform: uppercase; margin-bottom: 8px; text-align: center;" class="mono">
+              WORLD CHAMPIONSHIP DECIDER
+            </div>
+
+            <div class="bracket-team winner" style="background: rgba(34, 197, 94, 0.15); border: 1px solid rgba(34, 197, 94, 0.4); border-radius: 8px; padding: 8px 12px;">
+              <span class="team-name" style="font-weight: 900; color: #fff;">Nowhere Esports</span>
+              <span class="team-score" style="color: #30d158; font-weight: 900; font-size: 1.2rem;">3</span>
+            </div>
+
+            <div class="bracket-team" style="padding: 8px 12px;">
+              <span class="team-name" style="color: #94a3b8;">LOUD</span>
+              <span class="team-score" style="color: #94a3b8;">2</span>
+            </div>
+
+            <div class="match-meta" style="text-align: center; color: #f59e0b; font-weight: 700; margin-top: 8px;">
+              NOWHERE ESPORTS WINS CHAMPIONSHIP
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Modal Footer -->
+    <div style="padding: 1rem 1.75rem; background: rgba(14, 19, 32, 0.95); border-top: 1px solid rgba(255, 255, 255, 0.08); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+      <div style="font-size: 0.8125rem; color: #94a3b8;" class="mono">
+        Double Elimination • Official Competitive Bracket Verification
+      </div>
+      <button type="button" onclick="closeBracketModal()" style="background: var(--accent); color: #fff; border: none; padding: 0.5rem 1.25rem; border-radius: 8px; font-weight: 700; font-size: 0.8125rem; cursor: pointer;">
+        Close Bracket
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ========================================================================= -->
+<!-- INTERACTIVE TOURNAMENT BRACKET MODAL                                      -->
+<!-- ========================================================================= -->
+<div id="bracket-modal" style="display: none; position: fixed; inset: 0; z-index: 9999; background: rgba(4, 6, 11, 0.94); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); align-items: center; justify-content: center; padding: 1.5rem;" onclick="handleBracketBackdropClick(event)">
+  
+  <div style="background: #0b0f19; border: 1px solid rgba(255, 42, 75, 0.35); border-radius: 24px; width: 100%; max-width: 1080px; max-height: 90vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 30px 80px rgba(0, 0, 0, 0.9), 0 0 40px rgba(255, 42, 75, 0.2); animation: modalFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);">
+    
+    <!-- Modal Header -->
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 1.25rem 1.75rem; border-bottom: 1px solid rgba(255, 255, 255, 0.08); background: rgba(14, 19, 32, 0.95);">
+      <div>
+        <div style="display: inline-flex; align-items: center; gap: 6px; padding: 2px 10px; border-radius: 9999px; background: rgba(255, 42, 75, 0.15); border: 1px solid rgba(255, 42, 75, 0.35); color: #ff2a4b; font-weight: 800; font-size: 0.7rem; text-transform: uppercase;" class="mono" id="modal-bracket-game">
+          TOURNAMENT BRACKET
+        </div>
+        <h3 id="modal-bracket-title" style="font-size: 1.25rem; font-weight: 800; color: #fff; margin: 4px 0 0;">
+          Championship Playoff Bracket
+        </h3>
+      </div>
+
+      <button type="button" onclick="closeBracketModal()" style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); color: #fff; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.2rem; transition: all 0.2s ease;">
+        ✕
+      </button>
+    </div>
+
+    <!-- Bracket Body (Scrollable horizontal container) -->
+    <div style="padding: 1.75rem; overflow-x: auto; overflow-y: auto; flex: 1;">
+      
+      <div style="display: flex; gap: 2rem; min-width: 860px; justify-content: space-between; align-items: stretch;">
+        
+        <!-- Column 1: Quarterfinals -->
+        <div style="flex: 1; display: flex; flex-direction: column; gap: 1.25rem;">
+          <div class="mono" style="font-size: 0.8125rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; padding-bottom: 0.5rem; border-bottom: 2px solid rgba(255, 255, 255, 0.1); display: flex; justify-content: space-between;">
+            <span>Quarterfinals (Bo3)</span>
+            <span style="color: #38bdf8;">Round 1</span>
+          </div>
+
+          <!-- Match 1 -->
+          <div class="bracket-match-card">
+            <div class="bracket-team winner">
+              <span class="team-name">Nowhere Esports</span>
+              <span class="team-score">2</span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-name">Sentinels</span>
+              <span class="team-score">1</span>
+            </div>
+            <div class="match-meta"><span class="status-live-dot">●</span> Final • Map 3: Haven</div>
+          </div>
+
+          <!-- Match 2 -->
+          <div class="bracket-match-card">
+            <div class="bracket-team winner">
+              <span class="team-name">Fnatic</span>
+              <span class="team-score">2</span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-name">Paper Rex</span>
+              <span class="team-score">0</span>
+            </div>
+            <div class="match-meta">Final • Map 2: Lotus</div>
+          </div>
+
+          <!-- Match 3 -->
+          <div class="bracket-match-card">
+            <div class="bracket-team">
+              <span class="team-name">Team Liquid</span>
+              <span class="team-score">1</span>
+            </div>
+            <div class="bracket-team winner">
+              <span class="team-name">DRX</span>
+              <span class="team-score">2</span>
+            </div>
+            <div class="match-meta">Final • Map 3: Split</div>
+          </div>
+
+          <!-- Match 4 -->
+          <div class="bracket-match-card">
+            <div class="bracket-team winner">
+              <span class="team-name">LOUD</span>
+              <span class="team-score">2</span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-name">EDward Gaming</span>
+              <span class="team-score">1</span>
+            </div>
+            <div class="match-meta">Final • Map 3: Bind</div>
+          </div>
+
+        </div>
+
+        <!-- Column 2: Semifinals -->
+        <div style="flex: 1; display: flex; flex-direction: column; justify-content: space-around; gap: 1.5rem;">
+          <div class="mono" style="font-size: 0.8125rem; font-weight: 800; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; padding-bottom: 0.5rem; border-bottom: 2px solid rgba(255, 42, 75, 0.4); display: flex; justify-content: space-between;">
+            <span>Semifinals (Bo3)</span>
+            <span style="color: #ff2a4b;">Final Four</span>
+          </div>
+
+          <!-- Semifinal 1 -->
+          <div class="bracket-match-card" style="border-color: rgba(255, 42, 75, 0.4); background: rgba(255, 42, 75, 0.04);">
+            <div class="bracket-team winner">
+              <span class="team-name">Nowhere Esports</span>
+              <span class="team-score">2</span>
+            </div>
+            <div class="bracket-team">
+              <span class="team-name">Fnatic</span>
+              <span class="team-score">1</span>
+            </div>
+            <div class="match-meta"><span style="color: #30d158; font-weight: 700;">Completed</span> • Nowhere Advances</div>
+          </div>
+
+          <!-- Semifinal 2 -->
+          <div class="bracket-match-card" style="border-color: rgba(255, 42, 75, 0.4); background: rgba(255, 42, 75, 0.04);">
+            <div class="bracket-team">
+              <span class="team-name">DRX</span>
+              <span class="team-score">1</span>
+            </div>
+            <div class="bracket-team winner">
+              <span class="team-name">LOUD</span>
+              <span class="team-score">2</span>
+            </div>
+            <div class="match-meta"><span style="color: #30d158; font-weight: 700;">Completed</span> • LOUD Advances</div>
+          </div>
+
+        </div>
+
+        <!-- Column 3: Grand Finals -->
+        <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 1.5rem;">
+          <div class="mono" style="font-size: 0.8125rem; font-weight: 800; color: #f59e0b; text-transform: uppercase; letter-spacing: 0.05em; padding-bottom: 0.5rem; border-bottom: 2px solid rgba(245, 158, 11, 0.5); display: flex; justify-content: space-between;">
+            <span>Grand Final (Bo5)</span>
+            <span style="color: #f59e0b;">Trophy Match</span>
+          </div>
+
+          <!-- Grand Final Match -->
+          <div class="bracket-match-card" style="border: 2px solid #f59e0b; background: linear-gradient(135deg, rgba(245, 158, 11, 0.12) 0%, rgba(255, 42, 75, 0.12) 100%); box-shadow: 0 0 25px rgba(245, 158, 11, 0.2);">
+            
+            <div style="font-size: 0.7rem; font-weight: 800; color: #f59e0b; text-transform: uppercase; margin-bottom: 8px; text-align: center;" class="mono">
+              WORLD CHAMPIONSHIP DECIDER
+            </div>
+
+            <div class="bracket-team winner" style="background: rgba(34, 197, 94, 0.15); border: 1px solid rgba(34, 197, 94, 0.4); border-radius: 8px; padding: 8px 12px;">
+              <span class="team-name" style="font-weight: 900; color: #fff;">Nowhere Esports</span>
+              <span class="team-score" style="color: #30d158; font-weight: 900; font-size: 1.2rem;">3</span>
+            </div>
+
+            <div class="bracket-team" style="padding: 8px 12px;">
+              <span class="team-name" style="color: #94a3b8;">LOUD</span>
+              <span class="team-score" style="color: #94a3b8;">2</span>
+            </div>
+
+            <div class="match-meta" style="text-align: center; color: #f59e0b; font-weight: 700; margin-top: 8px;">
+              NOWHERE ESPORTS WINS CHAMPIONSHIP
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Modal Footer -->
+    <div style="padding: 1rem 1.75rem; background: rgba(14, 19, 32, 0.95); border-top: 1px solid rgba(255, 255, 255, 0.08); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.75rem;">
+      <div style="font-size: 0.8125rem; color: #94a3b8;" class="mono">
+        Double Elimination • Official Competitive Bracket Verification
+      </div>
+      <button type="button" onclick="closeBracketModal()" style="background: var(--accent); color: #fff; border: none; padding: 0.5rem 1.25rem; border-radius: 8px; font-weight: 700; font-size: 0.8125rem; cursor: pointer;">
+        Close Bracket
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<style>
+  @keyframes modalFadeIn {
+    from { opacity: 0; transform: scale(0.96); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  .tournament-row-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+
+  .bracket-match-card {
+    background: rgba(18, 24, 38, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 12px;
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    transition: all 0.2s ease;
+  }
+  .bracket-match-card:hover {
+    border-color: rgba(255, 255, 255, 0.25);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+  }
+  .bracket-team {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.875rem;
+    color: #e2e8f0;
+  }
+  .bracket-team.winner .team-name {
+    color: #ffffff;
+    font-weight: 800;
+  }
+  .bracket-team.winner .team-score {
+    color: #38bdf8;
+    font-weight: 900;
+  }
+  .team-score {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 1rem;
+    color: #64748b;
+  }
+  .match-meta {
+    font-size: 0.72rem;
+    color: #64748b;
+    font-family: 'JetBrains Mono', monospace;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    padding-top: 5px;
+    margin-top: 2px;
+  }
+  .status-live-dot {
+    color: #ff2a4b;
+    animation: livePulse 1s infinite alternate;
+  }
+  @keyframes livePulse {
+    from { opacity: 0.6; }
+    to { opacity: 1; }
+  }
+</style>
+
+<script>
+  function openBracketModal(id, title, game) {
+    const modal = document.getElementById('bracket-modal');
+    const titleEl = document.getElementById('modal-bracket-title');
+    const gameEl = document.getElementById('modal-bracket-game');
+
+    if (!modal) return;
+    if (titleEl) titleEl.textContent = title ? `${title} — Official Bracket` : 'Tournament Championship Bracket';
+    if (gameEl) gameEl.textContent = (game || 'ESPORTS') + ' • DOUBLE ELIMINATION';
+
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeBracketModal() {
+    const modal = document.getElementById('bracket-modal');
+    if (modal) modal.style.display = 'none';
+    document.body.style.overflow = 'auto';
+  }
+
+  function handleBracketBackdropClick(event) {
+    if (event.target && event.target.id === 'bracket-modal') {
+      closeBracketModal();
+    }
+  }
+
+  function openStreamModal(videoId, title, game, matchInfo) {
+    const modal = document.getElementById('stream-modal');
+    const iframe = document.getElementById('modal-youtube-iframe');
+    const titleEl = document.getElementById('modal-stream-title');
+    const gameEl = document.getElementById('modal-stream-game');
+    const matchEl = document.getElementById('modal-stream-match-info');
+    const directLink = document.getElementById('modal-youtube-direct-link');
+
+    if (!modal || !iframe) return;
+
+    if (titleEl) titleEl.textContent = title || 'Live Tournament Broadcast';
+    if (gameEl) gameEl.textContent = (game ? game.toUpperCase() + ' • ' : '') + 'NOWHERE ESPORTS LIVE BROADCAST';
+    if (matchEl && matchInfo) matchEl.textContent = matchInfo;
+    if (directLink) directLink.href = 'https://www.youtube.com/watch?v=' + videoId;
+
+    // Use youtube-nocookie.com embed with autoplay=1
+    iframe.src = 'https://www.youtube-nocookie.com/embed/' + videoId + '?autoplay=1&rel=0&modestbranding=1';
+
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeStreamModal() {
+    const modal = document.getElementById('stream-modal');
+    const iframe = document.getElementById('modal-youtube-iframe');
+
+    if (iframe) iframe.src = '';
+    if (modal) modal.style.display = 'none';
+    document.body.style.overflow = 'auto';
+  }
+
+  function handleModalBackdropClick(event) {
+    if (event.target && event.target.id === 'stream-modal') {
+      closeStreamModal();
+    }
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeStreamModal();
+      closeBracketModal();
+    }
+  });
+</script>
 
 <%- include('../layouts/footer') %>

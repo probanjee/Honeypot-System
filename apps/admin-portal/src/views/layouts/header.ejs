@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="/images/nowhere-logo.png">
+  <title>
+    <%= title %> | Nowhere Esports Admin Portal
+  </title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;600;700&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #07090e;
+      --bg-secondary: #0c111e;
+      --bg-card: rgba(15, 21, 35, 0.85);
+      --bg-card-hover: rgba(22, 30, 48, 0.95);
+      --accent: #ff2a4b;
+      --accent-hover: #ff4767;
+      --accent-glow: rgba(255, 42, 75, 0.35);
+      --accent-cyan: #38bdf8;
+      --accent-amber: #f59e0b;
+      --accent-purple: #c084fc;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border: rgba(255, 255, 255, 0.1);
+      --border-red: rgba(255, 42, 75, 0.35);
+      --success: #30d158;
+      --warning: #ff9f0a;
+      --danger: #ff453a;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* Ambient Cyber Glow */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -15%;
+      left: 10%;
+      width: 650px;
+      height: 650px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 42, 75, 0.08) 0%, transparent 70%);
+      filter: blur(120px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      bottom: -15%;
+      right: 10%;
+      width: 550px;
+      height: 550px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(56, 189, 248, 0.06) 0%, transparent 70%);
+      filter: blur(140px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Top Command Header */
+    header {
+      background: rgba(12, 17, 30, 0.92);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-top {
+      padding: 0.75rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      text-decoration: none;
+      color: var(--text-main);
+    }
+
+    .brand-logo {
+      height: 48px;
+      width: auto;
+      filter: drop-shadow(0 0 16px rgba(255, 42, 75, 0.45));
+    }
+
+    .brand-titles h1 {
+      font-size: 1.2rem;
+      font-weight: 900;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      background: linear-gradient(135deg, #fff 40%, #ff4767 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-titles .subtitle {
+      font-size: 0.6875rem;
+      color: var(--accent);
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .quick-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      font-size: 0.8125rem;
+      font-weight: 700;
+      text-decoration: none;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-public {
+      background: rgba(255, 255, 255, 0.06);
+      border-color: var(--border);
+      color: #e2e8f0;
+    }
+
+    .btn-public:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.25);
+      color: #fff;
+    }
+
+    .btn-soc {
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.15), rgba(37, 99, 235, 0.25));
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      color: #38bdf8;
+      box-shadow: 0 0 14px rgba(56, 189, 248, 0.15);
+    }
+
+    .btn-soc:hover {
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.3), rgba(37, 99, 235, 0.4));
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.35);
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #ff2a4b, #c8102e);
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(255, 42, 75, 0.4);
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #ff4767, #e01235);
+      box-shadow: 0 6px 20px rgba(255, 42, 75, 0.6);
+      transform: translateY(-1px);
+    }
+
+    /* Sub Navigation Bar */
+    .header-nav {
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      overflow-x: auto;
+    }
+
+    .nav-tabs {
+      display: flex;
+      list-style: none;
+      gap: 0.5rem;
+    }
+
+    .nav-tabs a {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 0.85rem 1.1rem;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 700;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .nav-tabs a:hover {
+      color: #fff;
+      border-bottom-color: rgba(255, 42, 75, 0.5);
+    }
+
+    .nav-tabs a.active {
+      color: #fff;
+      border-bottom-color: var(--accent);
+      background: linear-gradient(180deg, rgba(255, 42, 75, 0.08) 0%, transparent 100%);
+    }
+
+    .system-status {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .status-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 10px;
+      border-radius: 9999px;
+      background: rgba(48, 209, 88, 0.12);
+      border: 1px solid rgba(48, 209, 88, 0.35);
+      color: var(--success);
+      font-weight: 700;
+    }
+
+    .status-pill .pulse-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--success);
+      box-shadow: 0 0 8px var(--success);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: 0.4;
+        transform: scale(0.85);
+      }
+    }
+
+    /* Content Area */
+    main {
+      flex: 1;
+      padding: 2rem;
+      max-width: 1440px;
+      margin: 0 auto;
+      width: 100%;
+      position: relative;
+      z-index: 10;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.75rem;
+      margin-bottom: 1.75rem;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.4);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.25rem;
+      padding-bottom: 0.85rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .card-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+      text-align: left;
+    }
+
+    th {
+      padding: 12px 14px;
+      color: var(--text-muted);
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 0.72rem;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--border);
+    }
+
+    td {
+      padding: 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .badge-live {
+      background: rgba(48, 209, 88, 0.15);
+      color: var(--success);
+      border: 1px solid rgba(48, 209, 88, 0.4);
+    }
+
+    .badge-warning {
+      background: rgba(255, 159, 10, 0.15);
+      color: var(--warning);
+      border: 1px solid rgba(255, 159, 10, 0.4);
+    }
+
+    .badge-danger {
+      background: rgba(255, 42, 75, 0.15);
+      color: var(--accent);
+      border: 1px solid rgba(255, 42, 75, 0.4);
+    }
+
+    .badge-cyan {
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--accent-cyan);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+    }
+
+    .input-control {
+      width: 100%;
+      background: rgba(8, 12, 22, 0.8);
+      border: 1px solid var(--border);
+      padding: 0.7rem 1rem;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 0.875rem;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .input-control:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(255, 42, 75, 0.25);
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <!-- Top Branding & Port Switches -->
+    <div class="header-top">
+      <a href="/" class="brand-group">
+        <img src="/images/nowhere-logo.png" alt="Nowhere Esports Logo" class="brand-logo" />
+        <div class="brand-titles">
+          <h1>NOWHERE ESPORTS</h1>
+          <div class="subtitle">ADMINISTRATIVE & OPERATIONS COMMAND PORTAL</div>
+        </div>
+      </a>
+
+      <div class="quick-actions">
+        <a href="http://localhost:3000" target="_blank" class="btn btn-public"
+          title="Open Public Intranet Site (Port 3000)">
+          <span> Nowhere Intranet</span>
+          <span class="mono" style="font-size: 0.7rem; opacity: 0.7;">:3000</span>
+        </a>
+
+        <a href="http://localhost:5173" target="_blank" class="btn btn-soc"
+          title="Open VIGILANCE Threat Intelligence Radar (Port 5173)">
+          <span> Attack Analysis</span>
+          <span class="mono" style="font-size: 0.7rem; opacity: 0.8;">:5173</span>
+        </a>
+
+        <div
+          style="display: flex; align-items: center; gap: 8px; margin-left: 0.5rem; padding-left: 0.75rem; border-left: 1px solid var(--border);">
+          <div
+            style="width: 34px; height: 34px; border-radius: 50%; background: linear-gradient(135deg, var(--accent), #ff9f0a); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.78rem; color: #fff; box-shadow: 0 0 12px rgba(255, 42, 75, 0.4);">
+            AD
+          </div>
+          <div>
+            <div style="font-size: 0.78rem; font-weight: 800; color: #fff;">SYS_ADMIN</div>
+            <div class="mono" style="font-size: 0.65rem; color: #ff9f0a; font-weight: 700;">CLEARANCE L4</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabbed Navigation -->
+    <div class="header-nav">
+      <ul class="nav-tabs">
+        <li><a href="/" class="<%= currentTab === 'dashboard' ? 'active' : '' %>"> Command Deck</a></li>
+        <li><a href="/tournaments" class="<%= currentTab === 'tournaments' ? 'active' : '' %>"> Tournaments</a></li>
+        <li><a href="/servers" class="<%= currentTab === 'servers' ? 'active' : '' %>"> Match Server Fleet</a></li>
+        <li><a href="/security" class="<%= currentTab === 'security' ? 'active' : '' %>">Honeypot & Threat Sim</a>
+        </li>
+        <li><a href="/personnel" class="<%= currentTab === 'personnel' ? 'active' : '' %>"> Personnel & Access</a>
+        </li>
+        <li><a href="/logs" class="<%= currentTab === 'logs' ? 'active' : '' %>"> Audit Logs</a></li>
+      </ul>
+
+      <div class="system-status">
+        <div class="status-pill mono">
+          <span class="pulse-dot"></span>
+          <span>SYSTEMS OPERATIONAL</span>
+        </div>
+        <span class="mono" id="liveClock" style="color: #cbd5e1; font-weight: 600;">--:--:-- UTC</span>
+      </div>
+    </div>
+  </header>
+
+  <script>
+    function updateClock() {
+      const now = new Date();
+      const el = document.getElementById('liveClock');
+      if (el) {
+        el.innerText = now.toTimeString().split(' ')[0] + ' UTC';
+      }
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+  </script>
+
+  <main>

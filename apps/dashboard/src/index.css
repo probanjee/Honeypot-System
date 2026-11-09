@@ -1,4 +1,4 @@
-/* VIGILANCE SOC Dashboard - Futuristic Apple Glassmorphism Design System (OS 27) */
+/* VIGILANCE SOC Dashboard  */
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
 :root {
@@ -168,7 +168,7 @@
     0 20px 48px -12px rgba(15, 23, 42, 0.08),
     0 8px 24px -8px rgba(15, 23, 42, 0.04),
     inset 0 1px 1px 0 rgba(255, 255, 255, 0.95),
-  inset 0 -1px 2px 0 rgba(0, 0, 0, 0.03);
+    inset 0 -1px 2px 0 rgba(0, 0, 0, 0.03);
 }
 
 [data-theme="light"] body {
@@ -474,8 +474,11 @@ body::after {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 7px 16px;
+  gap: 7px;
+  height: 36px;
+  padding: 0 16px;
+  box-sizing: border-box;
+  white-space: nowrap;
   font-size: 0.8125rem;
   font-weight: 600;
   border-radius: var(--radius-pill);

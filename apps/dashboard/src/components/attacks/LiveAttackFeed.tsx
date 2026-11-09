@@ -1,9 +1,4 @@
-/**
- * Live Attack Feed & Historical Table (Phase 5)
- * Combines real-time streaming SSE events with cursor-paginated attack records.
- * Supports pause/resume, deduplication, row selection for detail modal,
- * and clear loading/empty/error states.
- */
+
 
 import React, { useState } from 'react';
 import {

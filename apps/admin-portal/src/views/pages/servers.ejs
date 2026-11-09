@@ -1,0 +1,111 @@
+<%- include('../layouts/header', { title: 'Match Server Fleet & Cluster Infrastructure', currentTab: 'servers' }) %>
+
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1.5rem;">
+  <div>
+    <div class="mono" style="font-size: 0.72rem; color: var(--accent-cyan); font-weight: 700; text-transform: uppercase; margin-bottom: 0.4rem;">
+      MATCH SERVER CLUSTER & INFRASTRUCTURE
+    </div>
+    <h1 style="font-size: 2.2rem; font-weight: 900; text-transform: uppercase;">
+      128-Tick Match Server Fleet
+    </h1>
+    <p style="color: var(--text-muted); font-size: 0.95rem;">
+      High-performance competitive bare-metal clusters with hardware kernel bypass and anti-cheat enforcement.
+    </p>
+  </div>
+
+  <div style="display: flex; gap: 1rem; align-items: center;">
+    <button onclick="cycleAllServers()" class="btn btn-public" style="padding: 0.65rem 1.25rem;">
+      🔄 Cycle All Clusters
+    </button>
+  </div>
+</div>
+
+<!-- Fleet Grid -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem;">
+  <% servers.forEach(function(server) { %>
+    <div class="card" style="border-left: 4px solid <%= server.status === 'ONLINE' ? 'var(--success)' : 'var(--warning)' %>; padding: 1.75rem;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.25rem;">
+        <div>
+          <span class="mono" style="font-size: 0.75rem; color: var(--accent-cyan); font-weight: 700;"><%= server.id %></span>
+          <h2 style="font-size: 1.3rem; font-weight: 800; color: #fff;"><%= server.name %></h2>
+          <div style="font-size: 0.8125rem; color: var(--text-muted);"><%= server.location %> &bull; <%= server.game %></div>
+        </div>
+        <span class="badge <%= server.status === 'ONLINE' ? 'badge-live' : 'badge-warning' %>" id="status-<%= server.id %>">
+          <%= server.status %>
+        </span>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.25rem; font-size: 0.8125rem;" class="mono">
+        <div style="background: rgba(8, 12, 22, 0.6); padding: 0.75rem; border-radius: 8px; border: 1px solid var(--border);">
+          <div style="color: var(--text-muted); font-size: 0.7rem;">TICKRATE</div>
+          <div style="color: var(--success); font-weight: 800; font-size: 1.1rem;"><%= server.tickrate %></div>
+        </div>
+        <div style="background: rgba(8, 12, 22, 0.6); padding: 0.75rem; border-radius: 8px; border: 1px solid var(--border);">
+          <div style="color: var(--text-muted); font-size: 0.7rem;">PING / JITTER</div>
+          <div style="color: #fff; font-weight: 800; font-size: 1.1rem;"><%= server.ping %></div>
+        </div>
+      </div>
+
+      <div style="margin-bottom: 1.25rem;">
+        <div style="display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--text-muted); margin-bottom: 4px;">
+          <span>CPU LOAD (<%= server.cpuLoad %>)</span>
+          <span class="mono" style="color: #fff;"><%= server.cpuPercent %>%</span>
+        </div>
+        <div style="width: 100%; height: 6px; background: rgba(255, 255, 255, 0.08); border-radius: 9999px; overflow: hidden;">
+          <div style="width: <%= server.cpuPercent %>%; height: 100%; background: <%= server.cpuPercent > 70 ? 'var(--warning)' : 'var(--accent-cyan)' %>;"></div>
+        </div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 1rem; border-top: 1px solid var(--border);">
+        <div class="mono" style="font-size: 0.78rem; color: var(--text-muted);">
+          PLAYERS: <strong style="color: #fff;"><%= server.players %></strong>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button onclick="restartServer('<%= server.id %>', '<%= server.name %>')" class="btn btn-public" style="padding: 0.35rem 0.75rem; font-size: 0.75rem;">
+            🔄 Restart Node
+          </button>
+        </div>
+      </div>
+    </div>
+  <% }); %>
+</div>
+
+<script>
+  async function restartServer(serverId, serverName) {
+    const statusEl = document.getElementById(`status-${serverId}`);
+    if (statusEl) {
+      statusEl.innerText = 'RECYCLING...';
+      statusEl.className = 'badge badge-warning';
+    }
+    try {
+      await fetch('/api/servers/restart', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ serverId })
+      });
+      setTimeout(() => {
+        if (statusEl) {
+          statusEl.innerText = 'ONLINE';
+          statusEl.className = 'badge badge-live';
+        }
+      }, 1200);
+    } catch (err) {
+      location.reload();
+    }
+  }
+
+  function cycleAllServers() {
+    alert('Cycling all 4 regional match server nodes...');
+    document.querySelectorAll('.badge-live').forEach(b => {
+      b.innerText = 'RECYCLING...';
+      b.className = 'badge badge-warning';
+      setTimeout(() => {
+        b.innerText = 'ONLINE';
+        b.className = 'badge badge-live';
+      }, 1500);
+    });
+  }
+</script>
+
+<%- include('../layouts/footer') %>
+

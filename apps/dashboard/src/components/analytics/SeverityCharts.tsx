@@ -1,8 +1,3 @@
-/**
- * Severity & Category Analytical Visualizations (Phase 5)
- * Visualizes attack distribution across severity tiers and top exploit categories
- * using responsive, accessible SVG graphics with cybersecurity dark-mode styling.
- */
 
 import React from 'react';
 import { PieChart, BarChart2 } from 'lucide-react';

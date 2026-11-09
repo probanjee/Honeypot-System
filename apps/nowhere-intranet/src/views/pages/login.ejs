@@ -1,39 +1,1157 @@
-<%- include('../layouts/header', { title: 'Player & Staff Login' }) %>
+<%- include('../layouts/header', { title: 'Player & Fan Authentication' }) %>
 
-<div style="max-width: 440px; margin: 3rem auto;">
-  <div class="card" style="padding: 2.5rem 2rem;">
-    <div style="text-align: center; margin-bottom: 2rem;">
-      <div style="width: 50px; height: 50px; background: var(--accent); border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 800; margin-bottom: 1rem;">N</div>
-      <h1 style="font-size: 1.6rem; font-weight: 700;">Intranet Sign In</h1>
-      <p style="color: var(--text-muted); font-size: 0.9rem;">Enter your verified Nowhere Esports credentials</p>
+<div style="max-width: 520px; margin: 3rem auto 4.5rem; position: relative; z-index: 2;">
+  
+  <!-- Outer Card with Glowing Glassmorphism Border -->
+  <div class="card auth-main-card" id="authMainCard" style="padding: 2.75rem 2.25rem; border-radius: 28px; border: 1px solid rgba(255, 42, 75, 0.35); background: rgba(14, 19, 32, 0.95); box-shadow: 0 25px 60px rgba(0, 0, 0, 0.75), 0 0 35px rgba(255, 42, 75, 0.15); backdrop-filter: blur(24px); position: relative; overflow: hidden;">
+    
+    <!-- Chamfered Decorative Glass Accents -->
+    <div class="chamfer-corner chamfer-tl"></div>
+    <div class="chamfer-corner chamfer-br"></div>
+
+    <!-- Brand Logo & Header -->
+    <div style="text-align: center; margin-bottom: 2rem;" id="authHeaderBlock">
+      <div style="position: relative; display: inline-block; margin-bottom: 1.25rem;">
+        <div style="position: absolute; inset: -15px; border-radius: 50%; background: radial-gradient(circle, rgba(255, 42, 75, 0.4) 0%, transparent 70%); filter: blur(20px); pointer-events: none;"></div>
+        <img src="/images/nowhere-logo.png" alt="Nowhere Esports Logo" style="height: 72px; width: auto; position: relative; filter: drop-shadow(0 0 18px rgba(255, 42, 75, 0.5));" />
+      </div>
+
+      <div style="display: inline-flex; align-items: center; gap: 6px; padding: 3px 12px; border-radius: 9999px; background: rgba(255, 42, 75, 0.12); border: 1px solid rgba(255, 42, 75, 0.35); color: var(--accent); font-weight: 800; font-size: 0.7rem; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.6rem;" class="mono">
+        NOWHERE ESPORTS PASSPORT
+      </div>
+
+      <h1 style="font-size: 1.85rem; font-weight: 900; text-transform: uppercase; letter-spacing: -0.01em; color: #fff;">
+        Fan & Player Portal
+      </h1>
+      <p style="color: var(--text-muted); font-size: 0.875rem; max-width: 420px; margin: 0.35rem auto 0;">
+        Sign in with Gmail OTP or your competitive credentials to access live tournament streams and player passport.
+      </p>
     </div>
 
+    <!-- Alert Banners -->
     <% if (typeof error !== 'undefined' && error) { %>
-      <div style="background: rgba(255, 23, 68, 0.15); border: 1px solid var(--danger); color: #ff80ab; padding: 0.75rem 1rem; border-radius: 6px; font-size: 0.9rem; margin-bottom: 1.5rem;">
-        <%= error %>
+      <div style="background: rgba(255, 42, 75, 0.15); border: 1px solid var(--danger); color: #ff80ab; padding: 0.85rem 1.1rem; border-radius: 12px; font-size: 0.875rem; margin-bottom: 1.75rem; display: flex; align-items: center; gap: 8px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span><%= error %></span>
       </div>
     <% } %>
 
-    <form action="/login" method="POST">
-      <div style="margin-bottom: 1.25rem;">
-        <label for="username" style="display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.4rem; font-weight: 500;">Username / Esports ID</label>
-        <input type="text" id="username" name="username" required autocomplete="username" style="width: 100%; background: var(--bg-secondary); border: 1px solid var(--border); padding: 0.7rem 1rem; border-radius: 6px; color: #fff; font-size: 0.95rem;">
+    <% if (typeof loggedOut !== 'undefined' && loggedOut) { %>
+      <div style="background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.4); color: #38bdf8; padding: 0.85rem 1.1rem; border-radius: 12px; font-size: 0.875rem; margin-bottom: 1.75rem; display: flex; align-items: center; gap: 8px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <span>You have successfully signed out of your Nowhere session.</span>
       </div>
+    <% } %>
 
-      <div style="margin-bottom: 1.5rem;">
-        <label for="password" style="display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.4rem; font-weight: 500;">Password</label>
-        <input type="password" id="password" name="password" required autocomplete="current-password" style="width: 100%; background: var(--bg-secondary); border: 1px solid var(--border); padding: 0.7rem 1rem; border-radius: 6px; color: #fff; font-size: 0.95rem;">
+    <% if (typeof welcome !== 'undefined' && welcome) { %>
+      <div style="background: rgba(48, 209, 88, 0.15); border: 1px solid rgba(48, 209, 88, 0.4); color: #30d158; padding: 0.85rem 1.1rem; border-radius: 12px; font-size: 0.875rem; margin-bottom: 1.75rem; display: flex; align-items: center; gap: 8px;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        <span>Account created! Sign in with your new credentials below.</span>
       </div>
+    <% } %>
 
-      <button type="submit" style="width: 100%; background: var(--accent); color: #fff; border: none; padding: 0.75rem; border-radius: 6px; font-weight: 700; font-size: 1rem; cursor: pointer; transition: opacity 0.2s;">
-        Sign In
+    <!-- Segmented Tab Switcher -->
+    <div id="authTabsNav" style="display: flex; background: rgba(8, 12, 22, 0.9); border: 1px solid rgba(255, 255, 255, 0.08); padding: 4px; border-radius: 12px; margin-bottom: 1.75rem; gap: 4px;">
+      <button type="button" id="tab-otp-btn" onclick="switchAuthTab('otp')" class="auth-tab-btn active">
+        Gmail / Mobile OTP
       </button>
-    </form>
-
-    <div style="margin-top: 1.5rem; text-align: center; font-size: 0.8rem; color: var(--text-muted);">
-      Authorized personnel only. All access attempts are monitored and recorded.
+      <button type="button" id="tab-login-btn" onclick="switchAuthTab('login')" class="auth-tab-btn">
+        Password
+      </button>
+      <button type="button" id="tab-signup-btn" onclick="switchAuthTab('signup')" class="auth-tab-btn">
+        Create Passport
+      </button>
     </div>
+
+    <!-- ===================================================================== -->
+    <!-- TAB 1: GMAIL + MOBILE OTP FLOW (IN-PLACE 2-STEP WITH GLASSY ANIMATION) -->
+    <!-- ===================================================================== -->
+    <div id="auth-panel-otp" style="display: block;">
+      
+      <!-- STEP 1: Enter Gmail or Mobile to receive OTP -->
+      <div id="otp-step-contact">
+        <div style="margin-bottom: 1.5rem;">
+          <label for="auth-email-input" style="display: block; font-size: 0.8125rem; color: #cbd5e1; margin-bottom: 0.4rem; font-weight: 700;">
+            Gmail Address or Mobile Number *
+          </label>
+          <div style="position: relative;">
+            <input type="text" id="auth-email-input" placeholder="e.g. prosunbanerjee8@gmail.com" required autocomplete="email" class="auth-input" style="padding-left: 2.75rem;">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); pointer-events: none;">
+              <rect width="20" height="16" x="2" y="4" rx="2"/>
+              <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Send Code Button -->
+        <button type="button" id="btnSendOtp" onclick="triggerSendOtp()" style="width: 100%; background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%); color: #0f172a; border: none; padding: 0.85rem; border-radius: 12px; font-weight: 800; font-size: 0.95rem; cursor: pointer; text-transform: uppercase; letter-spacing: 0.05em; box-shadow: 0 4px 18px rgba(245, 158, 11, 0.35); transition: all 0.2s ease; margin-bottom: 1.25rem; display: flex; align-items: center; justify-content: center; gap: 8px;">
+          <span id="btnSendOtpText">Send 4-Digit Security Code →</span>
+        </button>
+
+        <!-- One Click Pass / Join as Guest ID -->
+        <div style="margin-bottom: 1.75rem; padding: 1rem; border-radius: 14px; background: rgba(56, 189, 248, 0.08); border: 1px dashed rgba(56, 189, 248, 0.35); text-align: center;">
+          <div style="font-size: 0.75rem; color: #38bdf8; font-weight: 700; text-transform: uppercase; margin-bottom: 6px;" class="mono">
+            One Click Pass
+          </div>
+          <form action="/login" method="POST" style="margin: 0;">
+            <input type="hidden" name="is_guest" value="true">
+            <button type="submit" style="width: 100%; background: rgba(56, 189, 248, 0.18); border: 1px solid rgba(56, 189, 248, 0.5); color: #fff; padding: 0.65rem 1rem; border-radius: 10px; font-weight: 800; font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: background 0.2s ease;">
+              <span>Join as a Guest ID →</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- Social Logins -->
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 1.25rem;">
+          <div style="flex: 1; height: 1px; background: rgba(255, 255, 255, 0.1);"></div>
+          <span style="font-size: 0.75rem; color: #64748b; text-transform: uppercase; font-weight: 700;" class="mono">Or Connect With</span>
+          <div style="flex: 1; height: 1px; background: rgba(255, 255, 255, 0.1);"></div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+          <button type="button" onclick="quickSocialLogin('Discord')" class="social-auth-btn">
+            <span>Discord</span>
+          </button>
+          <button type="button" onclick="quickSocialLogin('Steam')" class="social-auth-btn">
+            <span>Steam</span>
+          </button>
+          <button type="button" onclick="quickSocialLogin('Google')" class="social-auth-btn">
+            <span>Google</span>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- STEP 2: IN-PLACE GLASSY OTP ANIMATION VERIFICATION -->
+      <div id="otp-step-verify" style="display: none; animation: fadeInStage 0.3s ease;">
+        
+        <!-- Header: Key Icon & Title -->
+        <div style="text-align: center; margin-bottom: 1.5rem;">
+          
+          <div class="otp-icon-wrapper" id="otpIconWrapper">
+            <!-- Golden Key SVG -->
+            <svg id="iconKey" class="otp-icon-svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m21 2-2 2m-1.5 1.5L14 9M9.5 14.5l-2.5 2.5a3.535 3.535 0 1 1-5-5l2.5-2.5a3.535 3.535 0 0 1 5 0l2 2Z"/>
+              <circle cx="16" cy="8" r="1.5"/>
+            </svg>
+
+            <!-- Emerald Shield Check SVG -->
+            <svg id="iconSuccessShield" class="otp-icon-svg" style="display: none;" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              <path d="m9 12 2 2 4-4"/>
+            </svg>
+          </div>
+
+          <h2 class="otp-title" id="otpTitle" style="font-size: 1.6rem; font-weight: 800; margin: 0 0 0.4rem; color: #fff;">
+            Verify <span class="highlight-gold" id="otpHighlightWord">OTP</span>
+          </h2>
+
+          <p class="otp-subtitle" id="otpSubtitle" style="color: #94a3b8; font-size: 0.85rem; margin: 0 auto 0.6rem;">
+            Enter the 4-digit security code sent to your device
+          </p>
+
+          <div class="otp-email-pill" style="display: inline-flex; align-items: center; gap: 8px; padding: 4px 12px; border-radius: 9999px; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.12); font-size: 0.8rem; color: #cbd5e1; margin-bottom: 0.5rem;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect width="20" height="16" x="2" y="4" rx="2"/>
+              <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+            </svg>
+            <span id="displayVerifiedEmail" class="mono">prosunbanerjee8@gmail.com</span>
+            <button type="button" onclick="backToContactStep()" style="background: none; border: none; color: #38bdf8; cursor: pointer; font-size: 0.75rem; font-weight: 700; padding: 0 4px; text-decoration: underline;" title="Change Email">Edit</button>
+          </div>
+
+          <div id="resendStatusBadge" style="font-size: 0.75rem; color: #22c55e; font-weight: 600; margin-top: 2px;">
+            ● Delivered via Resend to your Gmail inbox
+          </div>
+
+        </div>
+
+        <!-- Error Alert -->
+        <div id="otpErrorBanner" class="otp-error-alert" style="display: none; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.4); color: #fca5a5; padding: 0.65rem 1rem; border-radius: 12px; font-size: 0.8rem; align-items: center; gap: 8px; margin-bottom: 1.25rem;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <span id="otpErrorMessage">Invalid verification code. Please check your Gmail or request a new code.</span>
+        </div>
+
+        <!-- The 4-Digit Input & Animation Stage Container -->
+        <div class="otp-stage-container" id="otpStageContainer">
+          
+          <div class="otp-orbit-center" id="otpOrbitCenter">
+            
+            <!-- Box 0 (Top in Diamond) -->
+            <div class="otp-digit-card" id="digitCard0" data-pos="0">
+              <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="otp-field" id="otp-0" autocomplete="off">
+              <div class="box-glow-ring"></div>
+            </div>
+
+            <!-- Box 1 (Left in Diamond) -->
+            <div class="otp-digit-card" id="digitCard1" data-pos="1">
+              <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="otp-field" id="otp-1" autocomplete="off">
+              <div class="box-glow-ring"></div>
+            </div>
+
+            <!-- Box 2 (Right in Diamond) -->
+            <div class="otp-digit-card" id="digitCard2" data-pos="2">
+              <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="otp-field" id="otp-2" autocomplete="off">
+              <div class="box-glow-ring"></div>
+            </div>
+
+            <!-- Box 3 (Bottom in Diamond) -->
+            <div class="otp-digit-card" id="digitCard3" data-pos="3">
+              <input type="text" maxlength="1" inputmode="numeric" pattern="[0-9]*" class="otp-field" id="otp-3" autocomplete="off">
+              <div class="box-glow-ring"></div>
+            </div>
+
+            <!-- Center Success Checkmark Box -->
+            <div class="otp-success-card" id="otpSuccessCard">
+              <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              <div class="success-glow-ring"></div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- Countdown & Resend Section -->
+        <div style="text-align: center; margin-bottom: 1.5rem; font-size: 0.8125rem; color: #94a3b8;">
+          <span id="resendPromptText">Didn't receive the code?</span>
+          <span id="countdownContainer">
+            Resend in <span class="mono" id="countdownSec" style="color: #f59e0b; font-weight: 700;">00:38</span>
+          </span>
+          <button type="button" id="resendBtn" onclick="resendLiveOtp()" style="display: none; background: none; border: none; color: #f59e0b; font-weight: 700; text-decoration: underline; cursor: pointer;">
+            Resend Code
+          </button>
+        </div>
+
+        <!-- Action Button -->
+        <button type="button" id="btnVerify" class="btn-verify-otp" onclick="submitInPlaceOtp()">
+          <span id="btnVerifyText">Verify & Proceed →</span>
+        </button>
+
+      </div>
+
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- TAB 2: PASSWORD SIGN IN FORM                                         -->
+    <!-- ===================================================================== -->
+    <div id="auth-panel-login" style="display: none;">
+      <form action="/login" method="POST">
+        
+        <div style="margin-bottom: 1.25rem;">
+          <label for="login-username" style="display: block; font-size: 0.8125rem; color: #cbd5e1; margin-bottom: 0.4rem; font-weight: 700;">
+            Gamertag, Username, or Email *
+          </label>
+          <input type="text" id="login-username" name="username" placeholder="e.g. ViperStrike or fan@nowhereesports.gg" required autocomplete="username" class="auth-input">
+        </div>
+
+        <div style="margin-bottom: 1.25rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.4rem;">
+            <label for="login-password" style="font-size: 0.8125rem; color: #cbd5e1; font-weight: 700;">
+              Password *
+            </label>
+            <a href="#" onclick="switchAuthTab('otp'); return false;" style="font-size: 0.75rem; color: #38bdf8; text-decoration: none;">
+              Sign in with OTP instead
+            </a>
+          </div>
+          <div style="position: relative;">
+            <input type="password" id="login-password" name="password" placeholder="••••••••" required autocomplete="current-password" class="auth-input" style="padding-right: 3rem;">
+            <button type="button" onclick="togglePasswordVisibility('login-password')" class="eye-toggle-btn" title="Toggle password visibility">
+              <video id="eye-video-login-password" class="eye-toggle-video" playsinline muted preload="auto">
+                <source src="/images/eye-toggle.mp4" type="video/mp4">
+                <source src="https://cdn-icons-mp4.flaticon.com/512/8121/8121254.mp4" type="video/mp4">
+              </video>
+            </button>
+          </div>
+        </div>
+
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem; font-size: 0.8125rem; color: #94a3b8;">
+          <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+            <input type="checkbox" name="remember" checked style="accent-color: var(--accent);">
+            <span>Remember this device</span>
+          </label>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" style="width: 100%; background: linear-gradient(135deg, #ff2a4b 0%, #c8102e 100%); color: #fff; border: none; padding: 0.85rem; border-radius: 12px; font-weight: 800; font-size: 0.95rem; cursor: pointer; text-transform: uppercase; letter-spacing: 0.05em; box-shadow: 0 4px 18px rgba(255, 42, 75, 0.45); transition: all 0.2s ease; margin-bottom: 1.25rem;">
+          Sign In with Password
+        </button>
+
+      </form>
+
+      <div style="font-size: 0.75rem; color: #94a3b8; text-align: center; margin-top: 6px;">
+        Official Esports Account: <span class="mono" style="color: #cbd5e1;">fan@nowhereesports.gg</span> / <span class="mono" style="color: #cbd5e1;">nowhere2026</span>
+      </div>
+
+    </div>
+
+    <!-- ===================================================================== -->
+    <!-- TAB 3: CREATE FAN PASSPORT (SIGN UP)                                  -->
+    <!-- ===================================================================== -->
+    <div id="auth-panel-signup" style="display: none;">
+      <form action="/auth/signup" method="POST">
+        
+        <div style="margin-bottom: 1.15rem;">
+          <label for="reg-gamertag" style="display: block; font-size: 0.8125rem; color: #cbd5e1; margin-bottom: 0.4rem; font-weight: 700;">
+            Competitive Gamertag / In-Game Name *
+          </label>
+          <input type="text" id="reg-gamertag" name="gamertag" placeholder="e.g. Apex_Ghost, ViperKing" required class="auth-input">
+        </div>
+
+        <div style="margin-bottom: 1.15rem;">
+          <label for="reg-email" style="display: block; font-size: 0.8125rem; color: #cbd5e1; margin-bottom: 0.4rem; font-weight: 700;">
+            Email Address *
+          </label>
+          <input type="email" id="reg-email" name="email" placeholder="e.g. player@domain.com" required autocomplete="email" class="auth-input">
+        </div>
+
+        <div style="margin-bottom: 1.15rem;">
+          <label for="reg-pass" style="display: block; font-size: 0.8125rem; color: #cbd5e1; margin-bottom: 0.4rem; font-weight: 700;">
+            Create Password *
+          </label>
+          <div style="position: relative;">
+            <input type="password" id="reg-pass" name="password" placeholder="At least 6 characters" minlength="6" required class="auth-input" style="padding-right: 3rem;">
+            <button type="button" onclick="togglePasswordVisibility('reg-pass')" class="eye-toggle-btn" title="Toggle password visibility">
+              <video id="eye-video-reg-pass" class="eye-toggle-video" playsinline muted preload="auto">
+                <source src="/images/eye-toggle.mp4" type="video/mp4">
+                <source src="https://cdn-icons-mp4.flaticon.com/512/8121/8121254.mp4" type="video/mp4">
+              </video>
+            </button>
+          </div>
+        </div>
+
+        <!-- Discipline & Region Selectors -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 1.25rem;">
+          <div>
+            <label style="display: block; font-size: 0.75rem; color: #cbd5e1; margin-bottom: 0.4rem; font-weight: 700;">
+              Primary Game *
+            </label>
+            <select name="favorite_game" class="auth-input" style="padding: 0.65rem 0.8rem;">
+              <option value="VALORANT">VALORANT</option>
+              <option value="BGMI">BGMI</option>
+              <option value="Free Fire">Free Fire MAX</option>
+              <option value="eFootball">eFootball 2026</option>
+              <option value="Counter-Strike 2">Counter-Strike 2</option>
+              <option value="Apex Legends">Apex Legends</option>
+              <option value="Call of Duty">Call of Duty</option>
+              <option value="League of Legends">League of Legends</option>
+            </select>
+          </div>
+
+          <div>
+            <label style="display: block; font-size: 0.75rem; color: #cbd5e1; margin-bottom: 0.4rem; font-weight: 700;">
+              Server Region *
+            </label>
+            <select name="region" class="auth-input" style="padding: 0.65rem 0.8rem;">
+              <option value="India / South Asia">India / South Asia</option>
+              <option value="APAC / Global">APAC / Global</option>
+              <option value="Europe">Europe</option>
+              <option value="Americas">Americas</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Fair Play Agreement -->
+        <div style="margin-bottom: 1.5rem; font-size: 0.8125rem; color: #94a3b8; line-height: 1.4;">
+          <label style="display: flex; align-items: flex-start; gap: 8px; cursor: pointer;">
+            <input type="checkbox" required checked style="margin-top: 3px; accent-color: var(--accent);">
+            <span>I agree to the Nowhere Esports <a href="/terms" style="color: #38bdf8;">Terms</a>, <a href="/privacy" style="color: #38bdf8;">Privacy Policy</a>, and Fair Play Rulebook.</span>
+          </label>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" style="width: 100%; background: linear-gradient(135deg, #ff2a4b 0%, #c8102e 100%); color: #fff; border: none; padding: 0.85rem; border-radius: 12px; font-weight: 800; font-size: 0.95rem; cursor: pointer; text-transform: uppercase; letter-spacing: 0.05em; box-shadow: 0 4px 18px rgba(255, 42, 75, 0.45); transition: all 0.2s ease;">
+          Create Fan Passport (+500 NC Bonus)
+        </button>
+
+      </form>
+    </div>
+
   </div>
 </div>
+
+<!-- ========================================================================= -->
+<!-- STYLES FOR GLASSY OTP ANIMATION & AUTH CARD                               -->
+<!-- ========================================================================= -->
+<style>
+  @keyframes fadeInStage {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .chamfer-corner {
+    position: absolute;
+    width: 38px;
+    height: 38px;
+    pointer-events: none;
+    border: 1.5px solid rgba(255, 255, 255, 0.16);
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(10px);
+  }
+  .chamfer-tl {
+    top: -1px;
+    left: -1px;
+    border-top-left-radius: 28px;
+    border-bottom-right-radius: 18px;
+    border-right-color: rgba(255, 255, 255, 0.1);
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+  }
+  .chamfer-br {
+    bottom: -1px;
+    right: -1px;
+    border-bottom-right-radius: 28px;
+    border-top-left-radius: 18px;
+    border-left-color: rgba(255, 255, 255, 0.1);
+    border-top-color: rgba(255, 255, 255, 0.1);
+  }
+
+  .auth-tab-btn {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    padding: 0.65rem 0.35rem;
+    font-size: 0.8125rem;
+    font-weight: 800;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+    white-space: nowrap;
+  }
+  .auth-tab-btn.active {
+    background: rgba(255, 42, 75, 0.2);
+    border: 1px solid rgba(255, 42, 75, 0.4);
+    color: #fff;
+    box-shadow: 0 2px 10px rgba(255, 42, 75, 0.25);
+  }
+
+  .auth-input {
+    width: 100%;
+    background: rgba(8, 12, 22, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+    color: #fff;
+    font-size: 0.9rem;
+    outline: none;
+    transition: all 0.2s ease;
+    font-family: inherit;
+    box-sizing: border-box;
+  }
+  .auth-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 14px rgba(255, 42, 75, 0.35);
+    background: rgba(14, 19, 32, 0.95);
+  }
+
+  .social-auth-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #cbd5e1;
+    padding: 0.55rem;
+    border-radius: 8px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .social-auth-btn:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+    border-color: rgba(255, 255, 255, 0.2);
+  }
+
+  /* Animated Password Eye Video Toggle */
+  .eye-toggle-btn {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px;
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    transition: background 0.2s ease, transform 0.15s ease, opacity 0.2s ease;
+    opacity: 0.85;
+  }
+  .eye-toggle-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
+    opacity: 1;
+  }
+  .eye-toggle-btn:active {
+    transform: translateY(-50%) scale(0.92);
+  }
+  .eye-toggle-video {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+    pointer-events: none;
+    mix-blend-mode: screen;
+    filter: invert(1);
+    border-radius: 4px;
+    display: block;
+  }
+
+  /* OTP Icon Wrapper */
+  .otp-icon-wrapper {
+    width: 50px;
+    height: 50px;
+    border-radius: 16px;
+    margin: 0 auto 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(245, 158, 11, 0.12);
+    border: 1px solid rgba(245, 158, 11, 0.35);
+    box-shadow: 0 0 24px rgba(245, 158, 11, 0.25);
+    transition: all 0.4s ease;
+  }
+  .otp-icon-wrapper.success-mode {
+    background: rgba(34, 197, 94, 0.15);
+    border-color: rgba(34, 197, 94, 0.5);
+    box-shadow: 0 0 30px rgba(34, 197, 94, 0.4);
+  }
+
+  .highlight-gold {
+    color: #f59e0b;
+    background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .highlight-green {
+    color: #22c55e;
+    background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  /* 4-Digit Stage Container */
+  .otp-stage-container {
+    height: 180px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0.5rem 0 1.25rem;
+  }
+
+  .otp-orbit-center {
+    position: relative;
+    width: 280px;
+    height: 160px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .otp-digit-card {
+    position: absolute;
+    width: 58px;
+    height: 58px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1.5px solid rgba(255, 255, 255, 0.14);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 
+      transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1),
+      border-color 0.3s ease,
+      box-shadow 0.3s ease,
+      opacity 0.4s ease;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+    overflow: hidden;
+  }
+
+  #digitCard0 { transform: translate(-96px, 0); }
+  #digitCard1 { transform: translate(-32px, 0); }
+  #digitCard2 { transform: translate(32px, 0); }
+  #digitCard3 { transform: translate(96px, 0); }
+
+  .otp-digit-card.focused {
+    border-color: #f59e0b;
+    box-shadow: 0 0 18px rgba(245, 158, 11, 0.35);
+    background: rgba(245, 158, 11, 0.05);
+  }
+
+  .otp-digit-card.filled {
+    border-color: rgba(245, 158, 11, 0.6);
+  }
+
+  .otp-field {
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #ffffff;
+    font-size: 1.6rem;
+    font-weight: 800;
+    text-align: center;
+    font-family: inherit;
+    caret-color: #f59e0b;
+  }
+
+  .box-glow-ring {
+    position: absolute;
+    inset: -2px;
+    border-radius: 18px;
+    background: conic-gradient(from 0deg, transparent 60%, #f59e0b, #ef4444);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+
+  /* PHASE 1: Diamond Orbit Formation */
+  .otp-stage-container.animating .otp-orbit-center {
+    animation: diamondOrbit 1.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  }
+  .otp-stage-container.animating .box-glow-ring {
+    opacity: 1;
+    animation: spinRing 1s linear infinite;
+  }
+  @keyframes spinRing {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  @keyframes diamondOrbit {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  .otp-stage-container.animating #digitCard0 {
+    transform: translate(0px, -55px) rotate(-360deg);
+  }
+  .otp-stage-container.animating #digitCard1 {
+    transform: translate(-55px, 0px) rotate(-360deg);
+  }
+  .otp-stage-container.animating #digitCard2 {
+    transform: translate(55px, 0px) rotate(-360deg);
+  }
+  .otp-stage-container.animating #digitCard3 {
+    transform: translate(0px, 55px) rotate(-360deg);
+  }
+  .otp-stage-container.animating .otp-field {
+    animation: counterRotate 1.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  }
+  @keyframes counterRotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(-360deg); }
+  }
+
+  /* PHASE 2: Center Collapse */
+  .otp-stage-container.collapsing .otp-orbit-center {
+    animation: none;
+    transform: rotate(0deg);
+  }
+  .otp-stage-container.collapsing .otp-digit-card {
+    transform: translate(0px, 0px) scale(0.9) !important;
+    opacity: 0.6;
+    transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* PHASE 3: Success Checkmark */
+  .otp-stage-container.success .otp-digit-card {
+    transform: translate(0px, 0px) scale(0) !important;
+    opacity: 0;
+    pointer-events: none;
+  }
+  .otp-success-card {
+    position: absolute;
+    width: 68px;
+    height: 68px;
+    border-radius: 20px;
+    background: rgba(34, 197, 94, 0.12);
+    border: 2px solid #22c55e;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 35px rgba(34, 197, 94, 0.45);
+    opacity: 0;
+    transform: scale(0.3);
+    pointer-events: none;
+    transition: all 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .otp-stage-container.success .otp-success-card {
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: auto;
+  }
+  .success-glow-ring {
+    position: absolute;
+    inset: -6px;
+    border-radius: 24px;
+    border: 2px solid rgba(34, 197, 94, 0.4);
+    animation: successPulse 2s ease-out infinite;
+  }
+  @keyframes successPulse {
+    0% { transform: scale(1); opacity: 0.8; }
+    100% { transform: scale(1.3); opacity: 0; }
+  }
+
+  /* Action Button */
+  .btn-verify-otp {
+    width: 100%;
+    padding: 0.95rem 1.5rem;
+    border-radius: 14px;
+    border: none;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 800;
+    letter-spacing: 0.03em;
+    background: linear-gradient(135deg, #d97706 0%, #f59e0b 100%);
+    color: #0f172a;
+    box-shadow: 0 6px 20px rgba(245, 158, 11, 0.35);
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .btn-verify-otp:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(245, 158, 11, 0.45);
+    background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
+  }
+  .btn-verify-otp.verifying-mode {
+    background: linear-gradient(135deg, #ca8a04 0%, #eab308 100%);
+    cursor: wait;
+    transform: none;
+  }
+  .btn-verify-otp.success-mode {
+    background: linear-gradient(135deg, #15803d 0%, #22c55e 100%);
+    color: #ffffff;
+    box-shadow: 0 6px 25px rgba(34, 197, 94, 0.45);
+    transform: none;
+  }
+
+  .otp-spinner {
+    width: 18px;
+    height: 18px;
+    border: 2.5px solid rgba(15, 23, 42, 0.25);
+    border-top-color: #0f172a;
+    border-radius: 50%;
+    animation: spinnerRotate 0.75s linear infinite;
+    display: inline-block;
+  }
+  @keyframes spinnerRotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+</style>
+
+<!-- ========================================================================= -->
+<!-- JAVASCRIPT: RESEND EMAIL DISPATCH + IN-PLACE GLASSY ANIMATION ORCHESTRATION -->
+<!-- ========================================================================= -->
+<script>
+  let activeEmail = 'prosunbanerjee8@gmail.com';
+  let countdownSeconds = 38;
+  let countdownTimerId = null;
+  let isSubmitting = false;
+
+  function switchAuthTab(tab) {
+    const otpPanel = document.getElementById('auth-panel-otp');
+    const loginPanel = document.getElementById('auth-panel-login');
+    const signupPanel = document.getElementById('auth-panel-signup');
+
+    const otpBtn = document.getElementById('tab-otp-btn');
+    const loginBtn = document.getElementById('tab-login-btn');
+    const signupBtn = document.getElementById('tab-signup-btn');
+
+    if (otpPanel) otpPanel.style.display = 'none';
+    if (loginPanel) loginPanel.style.display = 'none';
+    if (signupPanel) signupPanel.style.display = 'none';
+
+    if (otpBtn) otpBtn.classList.remove('active');
+    if (loginBtn) loginBtn.classList.remove('active');
+    if (signupBtn) signupBtn.classList.remove('active');
+
+    if (tab === 'signup') {
+      if (signupPanel) signupPanel.style.display = 'block';
+      if (signupBtn) signupBtn.classList.add('active');
+    } else if (tab === 'login') {
+      if (loginPanel) loginPanel.style.display = 'block';
+      if (loginBtn) loginBtn.classList.add('active');
+    } else {
+      if (otpPanel) otpPanel.style.display = 'block';
+      if (otpBtn) otpBtn.classList.add('active');
+    }
+  }
+
+  function togglePasswordVisibility(inputId) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    const isNowVisible = input.type === 'password';
+    input.type = isNowVisible ? 'text' : 'password';
+
+    const video = document.getElementById(`eye-video-${inputId}`);
+    if (video) {
+      video.currentTime = 0;
+      video.play().catch(() => {});
+    }
+  }
+
+  function quickSocialLogin(provider) {
+    const usernameInput = document.getElementById('login-username');
+    const passwordInput = document.getElementById('login-password');
+    if (usernameInput && passwordInput) {
+      usernameInput.value = provider.toLowerCase() + '_fan@nowhereesports.gg';
+      passwordInput.value = 'nowhere2026';
+      usernameInput.form.submit();
+    }
+  }
+
+  /* ------------------------------------------------------------------------- */
+  /* STEP 1: SEND OTP VIA RESEND API                                            */
+  /* ------------------------------------------------------------------------- */
+  async function triggerSendOtp() {
+    const input = document.getElementById('auth-email-input');
+    const rawVal = input ? input.value.trim() : '';
+    activeEmail = rawVal || 'prosunbanerjee8@gmail.com';
+
+    const btnText = document.getElementById('btnSendOtpText');
+    const btn = document.getElementById('btnSendOtp');
+    if (btnText) btnText.innerHTML = '<span class="otp-spinner"></span> Dispatching Code via Resend...';
+    if (btn) btn.style.pointerEvents = 'none';
+
+    try {
+      const resp = await fetch('/auth/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: activeEmail })
+      });
+      const data = await resp.json();
+
+      // Transition to Step 2: In-Place Glassy OTP View
+      document.getElementById('otp-step-contact').style.display = 'none';
+      document.getElementById('otp-step-verify').style.display = 'block';
+      document.getElementById('displayVerifiedEmail').innerText = activeEmail;
+
+      const resendBadge = document.getElementById('resendStatusBadge');
+      if (resendBadge) {
+        if (data.resendSent) {
+          resendBadge.innerHTML = '● <span style="color: #22c55e;">Delivered to your inbox via Resend</span>';
+        } else {
+          resendBadge.innerHTML = '● <span style="color: #22c55e;">Security verification code dispatched to your inbox</span>';
+        }
+      }
+
+      startCountdown();
+      setupOtpInputHandlers();
+
+      // Focus first digit box
+      setTimeout(() => {
+        const first = document.getElementById('otp-0');
+        if (first) first.focus();
+      }, 100);
+
+    } catch (err) {
+      console.error('Error dispatching OTP:', err);
+      // Fallback transition so user can proceed
+      document.getElementById('otp-step-contact').style.display = 'none';
+      document.getElementById('otp-step-verify').style.display = 'block';
+      document.getElementById('displayVerifiedEmail').innerText = activeEmail;
+      startCountdown();
+      setupOtpInputHandlers();
+    } finally {
+      if (btnText) btnText.innerText = 'Send 4-Digit Security Code →';
+      if (btn) btn.style.pointerEvents = 'auto';
+    }
+  }
+
+  function backToContactStep() {
+    document.getElementById('otp-step-verify').style.display = 'none';
+    document.getElementById('otp-step-contact').style.display = 'block';
+    clearInterval(countdownTimerId);
+  }
+
+  /* ------------------------------------------------------------------------- */
+  /* STEP 2: IN-PLACE INPUT HANDLING & COUNTDOWN TIMER                          */
+  /* ------------------------------------------------------------------------- */
+  function setupOtpInputHandlers() {
+    const inputs = [
+      document.getElementById('otp-0'),
+      document.getElementById('otp-1'),
+      document.getElementById('otp-2'),
+      document.getElementById('otp-3')
+    ];
+
+    inputs.forEach((input, index) => {
+      if (!input) return;
+
+      input.addEventListener('focus', () => {
+        const card = document.getElementById(`digitCard${index}`);
+        if (card) card.classList.add('focused');
+      });
+
+      input.addEventListener('blur', () => {
+        const card = document.getElementById(`digitCard${index}`);
+        if (card) card.classList.remove('focused');
+      });
+
+      input.addEventListener('input', (e) => {
+        if (e.target.value.length > 1) {
+          input.value = e.target.value.slice(-1);
+        }
+
+        if (input.value) {
+          input.parentElement.classList.add('filled');
+          if (index < 3) {
+            inputs[index + 1].focus();
+            inputs[index + 1].select();
+          } else {
+            // Auto submit when 4th digit entered
+            if (getEnteredCode().length === 4) {
+              setTimeout(() => submitInPlaceOtp(), 250);
+            }
+          }
+        } else {
+          input.parentElement.classList.remove('filled');
+        }
+      });
+
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace' && !input.value && index > 0) {
+          inputs[index - 1].focus();
+          inputs[index - 1].value = '';
+          inputs[index - 1].parentElement.classList.remove('filled');
+        } else if (e.key === 'ArrowLeft' && index > 0) {
+          inputs[index - 1].focus();
+        } else if (e.key === 'ArrowRight' && index < 3) {
+          inputs[index + 1].focus();
+        } else if (e.key === 'Enter') {
+          submitInPlaceOtp();
+        }
+      });
+
+      input.addEventListener('paste', (e) => {
+        e.preventDefault();
+        const pasted = (e.clipboardData || window.clipboardData).getData('text').trim();
+        const digits = pasted.replace(/\D/g, '').slice(0, 4);
+        if (digits) {
+          for (let i = 0; i < 4; i++) {
+            if (inputs[i] && digits[i]) {
+              inputs[i].value = digits[i];
+              inputs[i].parentElement.classList.add('filled');
+            }
+          }
+          if (digits.length === 4) {
+            setTimeout(() => submitInPlaceOtp(), 250);
+          }
+        }
+      });
+    });
+  }
+
+  function getEnteredCode() {
+    let code = '';
+    for (let i = 0; i < 4; i++) {
+      const inp = document.getElementById(`otp-${i}`);
+      if (inp) code += inp.value.trim();
+    }
+    return code;
+  }
+
+  function startCountdown() {
+    countdownSeconds = 38;
+    const cdSec = document.getElementById('countdownSec');
+    const cdWrap = document.getElementById('countdownContainer');
+    const resendBtn = document.getElementById('resendBtn');
+    const promptText = document.getElementById('resendPromptText');
+
+    if (cdWrap) cdWrap.style.display = 'inline';
+    if (resendBtn) resendBtn.style.display = 'none';
+    if (promptText) promptText.innerText = "Didn't receive the code?";
+
+    clearInterval(countdownTimerId);
+    countdownTimerId = setInterval(() => {
+      countdownSeconds--;
+      if (cdSec) {
+        const s = countdownSeconds < 10 ? '0' + countdownSeconds : countdownSeconds;
+        cdSec.innerText = `00:${s}`;
+      }
+
+      if (countdownSeconds <= 0) {
+        clearInterval(countdownTimerId);
+        if (cdWrap) cdWrap.style.display = 'none';
+        if (resendBtn) resendBtn.style.display = 'inline-block';
+        if (promptText) promptText.innerText = "Code expired?";
+      }
+    }, 1000);
+  }
+
+  async function resendLiveOtp() {
+    try {
+      const resp = await fetch('/auth/resend-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: activeEmail })
+      });
+      const data = await resp.json();
+      const resendBadge = document.getElementById('resendStatusBadge');
+      if (resendBadge) {
+        resendBadge.innerHTML = '● <span style="color: #22c55e;">Fresh OTP dispatched to your inbox via Resend!</span>';
+      }
+      startCountdown();
+    } catch (err) {
+      console.error('Error resending OTP:', err);
+      startCountdown();
+    }
+  }
+
+  /* ------------------------------------------------------------------------- */
+  /* STEP 3: THE GLASSY OTP ANIMATION & VERIFICATION PIPELINE                  */
+  /* ------------------------------------------------------------------------- */
+  async function submitInPlaceOtp() {
+    if (isSubmitting) return;
+
+    const code = getEnteredCode();
+    const errorBanner = document.getElementById('otpErrorBanner');
+    const errorMessage = document.getElementById('otpErrorMessage');
+
+    if (code.length < 4) {
+      if (errorBanner) {
+        errorMessage.innerText = 'Please enter all 4 digits of the security verification code.';
+        errorBanner.style.display = 'flex';
+      }
+      return;
+    }
+
+    if (errorBanner) errorBanner.style.display = 'none';
+    isSubmitting = true;
+
+    const stage = document.getElementById('otpStageContainer');
+    const btn = document.getElementById('btnVerify');
+    const btnText = document.getElementById('btnVerifyText');
+
+    // 1. Verifying Button state
+    btn.classList.add('verifying-mode');
+    btnText.innerHTML = '<span class="otp-spinner"></span> Verifying Code...';
+
+    // 2. Launch Diamond Orbit Animation
+    stage.classList.remove('collapsing', 'success');
+    stage.classList.add('animating');
+
+    try {
+      const resp = await fetch('/auth/verify-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: activeEmail, otp: code })
+      });
+
+      const result = await resp.json();
+
+      if (resp.ok && result.status === 'success') {
+        // Allow orbit animation to run for 1.3s
+        setTimeout(() => {
+          // 3. Phase: Center Collapse
+          stage.classList.remove('animating');
+          stage.classList.add('collapsing');
+
+          setTimeout(() => {
+            // 4. Phase: Morph into Green Success Card
+            stage.classList.remove('collapsing');
+            stage.classList.add('success');
+
+            const iconKey = document.getElementById('iconKey');
+            const iconShield = document.getElementById('iconSuccessShield');
+            const iconWrapper = document.getElementById('otpIconWrapper');
+            if (iconKey) iconKey.style.display = 'none';
+            if (iconShield) iconShield.style.display = 'block';
+            if (iconWrapper) iconWrapper.classList.add('success-mode');
+
+            const title = document.getElementById('otpTitle');
+            const subtitle = document.getElementById('otpSubtitle');
+            if (title) title.innerHTML = 'Verified <span class="highlight-green">Successfully</span>';
+            if (subtitle) subtitle.innerText = 'Your security verification code has been confirmed.';
+
+            btn.classList.remove('verifying-mode');
+            btn.classList.add('success-mode');
+            btnText.innerHTML = `
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                <path d="m9 12 2 2 4-4"/>
+              </svg> 
+              Verified & Secured
+            `;
+
+            // 5. Final Phase: Transition to Portal
+            setTimeout(() => {
+              window.location.href = result.redirect || '/portal?welcome=1';
+            }, 1200);
+
+          }, 450);
+
+        }, 1300);
+
+      } else {
+        setTimeout(() => {
+          stage.classList.remove('animating', 'collapsing', 'success');
+          btn.classList.remove('verifying-mode');
+          btnText.innerText = 'Verify & Proceed →';
+          isSubmitting = false;
+
+          if (errorBanner) {
+            errorMessage.innerText = result.message || 'Invalid verification code. Please request a new code.';
+            errorBanner.style.display = 'flex';
+          }
+
+          const first = document.getElementById('otp-0');
+          if (first) {
+            first.focus();
+            first.select();
+          }
+        }, 800);
+      }
+
+    } catch (err) {
+      console.error('Verification error:', err);
+      stage.classList.remove('animating', 'collapsing', 'success');
+      btn.classList.remove('verifying-mode');
+      btnText.innerText = 'Verify & Proceed →';
+      isSubmitting = false;
+
+      if (errorBanner) {
+        errorMessage.innerText = 'Network error during verification. Please request a new code.';
+        errorBanner.style.display = 'flex';
+      }
+    }
+  }
+
+  // Handle URL hash or tab query param
+  document.addEventListener('DOMContentLoaded', () => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('tab') === 'signup' || window.location.pathname === '/signup') {
+      switchAuthTab('signup');
+    } else if (params.get('tab') === 'login') {
+      switchAuthTab('login');
+    }
+
+    // Initialize eye toggle videos
+    ['login-password', 'reg-pass'].forEach(id => {
+      const vid = document.getElementById(`eye-video-${id}`);
+      if (vid) {
+        vid.currentTime = 0.01;
+      }
+    });
+
+    document.querySelectorAll('.eye-toggle-btn').forEach(btn => {
+      btn.addEventListener('mouseenter', () => {
+        const vid = btn.querySelector('.eye-toggle-video');
+        if (vid && vid.paused) {
+          vid.currentTime = 0;
+          vid.play().catch(() => {});
+        }
+      });
+    });
+  });
+</script>
 
 <%- include('../layouts/footer') %>

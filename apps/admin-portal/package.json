@@ -1,0 +1,25 @@
+{
+  "name": "nowhere-admin-portal",
+  "version": "1.0.0",
+  "description": "Nowhere Esports Executive Operations & Administrative Portal",
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js",
+    "test": "node --test tests/*.test.js"
+  },
+  "keywords": [
+    "admin-portal",
+    "operations",
+    "esports",
+    "nowhere"
+  ],
+  "author": "Nowhere Esports Operations",
+  "license": "ISC",
+  "dependencies": {
+    "ejs": "^3.1.10",
+    "express": "^4.21.2"
+  }
+}
+

@@ -1,0 +1,341 @@
+<%- include('../layouts/header', { title: 'Player & Team Registration' }) %>
+
+<div style="max-width: 900px; margin: 0 auto; margin-bottom: 4rem;">
+  
+  <!-- Header Banner -->
+  <div style="text-align: center; margin-bottom: 2.5rem;">
+    <div style="display: inline-flex; align-items: center; gap: 8px; padding: 4px 14px; border-radius: 9999px; background: rgba(255, 42, 75, 0.15); border: 1px solid rgba(255, 42, 75, 0.4); color: var(--accent); font-weight: 800; font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 1rem;">
+      PRO CIRCUIT 2026 RECRUITMENT & TOURNAMENT ENTRY
+    </div>
+    <h1 style="font-size: 2.5rem; font-weight: 900; letter-spacing: -0.02em; text-transform: uppercase; margin-bottom: 0.75rem;">
+      Register to Play & Join Esports
+    </h1>
+    <p style="color: var(--text-muted); font-size: 1.05rem; max-width: 680px; margin: 0 auto;">
+      Submit your squad roster to compete in official nowhere-sanctioned leagues across VALORANT, BGMI, Free Fire, eFootball, and CS2.
+    </p>
+  </div>
+
+  <!-- Registration Card -->
+  <div class="card" style="padding: 2.5rem; border-radius: 20px; border-color: rgba(255, 255, 255, 0.12); background: rgba(14, 19, 32, 0.95); box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);">
+    
+    <!-- Success Banner (hidden by default) -->
+    <div id="registration-success-box" style="display: none; background: rgba(48, 209, 88, 0.15); border: 1px solid rgba(48, 209, 88, 0.4); border-radius: 14px; padding: 1.5rem; margin-bottom: 2rem; text-align: center;">
+      <div style="display: flex; justify-content: center; margin-bottom: 0.75rem;">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#30d158" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+          <polyline points="22 4 12 14.01 9 11.01"/>
+        </svg>
+      </div>
+      <h3 style="color: #30d158; font-size: 1.35rem; font-weight: 800; margin-bottom: 0.5rem;">Tournament Registration Submitted!</h3>
+      <p style="color: #cbd5e1; font-size: 0.95rem; margin-bottom: 1rem;">
+        Your squad application has been logged on the official tournament ladder.
+      </p>
+      <div class="mono" style="background: rgba(0, 0, 0, 0.4); padding: 8px 16px; border-radius: 8px; display: inline-block; color: #fff; font-size: 0.9rem; font-weight: 700; border: 1px dashed rgba(48, 209, 88, 0.5);">
+        REGISTRATION TOKEN: <span id="registration-token-display">NW-REG-2026-X94B</span>
+      </div>
+      <p style="color: var(--text-muted); font-size: 0.8125rem; margin-top: 1rem;">
+        Check your contact email for scrim discord links and lobby verification passcode.
+      </p>
+      <div style="margin-top: 1.25rem;">
+        <a href="/" style="background: var(--accent); color: #fff; padding: 0.5rem 1.25rem; border-radius: 8px; text-decoration: none; font-weight: 700; font-size: 0.875rem;">Return to Hub</a>
+      </div>
+    </div>
+
+    <!-- Registration Form -->
+    <form id="esports-registration-form" action="/register" method="POST" onsubmit="handleRegistrationSubmit(event)">
+      
+      <!-- Section 1: Tournament & Discipline -->
+      <div style="margin-bottom: 2rem;">
+        <h3 style="font-size: 1.1rem; font-weight: 800; text-transform: uppercase; color: #fff; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 0.75rem;">
+          <span style="color: var(--accent);">01.</span> Select Game & Championship Tournament
+        </h3>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem;">
+          <div>
+            <label style="display: block; font-size: 0.8125rem; font-weight: 700; color: #cbd5e1; margin-bottom: 0.5rem;">
+              Game Discipline *
+            </label>
+            <select id="reg-game" name="game" required class="form-input" onchange="updateTournamentOptions()">
+              <option value="VALORANT">VALORANT (5v5 Tactical Shooter)</option>
+              <option value="BGMI">BGMI (Battlegrounds Mobile India)</option>
+              <option value="Free Fire">Free Fire MAX (50P Survival BR)</option>
+              <option value="eFootball">eFootball 2026 (Championship Pro)</option>
+              <option value="Counter-Strike 2">Counter-Strike 2 (Valve Major)</option>
+              <option value="Apex Legends">Apex Legends (ALGS Match Point)</option>
+              <option value="Call of Duty">Call of Duty (Warzone Trios)</option>
+              <option value="League of Legends">League of Legends (5v5 MOBA)</option>
+            </select>
+          </div>
+
+          <div>
+            <label style="display: block; font-size: 0.8125rem; font-weight: 700; color: #cbd5e1; margin-bottom: 0.5rem;">
+              Sanctioned Tournament Event *
+            </label>
+            <select id="reg-tournament" name="tournament_id" required class="form-input">
+              <option value="trn-val-2026-inv">VALORANT Masters Tokyo: Champions Invitational ($500,000)</option>
+              <option value="trn-bgmi-2026-bms">BGMI Pro Series (BMS) 2026: Season 1 Finals (₹1,00,00,000)</option>
+              <option value="trn-ff-2026-ffws">Free Fire World Series (FFWS) 2026 Spring Finals ($500,000)</option>
+              <option value="trn-efootball-2026-pro">eFootball Championship Pro 2026 ($200,000)</option>
+              <option value="trn-cs2-2026-clash">CS2 Premier Winter Major Cologne ($1,000,000)</option>
+              <option value="trn-apex-2026-s1">Apex Masters Spring Major 2026 ($250,000)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 2: Squad / Team Information -->
+      <div style="margin-bottom: 2rem;">
+        <h3 style="font-size: 1.1rem; font-weight: 800; text-transform: uppercase; color: #fff; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 0.75rem;">
+          <span style="color: var(--accent);">02.</span> Squad & Captain Profile
+        </h3>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem; margin-bottom: 1.25rem;">
+          <div>
+            <label style="display: block; font-size: 0.8125rem; font-weight: 700; color: #cbd5e1; margin-bottom: 0.5rem;">
+              Squad / Clan Name *
+            </label>
+            <input type="text" name="team_name" placeholder="e.g. Nowhere Strikers, GodL Academy" required class="form-input">
+          </div>
+          <div>
+            <label style="display: block; font-size: 0.8125rem; font-weight: 700; color: #cbd5e1; margin-bottom: 0.5rem;">
+              Clan Tag *
+            </label>
+            <input type="text" name="clan_tag" placeholder="e.g. NW, GDL, FOX" maxlength="6" required class="form-input">
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem; margin-bottom: 1.25rem;">
+          <div>
+            <label style="display: block; font-size: 0.8125rem; font-weight: 700; color: #cbd5e1; margin-bottom: 0.5rem;">
+              Captain In-Game Tag (IGN) *
+            </label>
+            <input type="text" name="captain_ign" placeholder="e.g. Viper_99#NA1 or 512498273" required class="form-input">
+          </div>
+          <div>
+            <label style="display: block; font-size: 0.8125rem; font-weight: 700; color: #cbd5e1; margin-bottom: 0.5rem;">
+              Captain Real Name *
+            </label>
+            <input type="text" name="captain_name" placeholder="Full Name" required class="form-input">
+          </div>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem;">
+          <div>
+            <label style="display: block; font-size: 0.8125rem; font-weight: 700; color: #cbd5e1; margin-bottom: 0.5rem;">
+              Contact Email *
+            </label>
+            <input type="email" name="email" placeholder="captain@esports.gg" required class="form-input">
+          </div>
+          <div>
+            <label style="display: block; font-size: 0.8125rem; font-weight: 700; color: #cbd5e1; margin-bottom: 0.5rem;">
+              Discord Handle (For Match Bot Scrims) *
+            </label>
+            <input type="text" name="discord" placeholder="username#0000 or @username" required class="form-input">
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 3: Roster Lineup -->
+      <div style="margin-bottom: 2rem;">
+        <h3 style="font-size: 1.1rem; font-weight: 800; text-transform: uppercase; color: #fff; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 0.75rem;">
+          <span style="color: var(--accent);">03.</span> Squad Lineup & In-Game IDs
+        </h3>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem;">
+          <div>
+            <label style="display: block; font-size: 0.8125rem; font-weight: 700; color: #cbd5e1; margin-bottom: 0.5rem;">
+              Player 2 IGN / In-Game ID *
+            </label>
+            <input type="text" name="player_2" placeholder="Player 2 Tag & ID" required class="form-input">
+          </div>
+          <div>
+            <label style="display: block; font-size: 0.8125rem; font-weight: 700; color: #cbd5e1; margin-bottom: 0.5rem;">
+              Player 3 IGN / In-Game ID *
+            </label>
+            <input type="text" name="player_3" placeholder="Player 3 Tag & ID" required class="form-input">
+          </div>
+          <div>
+            <label style="display: block; font-size: 0.8125rem; font-weight: 700; color: #cbd5e1; margin-bottom: 0.5rem;">
+              Player 4 IGN / In-Game ID *
+            </label>
+            <input type="text" name="player_4" placeholder="Player 4 Tag & ID" required class="form-input">
+          </div>
+          <div>
+            <label style="display: block; font-size: 0.8125rem; font-weight: 700; color: #cbd5e1; margin-bottom: 0.5rem;">
+              Substitute / 5th Player (Optional)
+            </label>
+            <input type="text" name="player_sub" placeholder="Sub IGN (Optional)" class="form-input">
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 4: Server Region & Acceptance -->
+      <div style="margin-bottom: 2.5rem;">
+        <h3 style="font-size: 1.1rem; font-weight: 800; text-transform: uppercase; color: #fff; margin-bottom: 1.25rem; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 0.75rem;">
+          <span style="color: var(--accent);">04.</span> Server Location & Fair Play Verification
+        </h3>
+
+        <div style="margin-bottom: 1.25rem;">
+          <label style="display: block; font-size: 0.8125rem; font-weight: 700; color: #cbd5e1; margin-bottom: 0.5rem;">
+            Match Server Region *
+          </label>
+          <select name="server_region" class="form-input">
+            <option value="in-mumbai">India / South Asia (Mumbai & Delhi Nodes)</option>
+            <option value="ap-southeast">APAC (Singapore / Tokyo High Tick)</option>
+            <option value="eu-central">Europe (Frankfurt & Cologne LAN Nodes)</option>
+            <option value="us-central">Americas (Dallas & Chicago Nodes)</option>
+          </select>
+        </div>
+
+        <div style="display: flex; align-items: flex-start; gap: 10px; background: rgba(0, 0, 0, 0.35); padding: 1rem; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.08);">
+          <input type="checkbox" id="terms-agree" required style="margin-top: 4px; accent-color: var(--accent);">
+          <label for="terms-agree" style="font-size: 0.8125rem; color: #cbd5e1; line-height: 1.5; cursor: pointer;">
+            I confirm that our squad members are at least 16 years old, have verified in-game IDs, and agree to the <a href="/rulebook" target="_blank" style="color: var(--accent); text-decoration: underline;">Official Nowhere Circuit Rulebook</a>, Anti-Cheat Policies, and Terms of Service.
+          </label>
+        </div>
+      </div>
+
+      <!-- Submit Button -->
+      <div style="text-align: center;">
+        <button type="submit" id="submit-reg-btn" style="background: linear-gradient(135deg, #ff2a4b 0%, #c8102e 100%); color: #fff; border: 1px solid rgba(255, 255, 255, 0.3); padding: 1rem 3rem; border-radius: 12px; font-weight: 800; font-size: 1.05rem; letter-spacing: 0.04em; text-transform: uppercase; cursor: pointer; box-shadow: 0 10px 25px rgba(255, 42, 75, 0.4); transition: all 0.25s ease;">
+          Submit Squad Registration →
+        </button>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+<style>
+  .form-input {
+    width: 100%;
+    background: rgba(18, 24, 38, 0.85);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    color: #f8fafc;
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+    font-size: 0.875rem;
+    font-family: inherit;
+    outline: none;
+    transition: all 0.2s ease;
+  }
+  .form-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 14px rgba(255, 42, 75, 0.35);
+    background: rgba(22, 30, 48, 0.95);
+  }
+  .form-input option {
+    background: #0e1320;
+    color: #fff;
+  }
+</style>
+
+<script>
+  function handleRegistrationSubmit(event) {
+    event.preventDefault();
+    const btn = document.getElementById('submit-reg-btn');
+    if (btn) {
+      btn.textContent = 'Processing Application...';
+      btn.disabled = true;
+      btn.style.opacity = '0.7';
+    }
+
+    // Generate authentic verification token
+    const randomHex = Math.floor(Math.random() * 0xFFFFFF).toString(16).toUpperCase().padStart(6, '0');
+    const token = 'NW-REG-2026-' + randomHex;
+
+    setTimeout(() => {
+      const form = document.getElementById('esports-registration-form');
+      const successBox = document.getElementById('registration-success-box');
+      const tokenDisplay = document.getElementById('registration-token-display');
+
+      if (tokenDisplay) tokenDisplay.textContent = token;
+      if (form) form.style.display = 'none';
+      if (successBox) {
+        successBox.style.display = 'block';
+        successBox.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 700);
+  }
+
+  // Map games to tournaments
+  const GAME_TOURNAMENTS = {
+    'VALORANT': [
+      { id: 'trn-val-2026-inv', label: 'VALORANT Masters Tokyo: Champions Invitational ($500,000)' },
+    ],
+    'BGMI': [
+      { id: 'trn-bgmi-2026-bms', label: 'BGMI Pro Series (BMS) 2026: Season 1 Finals (₹1,00,00,000)' },
+    ],
+    'Free Fire': [
+      { id: 'trn-ff-2026-ffws', label: 'Free Fire World Series (FFWS) 2026 Spring Finals ($500,000)' },
+    ],
+    'eFootball': [
+      { id: 'trn-efootball-2026-pro', label: 'eFootball Championship Pro: Season Kickoff ($200,000)' },
+    ],
+    'Counter-Strike 2': [
+      { id: 'trn-cs2-2026-clash', label: 'CS2 Premier Winter Major Cologne ($1,00,000)' },
+    ],
+    'Apex Legends': [
+      { id: 'trn-apex-2026-s1', label: 'Apex Masters Spring Major 2026 ($250,000)' },
+    ],
+    'Call of Duty': [
+      { id: 'trn-codm-2026-world', label: 'Call of Duty: Warzone Global Gauntlet ($150,000)' },
+    ],
+    'League of Legends': [
+      { id: 'trn-lol-2026-inv', label: 'League of Legends: Mid-Season Invitational ($750,000)' },
+    ],
+  };
+
+  function updateTournamentOptions() {
+    const gameSelect = document.getElementById('reg-game');
+    const tourneySelect = document.getElementById('reg-tournament');
+    if (!gameSelect || !tourneySelect) return;
+
+    const selected = gameSelect.value;
+    const tourneys = GAME_TOURNAMENTS[selected] || [];
+
+    if (tourneys.length > 0) {
+      tourneySelect.innerHTML = '';
+      tourneys.forEach(t => {
+        const opt = document.createElement('option');
+        opt.value = t.id;
+        opt.textContent = t.label;
+        tourneySelect.appendChild(opt);
+      });
+    }
+  }
+
+  // Pre-select game and tournament if passed via query params
+  document.addEventListener('DOMContentLoaded', () => {
+    const params = new URLSearchParams(window.location.search);
+    const gameParam = params.get('game');
+    const tourneyParam = params.get('tournament');
+
+    if (gameParam) {
+      const gameSelect = document.getElementById('reg-game');
+      if (gameSelect) {
+        for (let i = 0; i < gameSelect.options.length; i++) {
+          if (gameSelect.options[i].value.toLowerCase().includes(gameParam.toLowerCase())) {
+            gameSelect.selectedIndex = i;
+            updateTournamentOptions();
+            break;
+          }
+        }
+      }
+    }
+
+    if (tourneyParam) {
+      const tourneySelect = document.getElementById('reg-tournament');
+      if (tourneySelect) {
+        for (let i = 0; i < tourneySelect.options.length; i++) {
+          if (tourneySelect.options[i].value.toLowerCase() === tourneyParam.toLowerCase()) {
+            tourneySelect.selectedIndex = i;
+            break;
+          }
+        }
+      }
+    }
+  });
+</script>
+
+<%- include('../layouts/footer') %>

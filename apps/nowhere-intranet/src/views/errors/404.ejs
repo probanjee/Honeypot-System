@@ -1,13 +1,17 @@
 <%- include('../layouts/header', { title: '404 Not Found' }) %>
 
-<div style="max-width: 600px; margin: 4rem auto; text-align: center;">
-  <div class="card" style="padding: 3rem 2rem;">
-    <div style="font-size: 3.5rem; font-weight: 900; color: var(--accent-cyan); margin-bottom: 0.5rem;">404</div>
-    <h1 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem;"><%= title || 'Resource Not Found' %></h1>
-    <p style="color: var(--text-muted); margin-bottom: 2rem;">
-      <%= message || 'The requested intranet page or API endpoint does not exist on this cluster.' %>
+<div style="max-width: 540px; margin: 4rem auto; text-align: center;">
+  <div class="card" style="padding: 3rem 2rem; border-color: rgba(255, 42, 75, 0.3); box-shadow: 0 0 35px rgba(0, 0, 0, 0.6);">
+    <img src="/images/nowhere-logo.png" alt="Nowhere Esports Logo" style="height: 60px; width: auto; margin-bottom: 1.5rem; filter: drop-shadow(0 0 14px rgba(255, 42, 75, 0.4));" />
+    <div style="font-size: 3.5rem; font-weight: 900; color: var(--accent); line-height: 1; margin-bottom: 0.5rem;" class="mono">404</div>
+    <h1 style="font-size: 1.5rem; font-weight: 800; text-transform: uppercase; margin-bottom: 1rem;"><%= title || 'Page Not Found' %></h1>
+    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 2rem;">
+      <%= message || 'The requested Nowhere Esports resource does not exist on this intranet node.' %>
     </p>
-    <a href="/" class="btn-login" style="display: inline-block;">Return to Dashboard</a>
+    <div style="display: flex; gap: 1rem; justify-content: center;">
+      <a href="/" class="btn-login" style="display: inline-block;">Return to Home Hub</a>
+      <a href="/control" class="btn-control" style="text-decoration: none;">Operations Control</a>
+    </div>
   </div>
 </div>
 

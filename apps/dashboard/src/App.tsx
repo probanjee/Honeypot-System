@@ -1,8 +1,4 @@
-/**
- * VIGILANCE Enterprise Honeypot SOC Dashboard (Phase 5)
- * Main Application Component coordinating live SSE telemetry,
- * REST analytics, cursor-paginated attack records, and interactive threat maps.
- */
+
 
 import React, { useState } from 'react';
 import { Header } from './components/layout/Header';
@@ -107,71 +103,71 @@ export const App: React.FC = () => {
       )}
       <div style={{ maxWidth: '1600px', margin: '0 auto', padding: '24px 20px' }}>
         {/* 1. Header & Live Connection Status */}
-      <Header
-        backendReachable={isBackendReachable}
-        streamStatus={streamState.status}
-        lastUpdated={lastUpdated}
-        isStreamPaused={isStreamPaused}
-        onTogglePause={onTogglePause}
-        onRefreshAll={handleRefreshAll}
-        isRefreshing={isRefreshing}
-        theme={theme}
-        onToggleTheme={toggleTheme}
-      />
+        <Header
+          backendReachable={isBackendReachable}
+          streamStatus={streamState.status}
+          lastUpdated={lastUpdated}
+          isStreamPaused={isStreamPaused}
+          onTogglePause={onTogglePause}
+          onRefreshAll={handleRefreshAll}
+          isRefreshing={isRefreshing}
+          theme={theme}
+          onToggleTheme={toggleTheme}
+        />
 
-      {/* 2. Analytical Summary Metrics */}
-      <SummaryCards
-        summary={summary}
-        loading={analyticsLoading}
-        error={analyticsError}
-        windowOption={windowOption}
-        onChangeWindow={changeWindow}
-      />
+        {/* 2. Analytical Summary Metrics */}
+        <SummaryCards
+          summary={summary}
+          loading={analyticsLoading}
+          error={analyticsError}
+          windowOption={windowOption}
+          onChangeWindow={changeWindow}
+        />
 
-      {/* 3. Middle Section: Severity Visualizations + Geographic Map */}
-      <SeverityCharts summary={summary} loading={analyticsLoading} />
+        {/* 3. Middle Section: Severity Visualizations + Geographic Map */}
+        <SeverityCharts summary={summary} loading={analyticsLoading} />
 
-      <AttackGeoMap
-        attacks={combinedMapAttacks}
-        onSelectAttack={(attack) => setSelectedAttack(attack)}
-        theme={theme}
-      />
+        <AttackGeoMap
+          attacks={combinedMapAttacks}
+          onSelectAttack={(attack) => setSelectedAttack(attack)}
+          theme={theme}
+        />
 
-      {/* 4. Bottom Section: Search & Filters + Live Attack Feed Table */}
-      <div className="soc-panel" style={{ overflow: 'hidden' }}>
-        <div className="soc-panel-header">
-          <div className="soc-panel-title">
-            <span>Threat Activity Stream & Archive</span>
+        {/* 4. Bottom Section: Search & Filters + Live Attack Feed Table */}
+        <div className="soc-panel" style={{ overflow: 'hidden' }}>
+          <div className="soc-panel-header">
+            <div className="soc-panel-title">
+              <span>Threat Activity Stream & Archive</span>
+            </div>
           </div>
+
+          <AttackFiltersBar
+            filters={filters}
+            onUpdateFilters={updateFilters}
+            onResetFilters={resetFilters}
+          />
+
+          <LiveAttackFeed
+            liveAttacks={liveAttacks}
+            historicalAttacks={historicalAttacks}
+            loading={attacksLoading}
+            error={attacksError}
+            isStreamPaused={isStreamPaused}
+            hasMore={hasMore}
+            canPrev={canPrev}
+            pageNumber={pageNumber}
+            onNextPage={nextPage}
+            onPrevPage={prevPage}
+            onSelectAttack={(attack) => setSelectedAttack(attack)}
+          />
         </div>
 
-        <AttackFiltersBar
-          filters={filters}
-          onUpdateFilters={updateFilters}
-          onResetFilters={resetFilters}
-        />
-
-        <LiveAttackFeed
-          liveAttacks={liveAttacks}
-          historicalAttacks={historicalAttacks}
-          loading={attacksLoading}
-          error={attacksError}
-          isStreamPaused={isStreamPaused}
-          hasMore={hasMore}
-          canPrev={canPrev}
-          pageNumber={pageNumber}
-          onNextPage={nextPage}
-          onPrevPage={prevPage}
-          onSelectAttack={(attack) => setSelectedAttack(attack)}
+        {/* 5. Forensic Detail Modal */}
+        <AttackDetailModal
+          attack={selectedAttack}
+          onClose={() => setSelectedAttack(null)}
         />
       </div>
-
-      {/* 5. Forensic Detail Modal */}
-      <AttackDetailModal
-        attack={selectedAttack}
-        onClose={() => setSelectedAttack(null)}
-      />
-    </div>
     </>
   );
 };

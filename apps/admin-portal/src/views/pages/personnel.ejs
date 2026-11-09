@@ -1,0 +1,61 @@
+<%- include('../layouts/header', { title: 'Personnel & Clearance Matrix', currentTab: 'personnel' }) %>
+
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; flex-wrap: wrap; gap: 1.5rem;">
+  <div>
+    <div class="mono" style="font-size: 0.72rem; color: var(--accent-amber); font-weight: 700; text-transform: uppercase; margin-bottom: 0.4rem;">
+      ORGANIZATIONAL ACCESS & SECURITY CLEARANCE
+    </div>
+    <h1 style="font-size: 2.2rem; font-weight: 900; text-transform: uppercase;">
+      Personnel & Clearance Matrix
+    </h1>
+    <p style="color: var(--text-muted); font-size: 0.95rem;">
+      Manage Nowhere Esports executive staff, match referees, production directors, and cryptographic token badges.
+    </p>
+  </div>
+</div>
+
+<div class="card">
+  <table>
+    <thead>
+      <tr>
+        <th>Operator / Title</th>
+        <th>Department</th>
+        <th>Badge ID</th>
+        <th>Hardware Token</th>
+        <th>Clearance Level</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% staff.forEach(function(member) { %>
+        <tr>
+          <td>
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <div style="width: 36px; height: 36px; border-radius: 8px; background: rgba(255, 42, 75, 0.2); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.9rem; color: #fff;">
+                <%= member.name.charAt(0) %>
+              </div>
+              <div>
+                <strong style="color: #fff; font-size: 0.95rem;"><%= member.name %></strong>
+                <div style="font-size: 0.75rem; color: var(--accent); font-weight: 600;"><%= member.role %></div>
+              </div>
+            </div>
+          </td>
+          <td><%= member.department %></td>
+          <td class="mono" style="font-size: 0.75rem; color: #cbd5e1;"><%= member.badge %></td>
+          <td class="mono" style="font-size: 0.75rem; color: var(--accent-cyan);">YUBI-FIDO2-<%= Math.floor(1000 + Math.random() * 9000) %></td>
+          <td>
+            <span class="mono" style="color: var(--warning); font-weight: 800; font-size: 0.8125rem;">
+              <%= member.clearance %>
+            </span>
+          </td>
+          <td>
+            <span class="badge badge-live">ACTIVE</span>
+          </td>
+        </tr>
+      <% }); %>
+    </tbody>
+  </table>
+</div>
+
+<%- include('../layouts/footer') %>
+
