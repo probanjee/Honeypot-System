@@ -91,15 +91,15 @@ flowchart TD
 
 ---
 
-## 3. Latest System Features & Updates
+## 3. Technology Stack & Key Decisions
 
-### Nowhere Esports Public Intranet (Decoy Target)
-- **Authentic Esports Experience**: Fictional tournament brackets, schedule filters, live streaming player, team rosters, and rules across VALORANT, BGMI, Free Fire, and CS2.
-- **Production Passwordless Auth**: Real-world 4-digit security code generation delivered to user inboxes using the **Resend API**.
-- **Interactive Security Micro-Interactions**: Custom animated password visibility toggle with dark-mode screen blending.
-- **One Click Pass**: Instant guest fan identity provisioning (`Join as a Guest ID →`) bypassing password requirements for casual users.
-- **Zero-Demo Aesthetic**: Completely purged of emojis, "demo", "prototype", and "decoy" labels to maintain strict deception fidelity against sophisticated human adversaries.
-- **Canary Honeytokens**: Instrumented canary traps (`/.env`, `/admin`, `/wp-login.php`, SQL injection vectors, Log4Shell JNDI injection) that capture forensic attacker metadata.
+- **Decoy Application**: Node.js, Express.js, Mongoose, MongoDB.
+- **Message Broker**: Apache Kafka 3.7+ in **KRaft mode** (no ZooKeeper).
+- **Canonical Analytical Store**: PostgreSQL 16 with indexed UUIDv4 keys and JSONB.
+- **Cache & Rate Limiting**: Redis 7.2 (24-hour Threat Intel cache).
+- **Backend API**: Python 3.11+, FastAPI, Pydantic, Server-Sent Events (SSE).
+- **Analytics**: Python, Pandas, NumPy, sliding-window Median Absolute Deviation (MAD).
+- **SOC Dashboard**: React 18+, TypeScript, Vite, Recharts, W3C `EventSource` (SSE).
 
 ### VIGILANCE SOC Radar & Analytical Core
 - **Live SSE Streaming**: Native W3C Server-Sent Events stream delivering sub-second attack notifications from Kafka straight to the SOC browser radar.
