@@ -229,7 +229,8 @@
         <div class="nw-loader-orbit-spinner"></div>
         <div class="nw-loader-orbit-spinner-reverse"></div>
         <div class="nw-loader-logo-box">
-          <lottie-player src="/animations/loading.json" background="transparent" speed="1.2" style="width: 120px; height: 120px;" loop autoplay></lottie-player>
+          <lottie-player src="/animations/loading.json" background="transparent" speed="1.2" style="position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1;" loop autoplay></lottie-player>
+          <img src="/images/nowhere-logo.png" alt="Nowhere Esports Crest" class="nw-loader-logo" style="position: relative; z-index: 2; width: 50px; height: auto; object-fit: contain; filter: drop-shadow(0 0 16px rgba(255, 42, 75, 0.9)); pointer-events: none;" />
         </div>
       </div>
 
@@ -249,20 +250,6 @@
         <div class="nw-loader-stats">
           <div class="nw-loader-status-text" id="nwLoaderStatusText">INITIALIZING SECURE CLIENT...</div>
           <div class="nw-loader-percent" id="nwLoaderPercent">0%</div>
-        </div>
-      </div>
-
-      <!-- Security / Protocol Watermark -->
-      <div class="nw-loader-footer-meta">
-        <div class="nw-meta-pill">
-          <span class="nw-meta-dot"></span>
-          <span>256-BIT TLS ENCRYPTED</span>
-        </div>
-        <div class="nw-meta-pill">
-          <span>REGION: GLOBAL-APAC-01</span>
-        </div>
-        <div class="nw-meta-pill">
-          <span>LATENCY: 4ms</span>
         </div>
       </div>
 
@@ -442,10 +429,8 @@
       border-radius: 10px;
       width: 130px;
     }
-      50% { transform: translateY(-4px); filter: drop-shadow(0 0 25px rgba(255, 42, 75, 0.85)); }
-    }
     .nw-loader-logo {
-      width: 58px;
+      width: 50px;
       height: auto;
       object-fit: contain;
     }
@@ -531,34 +516,6 @@
     .nw-loader-percent {
       color: #ff4767;
       font-weight: 800;
-    }
-    /* Footer Meta */
-    .nw-loader-footer-meta {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-      justify-content: center;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.625rem;
-      color: #64748b;
-    }
-    .nw-meta-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      padding: 3px 10px;
-      border-radius: 6px;
-      letter-spacing: 0.05em;
-    }
-    .nw-meta-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: #30d158;
-      box-shadow: 0 0 6px #30d158;
-      animation: nwBlink 1.5s infinite;
     }
     @keyframes nwBlink {
       0%, 100% { opacity: 1; }
