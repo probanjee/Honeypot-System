@@ -1,5 +1,6 @@
 import express from 'express';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -8,12 +9,35 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// Multi-environment path discovery for views and static assets (Vercel serverless + local)
+let viewsDir = path.join(__dirname, 'views');
+if (!fs.existsSync(viewsDir)) {
+  const candidates = [
+    path.join(process.cwd(), 'apps', 'admin-portal', 'src', 'views'),
+    path.join(process.cwd(), 'src', 'views'),
+    path.join(process.cwd(), 'views')
+  ];
+  for (const c of candidates) {
+    if (fs.existsSync(c)) { viewsDir = c; break; }
+  }
+}
 app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, 'views'));
+app.set('views', viewsDir);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, '../public')));
+
+const staticCandidates = [
+  path.join(__dirname, '../public'),
+  path.join(__dirname, 'public'),
+  path.join(process.cwd(), 'apps', 'admin-portal', 'public'),
+  path.join(process.cwd(), 'public')
+];
+for (const s of staticCandidates) {
+  if (fs.existsSync(s)) {
+    app.use(express.static(s));
+  }
+}
 
 // In-Memory Data Store
 let totalProbesSent = 18;
@@ -299,9 +323,13 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`[NOWHERE_ADMIN_PORTAL] Dedicated Admin Operations Portal live on http://localhost:${PORT}`);
-  console.log(`[NOWHERE_ADMIN_PORTAL] Linked to Public Site: http://localhost:3000`);
-  console.log(`[NOWHERE_ADMIN_PORTAL] Linked to VIGILANCE SOC: http://localhost:5173`);
-});
+export default app;
+
+if (process.env.VERCEL !== '1' && process.env.NODE_ENV !== 'test') {
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`[NOWHERE_ADMIN_PORTAL] Dedicated Admin Operations Portal live on http://localhost:${PORT}`);
+    console.log(`[NOWHERE_ADMIN_PORTAL] Linked to Public Site: http://localhost:3000`);
+    console.log(`[NOWHERE_ADMIN_PORTAL] Linked to VIGILANCE SOC: http://localhost:5173`);
+  });
+}
 
