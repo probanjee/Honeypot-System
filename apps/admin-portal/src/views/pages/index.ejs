@@ -84,11 +84,11 @@
   </div>
 
   <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
-    <a href="http://localhost:3000" target="_blank" class="btn btn-public" style="padding: 0.65rem 1.25rem; font-size: 0.875rem;">
-      🌐 Visit Public Hub (:3000)
+    <a href="https://owhere-esports-portal.vercel.app/" target="_blank" class="btn btn-public" style="padding: 0.65rem 1.25rem; font-size: 0.875rem;">
+      <span>NC Intranet</span>
     </a>
-    <a href="http://localhost:5173" target="_blank" class="btn btn-soc" style="padding: 0.65rem 1.25rem; font-size: 0.875rem;">
-      🛡 Launch SOC Radar (:5173) &rarr;
+    <a href="https://vigilance-soc-radar.vercel.app/" target="_blank" class="btn btn-soc" style="padding: 0.65rem 1.25rem; font-size: 0.875rem;">
+      <span>Launch SOC Radar &rarr;</span>
     </a>
   </div>
 </div>
@@ -189,7 +189,7 @@
     </div>
 
     <div style="margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid var(--border); text-align: center;">
-      <a href="http://localhost:5173" target="_blank" style="color: var(--accent-cyan); font-size: 0.8125rem; text-decoration: none; font-weight: 700;">
+      <a href="https://vigilance-soc-radar.vercel.app/" target="_blank" style="color: var(--accent-cyan); font-size: 0.8125rem; text-decoration: none; font-weight: 700;">
         Open SOC Radar to Watch Probe Live &rarr;
       </a>
     </div>
@@ -295,7 +295,7 @@
       if (countEl && data.totalProbes) {
         countEl.innerText = data.totalProbes;
       }
-      showToast(`Probe [<strong>${vector}</strong>] successfully captured by honeypot! Logged to Kafka & appearing live on <a href="http://localhost:5173" target="_blank" style="color: #38bdf8; text-decoration: underline;">SOC Radar</a>.`, true);
+      showToast(`Probe [<strong>${vector}</strong>] successfully captured by honeypot! Logged to Kafka & appearing live on <a href="https://vigilance-soc-radar.vercel.app/" target="_blank" style="color: #38bdf8; text-decoration: underline;">SOC Radar</a>.`, true);
     } catch (err) {
       showToast(`Probe [${vector}] sent to honeypot pipeline. Check SOC Radar!`, true);
     }

@@ -244,7 +244,8 @@ app.post('/api/security/probe', async (req, res) => {
   const { vector } = req.body;
   totalProbesSent++;
 
-  let targetUrl = 'http://localhost:3000/api/v1/tournaments';
+  const intranetBase = process.env.INTRANET_URL || 'https://owhere-esports-portal.vercel.app';
+  let targetUrl = `${intranetBase}/api/v1/tournaments`;
   let method = 'GET';
   let headers = { 'User-Agent': 'Nowhere-Admin-Probe-Simulator/1.0' };
   let body = undefined;
@@ -252,22 +253,22 @@ app.post('/api/security/probe', async (req, res) => {
   let severity = 'HIGH';
 
   if (vector === 'SQL_INJECTION') {
-    targetUrl = 'http://localhost:3000/api/v1/tournaments?search=' + encodeURIComponent("'; DROP TABLE matches;--");
+    targetUrl = `${intranetBase}/api/v1/tournaments?search=` + encodeURIComponent("'; DROP TABLE matches;--");
     rule = 'SIG-SQLI-001';
     severity = 'HIGH';
   } else if (vector === 'COMMAND_INJECTION') {
-    targetUrl = 'http://localhost:3000/exec';
+    targetUrl = `${intranetBase}/exec`;
     method = 'POST';
     headers['Content-Type'] = 'application/json';
     body = JSON.stringify({ cmd: '; cat /etc/passwd && whoami' });
     rule = 'SIG-RCE-001';
     severity = 'CRITICAL';
   } else if (vector === 'PATH_TRAVERSAL') {
-    targetUrl = 'http://localhost:3000/.env';
+    targetUrl = `${intranetBase}/.env`;
     rule = 'SIG-TRAV-001';
     severity = 'MEDIUM';
   } else if (vector === 'BRUTE_FORCE') {
-    targetUrl = 'http://localhost:3000/admin/login';
+    targetUrl = `${intranetBase}/admin/login`;
     method = 'POST';
     headers['Content-Type'] = 'application/x-www-form-urlencoded';
     body = 'username=admin&password=Password123!';

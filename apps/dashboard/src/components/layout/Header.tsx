@@ -147,7 +147,7 @@ export const Header: React.FC<HeaderProps> = ({
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           {/* Nowhere Esports Intranet & Control Center Shortcut */}
           <a
-            href="http://localhost:3000"
+            href="https://owhere-esports-portal.vercel.app/"
             target="_blank"
             rel="noreferrer"
             className="soc-btn"
@@ -160,14 +160,14 @@ export const Header: React.FC<HeaderProps> = ({
               fontWeight: 700,
               gap: '6px',
             }}
-            title="Open Nowhere Esports Portal & Match Operations (Port 3000)"
+            title="Open NC Intranet & Decoy Match Operations"
           >
             <img
               src="/images/nowhere-logo.png"
               alt="Nowhere"
               style={{ width: '15px', height: '15px', objectFit: 'contain' }}
             />
-            <span>Nowhere Esports</span>
+            <span>NC Intranet</span>
           </a>
 
           {/* Apple Liquid Glass Theme Toggle */}

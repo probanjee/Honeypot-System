@@ -14,8 +14,8 @@
   </div>
 
   <div style="display: flex; gap: 1rem; align-items: center;">
-    <a href="http://localhost:5173" target="_blank" class="btn btn-soc" style="padding: 0.65rem 1.25rem;">
-      🛡 Launch VIGILANCE Threat Radar (:5173) &rarr;
+    <a href="https://vigilance-soc-radar.vercel.app/" target="_blank" class="btn btn-soc" style="padding: 0.65rem 1.25rem;">
+      <span>Launch VIGILANCE Threat Radar &rarr;</span>
     </a>
   </div>
 </div>
@@ -83,7 +83,7 @@
     </div>
 
     <p style="color: var(--text-muted); font-size: 0.875rem; margin-bottom: 1.5rem;">
-      Select an adversarial attack vector to dispatch against the public honeypot decoy at <code class="mono" style="color: var(--accent);">http://localhost:3000</code>. Watch it process into Kafka and populate the VIGILANCE radar in real-time.
+      Select an adversarial attack vector to dispatch against the public honeypot decoy at <code class="mono" style="color: var(--accent);">NC Intranet</code>. Watch it process into Kafka and populate the VIGILANCE radar in real-time.
     </p>
 
     <div style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.5rem;">
@@ -121,7 +121,7 @@
     </div>
 
     <div id="terminalStream" style="height: 300px; overflow-y: auto; font-size: 0.78rem; line-height: 1.6; color: #94a3b8; display: flex; flex-direction: column; gap: 4px; padding-top: 0.5rem;">
-      <div style="color: #64748b;">[SYS_INIT] Decoy honeypot telemetry link established at http://localhost:3000</div>
+      <div style="color: #64748b;">[SYS_INIT] Decoy honeypot telemetry link established with NC Intranet</div>
       <div style="color: #64748b;">[SYS_INIT] Kafka broker outbox monitoring raw-attacks topic</div>
       <div style="color: var(--success);">[READY] Awaiting synthetic attack trigger from operator...</div>
     </div>
@@ -175,10 +175,10 @@
       logTerminal(`HONEYPOT_HIT: Status 200 OK | Event ID: ${data.eventId || 'evt-syn-' + Math.random().toString(36).substring(7)}`, 'var(--success)');
       logTerminal(`KAFKA_OUTBOX: Published to raw-attacks partition 0 (Key: 203.0.113.195)`, '#c084fc');
       logTerminal(`INGESTION: Severity: ${data.severity || 'HIGH'} | Rules: ${data.rule || 'SIG-SIM-001'}`, 'var(--warning)');
-      logTerminal(`VIGILANCE_RADAR: Reflected on SOC Radar at http://localhost:5173`, 'var(--accent-cyan)');
+      logTerminal(`VIGILANCE_RADAR: Reflected on SOC Radar at https://vigilance-soc-radar.vercel.app/`, 'var(--accent-cyan)');
     } catch (err) {
       logTerminal(`DISPATCH_SENT: Simulated probe delivered to honeypot outbox pipeline!`, 'var(--success)');
-      logTerminal(`VIGILANCE_RADAR: View on http://localhost:5173`, 'var(--accent-cyan)');
+      logTerminal(`VIGILANCE_RADAR: View on https://vigilance-soc-radar.vercel.app/`, 'var(--accent-cyan)');
     }
   }
 </script>

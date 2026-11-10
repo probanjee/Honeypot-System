@@ -12,6 +12,7 @@
 
 <br/>
 
+**[Live Deployments](#-live-cloud-deployments)** •
 **[Architecture](#1-system-architecture)** •
 **[Kafka Event Backbone](#2-apache-kafka-event-driven-backbone)** •
 **[Decoy Intranet](#3-target-honeypot-nowhere-esports-intranet)** •
@@ -31,6 +32,18 @@
 
 ---
 
+## 🚀 Live Cloud Deployments
+
+The VIGILANCE ecosystem is deployed and accessible across high-availability serverless and cloud endpoints:
+
+| Component | Production URL | Description |
+| :--- | :--- | :--- |
+| **NC Intranet** (Decoy Honeypot) | **[https://owhere-esports-portal.vercel.app/](https://owhere-esports-portal.vercel.app/)** | Public-facing esports tournament hub with Fan & Player Portal, live streams, OTP verification, and canary traps. |
+| **Nowhere Admin Portal** | **[https://honeypot-system-rho.vercel.app/](https://honeypot-system-rho.vercel.app/)** | Dedicated executive management console & synthetic adversarial probe dispatcher. |
+| **VIGILANCE SOC Radar** | **[https://vigilance-soc-radar.vercel.app/](https://vigilance-soc-radar.vercel.app/)** | Real-time security operations center dashboard streaming Kafka-ingested threats via SSE. |
+
+---
+
 ## 1. System Architecture
 
 VIGILANCE couples a public-facing decoy target (**Nowhere Esports Intranet**) with an event-driven telemetry processing pipeline that isolates adversaries, extracts high-fidelity forensics, streams events through **Apache Kafka**, enriches probes via **MaxMind GeoIP**, and displays telemetry on a live **SOC Radar Dashboard** using Server-Sent Events (SSE).
@@ -45,7 +58,9 @@ VIGILANCE couples a public-facing decoy target (**Nowhere Esports Intranet**) wi
      │ DECEPTION TIER (Target Honeypot: Nowhere Esports Intranet)              │
      │ - Realistic tournament hub: brackets, rosters, live streams, fan portal │
      │ - Real passwordless Gmail OTP verification via Resend API               │
-     │ - Animated hide/unhide password toggle & One Click Guest ID pass        │
+     │ - One Click Pass & Join as a Guest ID with biometric / OTP fallbacks    │
+     │ - Shimmer skeleton wireframe framework for low-bandwidth environments   │
+     │ - Embedded Lottie & video animations for Loading, 404, 403, 401, 500    │
      │ - Canary traps: /.env, /admin, SQLi, Log4Shell, Path Traversal          │
      │ - 14-Category regex signature detection & contextual scoring (0 - 100)  │
      │ - MongoDB Evidence Store: Un-executed raw HTTP forensic captures        │
@@ -248,7 +263,15 @@ Both the **Nowhere Esports Intranet & Portal** and the **VIGILANCE SOC Radar** c
    - `MONGO_URI`: (Optional) Remote MongoDB Atlas connection string. If omitted, the intranet operates with an in-memory repository.
 4. Click **Deploy**.
 
-#### 2. Deploy the SOC Radar Dashboard to Vercel
+#### 2. Deploy the Nowhere Admin Portal to Vercel
+1. Go to [vercel.com/new](https://vercel.com/new) and import `probanjee/Honeypot-System`.
+2. Configure settings:
+   - **Project Name**: `nowhere-admin-portal`
+   - **Root Directory**: `apps/admin-portal`
+   - **Framework Preset**: `Other`
+3. Click **Deploy**.
+
+#### 3. Deploy the SOC Radar Dashboard to Vercel
 1. Go to [vercel.com/new](https://vercel.com/new) and import `probanjee/Honeypot-System`.
 2. Configure settings:
    - **Project Name**: `vigilance-soc-radar`
@@ -298,10 +321,11 @@ SOC Radar Dashboard           ├── Nowhere Esports Decoy Site (Port 3000)
 
 ## 8. Project Directory & Quick Links
 
-| Directory / Component | Purpose | Key Manifests |
-| :--- | :--- | :--- |
-| [`apps/nowhere-intranet`](file:///c:/Users/prosu/OneDrive/Desktop/Honeypot-System/apps/nowhere-intranet) | Decoy esports tournament operations & honeypot sensor | [`package.json`](file:///c:/Users/prosu/OneDrive/Desktop/Honeypot-System/apps/nowhere-intranet/package.json), [`Dockerfile`](file:///c:/Users/prosu/OneDrive/Desktop/Honeypot-System/apps/nowhere-intranet/Dockerfile), [`vercel.json`](file:///c:/Users/prosu/OneDrive/Desktop/Honeypot-System/apps/nowhere-intranet/vercel.json) |
-| [`apps/dashboard`](file:///c:/Users/prosu/OneDrive/Desktop/Honeypot-System/apps/dashboard) | VIGILANCE SOC Radar real-time frontend | [`package.json`](file:///c:/Users/prosu/OneDrive/Desktop/Honeypot-System/apps/dashboard/package.json), [`vite.config.ts`](file:///c:/Users/prosu/OneDrive/Desktop/Honeypot-System/apps/dashboard/vite.config.ts), [`vercel.json`](file:///c:/Users/prosu/OneDrive/Desktop/Honeypot-System/apps/dashboard/vercel.json), [`netlify.toml`](file:///c:/Users/prosu/OneDrive/Desktop/Honeypot-System/apps/dashboard/netlify.toml) |
+| Directory / Component | Live Deployment | Purpose | Key Manifests |
+| :--- | :--- | :--- | :--- |
+| [`apps/nowhere-intranet`](file:///c:/Users/prosu/OneDrive/Desktop/Honeypot-System/apps/nowhere-intranet) | [owhere-esports-portal.vercel.app](https://owhere-esports-portal.vercel.app/) | Decoy esports operations, NC Intranet & honeypot sensor | [`package.json`](file:///c:/Users/prosu/OneDrive/Desktop/Honeypot-System/apps/nowhere-intranet/package.json), [`Dockerfile`](file:///c:/Users/prosu/OneDrive/Desktop/Honeypot-System/apps/nowhere-intranet/Dockerfile), [`vercel.json`](file:///c:/Users/prosu/OneDrive/Desktop/Honeypot-System/apps/nowhere-intranet/vercel.json) |
+| [`apps/admin-portal`](file:///c:/Users/prosu/OneDrive/Desktop/Honeypot-System/apps/admin-portal) | [honeypot-system-rho.vercel.app](https://honeypot-system-rho.vercel.app/) | Dedicated Nowhere executive operations portal | [`package.json`](file:///c:/Users/prosu/OneDrive/Desktop/Honeypot-System/apps/admin-portal/package.json), [`vercel.json`](file:///c:/Users/prosu/OneDrive/Desktop/Honeypot-System/apps/admin-portal/vercel.json) |
+| [`apps/dashboard`](file:///c:/Users/prosu/OneDrive/Desktop/Honeypot-System/apps/dashboard) | [vigilance-soc-radar.vercel.app](https://vigilance-soc-radar.vercel.app/) | VIGILANCE SOC Radar real-time frontend | [`package.json`](file:///c:/Users/prosu/OneDrive/Desktop/Honeypot-System/apps/dashboard/package.json), [`vite.config.ts`](file:///c:/Users/prosu/OneDrive/Desktop/Honeypot-System/apps/dashboard/vite.config.ts), [`vercel.json`](file:///c:/Users/prosu/OneDrive/Desktop/Honeypot-System/apps/dashboard/vercel.json), [`netlify.toml`](file:///c:/Users/prosu/OneDrive/Desktop/Honeypot-System/apps/dashboard/netlify.toml) |
 | [`services/backend`](file:///c:/Users/prosu/OneDrive/Desktop/Honeypot-System/services/backend) | FastAPI REST & SSE streaming server | [`requirements.txt`](file:///c:/Users/prosu/OneDrive/Desktop/Honeypot-System/services/backend/requirements.txt), [`Dockerfile`](file:///c:/Users/prosu/OneDrive/Desktop/Honeypot-System/services/backend/Dockerfile) |
 | [`services/ingestion`](file:///c:/Users/prosu/OneDrive/Desktop/Honeypot-System/services/ingestion) | Python Kafka consumer & GeoIP normalizer worker | [`requirements.txt`](file:///c:/Users/prosu/OneDrive/Desktop/Honeypot-System/services/ingestion/requirements.txt), [`Dockerfile`](file:///c:/Users/prosu/OneDrive/Desktop/Honeypot-System/services/ingestion/Dockerfile) |
 | [`configs/honeypot-rules.yaml`](file:///c:/Users/prosu/OneDrive/Desktop/Honeypot-System/configs/honeypot-rules.yaml) | 14-category regex signature engine rules | YAML configuration |
